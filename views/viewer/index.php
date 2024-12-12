@@ -6,7 +6,7 @@ $this->title = 'My Yii Application';
 ?>
 <div class="pdf-viewer-container">
     <?= \diecoding\pdfjs\PdfJs::widget([
-        // 'url' => 'uploads\semaphores.pdf',
+        'url' => 'uploads\semaphores.pdf',
         'options' => [
             'id' => 'pdf-viewer-widget',
             'style' => [
