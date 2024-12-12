@@ -24,7 +24,8 @@ $config = [
             'enableAutoLogin' => true,
         ],
         'errorHandler' => [
-            'errorAction' => 'site/error',
+            // TODO not an action
+            'errorAction' => 'viewer/error',
         ],
         'mailer' => [
             'class' => \yii\symfonymailer\Mailer::class,
@@ -42,14 +43,11 @@ $config = [
             ],
         ],
         'db' => $db,
-        /*
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
-            'rules' => [
-            ],
+            'rules' => require_once 'urls.php',
         ],
-        */
         // 'headers' => [
         //     'class' => 'hyperia\security\Headers',
         //     'cspDirectives' => [

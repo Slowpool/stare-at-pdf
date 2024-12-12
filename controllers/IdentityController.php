@@ -10,7 +10,7 @@ use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
 
-class SiteController extends Controller
+class IdentityController extends Controller
 {
     /**
      * {@inheritdoc}
@@ -69,11 +69,26 @@ class SiteController extends Controller
      *
      * @return Response|string
      */
-    public function actionLogin()
+    public function actionLoginForm()
     {
         if (!Yii::$app->user->isGuest) {
             return $this->goHome();
         }
+
+        $model = new LoginForm();
+        return $this->render('login', compact('model'));
+    }
+
+    /**
+     * Login action.
+     *
+     * @return Response|string
+     */
+    public function actionSendLoginForm()
+    {
+        // if (!Yii::$app->user->isGuest) {
+        //     return $this->goHome();
+        // }
 
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
