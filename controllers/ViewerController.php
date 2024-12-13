@@ -41,7 +41,12 @@ class ViewerController extends BaseAjaxController
     public function actionIndex()
     {
         // TODO how to send it once and then return only jsons? attach some value to request?
-        return $this->render('index');
+        if($this->isAjax()) {
+            // return $this->goHomeAjax();
+        }
+        else {   
+            return $this->render('index', ['url' => '']);
+        }
     }
 
     // TODO temporary stuff

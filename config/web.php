@@ -5,7 +5,7 @@ $db = require __DIR__ . '/db.php';
 
 $config = [
     'id' => 'basic',
-    'name' => 'Home',
+    'name' => 'Home', // let it be
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'aliases' => [

@@ -78,11 +78,9 @@ class IdentityController extends BaseAjaxController
         // TODO implement it via flags
         if (self::isAjax()) {
             if (!Yii::$app->user->isGuest) {
-                
+                return $this->goHomeAjax();
             }
-            else {
-                return json_encode($page);
-            }
+            return json_encode($page);
         } else {
             if (!Yii::$app->user->isGuest) {
                 return $this->goHome();
@@ -131,7 +129,8 @@ class IdentityController extends BaseAjaxController
     {
         Yii::$app->user->logout();
 
-        if (isAjax()) {
+        if ($this->isAjax()) {
+            return $this->goHomeAjax();
         } else {
             return $this->goHome();
         }
