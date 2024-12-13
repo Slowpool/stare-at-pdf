@@ -8,8 +8,7 @@ use yii\web\Controller;
 use yii\web\Response;
 use yii\filters\VerbFilter;
 
-
-class ViewerController extends Controller
+class ViewerController extends BaseAjaxController
 {
 
     public function behaviors()
@@ -32,7 +31,7 @@ class ViewerController extends Controller
                 'class' => VerbFilter::class,
                 'actions' => [
                     'index' => ['get'],
-                        // TODO remove error
+                    // TODO remove error
                     'error' => ['get']
                 ]
             ]
@@ -46,5 +45,8 @@ class ViewerController extends Controller
     }
 
     // TODO temporary stuff
-    public function actionError() {}
+    public function actionError()
+    {
+        return $this->render('error');
+    }
 }

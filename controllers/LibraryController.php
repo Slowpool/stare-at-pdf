@@ -9,9 +9,31 @@ use yii\web\Response;
 use yii\filters\VerbFilter;
 
 
-class LibraryController extends Controller {
+class LibraryController extends BaseAjaxController {
 
-    
+    public function behaviors()
+    {
+        return [
+            'access' => [
+                'class' => AccessControl::class,
+                'only' => ['index', 'upload-pdf'],
+                'rules' => [
+                    [
+                        'actions' => ['index', 'upload-pdf'],
+                        'allow' => true,
+                        'roles' => ['@']
+                    ]
+                ]
+            ],
+            'verbs' => [
+                'class' => VerbFilter::class,
+                'actions' => [
+                    'index' => ['get'],
+                    'upload-pdf' => ['post'],
+                ]
+            ]
+        ];
+    }
 
     public function actionIndex() {
         return 'libraryIndex';

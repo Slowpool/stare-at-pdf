@@ -101,8 +101,13 @@ main {
     overflow: hidden;
 }
 
-#w2 {
+.navbar-nav {
     width: 100%;
     justify-content: space-between;
     display: flex;
+}
+
+.site-login {
+    padding-top: 50px;
+    padding-inline: 200px;
 }

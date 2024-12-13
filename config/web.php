@@ -5,11 +5,18 @@ $db = require __DIR__ . '/db.php';
 
 $config = [
     'id' => 'basic',
+    'name' => 'Home',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',
+        
+        '@views' => '@app/views',
+        
+        '@single_page' => '//single_page.php',
+        '@home_view' => '//viewer/index.php',
+        '@login_view' => '//identity/login.php',
     ],
     'components' => [
         'request' => [
@@ -21,6 +28,7 @@ $config = [
         ],
         'user' => [
             'identityClass' => 'app\models\User',
+            'loginUrl' => '/login',
             'enableAutoLogin' => true,
         ],
         'errorHandler' => [

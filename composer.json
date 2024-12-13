@@ -72,5 +72,11 @@
             "type": "composer",
             "url": "https://asset-packagist.org"
         }
-    ]
+    ],
+    "autoload": {
+        "files": [
+            "models\\PageModel.php",
+            "controllers\\BaseAjaxController.php"
+        ]
+    }
 }

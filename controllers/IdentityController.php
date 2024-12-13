@@ -9,8 +9,9 @@ use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
+use app\models\PageModel;
 
-class IdentityController extends Controller
+class IdentityController extends BaseAjaxController
 {
     /**
      * {@inheritdoc}
@@ -61,6 +62,8 @@ class IdentityController extends Controller
      */
     public function actionIndex()
     {
+
+
         return $this->render('index');
     }
 
@@ -71,12 +74,21 @@ class IdentityController extends Controller
      */
     public function actionLoginForm()
     {
-        if (!Yii::$app->user->isGuest) {
-            return $this->goHome();
+        $page = new PageModel('Login', 'Signing in', $this->renderPartial(Yii::getAlias('@login_view')));
+        // TODO implement it via flags
+        if (self::isAjax()) {
+            if (!Yii::$app->user->isGuest) {
+                
+            }
+            else {
+                return json_encode($page);
+            }
+        } else {
+            if (!Yii::$app->user->isGuest) {
+                return $this->goHome();
+            }
+            return $this->render(Yii::getAlias('@single_page'), compact('page'));
         }
-
-        $model = new LoginForm();
-        return $this->render('login', compact('model'));
     }
 
     /**
@@ -86,9 +98,18 @@ class IdentityController extends Controller
      */
     public function actionSendLoginForm()
     {
-        // if (!Yii::$app->user->isGuest) {
-        //     return $this->goHome();
+        // TODO implement it via flags
+        // if (!self::isAjax()) {
+        //     if (!Yii::$app->user->isGuest) {
+        //         return $this->goHome();
+        //     }
+        // } else {
         // }
+        if (!Yii::$app->user->isGuest) {
+            // return json_encode($this->);
+            // TODO override goHome 
+            return $this->goHome();
+        }
 
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
@@ -110,6 +131,9 @@ class IdentityController extends Controller
     {
         Yii::$app->user->logout();
 
-        return $this->goHome();
+        if (isAjax()) {
+        } else {
+            return $this->goHome();
+        }
     }
 }

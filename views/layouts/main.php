@@ -44,13 +44,13 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
                 Yii::$app->user->isGuest
                     ? [
                         'label' => 'Login',
-                        'url' => ['/identity/login'],
+                        'url' => ['/login'],
                         'options' => [
                             'class' => 'login-button'
                         ]
                     ]
                     : '<li class="nav-item">'
-                    . Html::beginForm(['/identity/logout'])
+                    . Html::beginForm(['/logout'])
                     . Html::submitButton(
                         'Logout (' . Yii::$app->user->identity->username . ')',
                         ['class' => 'nav-link btn btn-link logout']
