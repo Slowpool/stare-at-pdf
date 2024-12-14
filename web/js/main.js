@@ -1,17 +1,18 @@
 var links = null;
 var loaded = true;
 var data = {
-    title: "",
-    body: "",
-    link: ""
+    selectedNav: "",
+    content: "",
+    url: "",
 };
 
 // TODO override in production
-var leftPartOfUrl = 'https://localhost:8080';
+var leftUrlPart = 'https://localhost:8080';
 
 var page = {
     title: document.getElementById('title'),
-    body: document.getElementById('body'),
+    // mainNavBar: document.getElementById('main-navbar').getElementByClassName('container'),
+    content: document.getElementById('main'),
 };
 
 OnLoad();
@@ -21,14 +22,14 @@ function OnLoad() {
 }
 
 function InitLinks() {
-    links = document.getElementsByClassName('internal_link');
-    links.forEach(link => {
+    links = document.getElementsByTagName('a');
+    for(var link of links) {
         link.addEventListener('click', function (e) {
             e.preventDefault();
             AjaxLinkClick(e.target.getAttribute('href'));
             return false;
         });
-    });
+    };
 }
 
 function AjaxLinkClick(url) {
@@ -37,7 +38,26 @@ function AjaxLinkClick(url) {
 
 function SendRequest(url) {
     var xmlRequest = new XMLHttpRequest();
-    xmlRequest.open(DescriptMethod(url),)
+    xmlRequest.open(DescriptMethod(url), url, true);
+    xmlRequest.setRequestHeader('X_REQUESTED_WITH', 'XMLHttpRequest');
+    xmlRequest.onreadystatechange = () => {
+        if (xmlRequest.readyState != 4) {
+            return;
+        }
+        loaded = true;
+        if(xmlRequest.status == 200) {
+            UpdatePage(JSON.parse(xmlRequest.responseText), url);
+        }
+        else {
+            alert('error');
+            console.log(xmlRequest.status + ': ' + xmlRequest.statusText);
+        }
+    };
+
+    loaded = false;
+    ShowLoading();
+
+    xmlRequest.send();
 }
 
 function DescriptMethod(url) {
@@ -46,15 +66,10 @@ function DescriptMethod(url) {
     switch (url) {
         case '/':
         case '':
-            $method = 'GET';
-            break;
-        // case 'stare-at'
         case '/login':
             $method = 'GET';
             break;
         case '/logout':
-            $method = 'POST';
-            break;
         case 'send-credentials-to-login':
             $method = 'POST';
             break;
@@ -62,4 +77,26 @@ function DescriptMethod(url) {
             throw new Error('Unknown url');
     }
     return $method;
+}
+
+function UpdatePage(response, url) {
+    data = {
+        selectedNav: response.selected_nav,
+        content: response.content,
+        url: response.url,
+    };
+
+    page.title.innerHTML = data.selectedNav;
+    page.content.innerHTML = data.content;
+    
+    // document.title = data.title // TODO what does it do?
+    window.history.pushState(data.content, data.selectedNav, url);
+    
+    InitLinks();
+}
+
+function ShowLoading() {
+    if(!loaded) {
+        page.content.innerHTML = 'Loading...';
+    }
 }

@@ -14,6 +14,17 @@ class BaseAjaxController extends Controller {
     /** @return PageModel  */
     public function goHomeAjax() {
         // TODO if unsigned user? (or in another app he might don't have required role)
-        return new PageModel(Yii::$app->name, Yii::$app->name, $this->renderPartial(Yii::getAlias('@home_view'), ['url' => '']));
+        return new PageModel(Yii::$app->name, $this->renderPartial(Yii::getAlias('@home_view'), ['url' => '']), Yii::$app->homeUrl);
+    }
+
+    /** @param PageModel $page */
+    /** This method renders single_page */
+    public function renderNotAjax($page) {
+        // TODO probably remove
+        return $this->render(Yii::getAlias('@single_page'), compact('page'));
+    }
+
+    public function renderSinglePage() {
+        return $this->renderPartial('//layouts/main');
     }
 }

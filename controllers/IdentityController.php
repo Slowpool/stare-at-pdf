@@ -74,7 +74,7 @@ class IdentityController extends BaseAjaxController
      */
     public function actionLoginForm()
     {
-        $page = new PageModel('Login', 'Signing in', $this->renderPartial(Yii::getAlias('@login_view')));
+        $page = new PageModel('Login', $this->renderPartial(Yii::getAlias('@login_view')), '');
         // TODO implement it via flags
         if (self::isAjax()) {
             if (!Yii::$app->user->isGuest) {

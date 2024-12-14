@@ -7,6 +7,7 @@ use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\Response;
 use yii\filters\VerbFilter;
+use app\models\PageModel;
 
 class ViewerController extends BaseAjaxController
 {
@@ -41,11 +42,14 @@ class ViewerController extends BaseAjaxController
     public function actionIndex()
     {
         // TODO how to send it once and then return only jsons? attach some value to request?
-        if($this->isAjax()) {
-            // return $this->goHomeAjax();
-        }
-        else {   
-            return $this->render('index', ['url' => '']);
+        // TODO pass url
+        if ($this->isAjax()) {
+            $url_for_pdf = '/uploads/semaphores.pdf';
+            $page = new PageModel('Home', $this->renderPartial('index', ['url' => $url_for_pdf]), $this->request->url);
+            $this->response->format = Response::FORMAT_JSON;
+            return $page;
+        } else {
+            return $this->renderSinglePage();
         }
     }
 

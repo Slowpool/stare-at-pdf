@@ -17,6 +17,9 @@ $config = [
         '@single_page' => '//single_page.php',
         '@home_view' => '//viewer/index.php',
         '@login_view' => '//identity/login.php',
+        '@library_view' => '//library/index.php',
+
+        'scripts' => '@app/web/js',
     ],
     'components' => [
         'request' => [

@@ -15,7 +15,7 @@ $model = new LoginForm();
 
 ?>
 
-<div class="site-login">
+<div id="login-container">
     <h1>Login</h1>
     <p>Please fill out the following fields to login:</p>
     <div class="row">
@@ -39,7 +39,7 @@ $model = new LoginForm();
             ]) ?>
 
             <div>
-                <?= Html::submitButton('Login', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
+                <?= Html::submitButton('Login', ['class' => 'btn btn-primar', 'name' => 'login-button']) ?>
             </div>
 
             <?php ActiveForm::end(); ?>

@@ -7,9 +7,10 @@ use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\Response;
 use yii\filters\VerbFilter;
+use app\models\PageModel;
 
-
-class LibraryController extends BaseAjaxController {
+class LibraryController extends BaseAjaxController
+{
 
     public function behaviors()
     {
@@ -35,12 +36,21 @@ class LibraryController extends BaseAjaxController {
         ];
     }
 
-    public function actionIndex() {
+    public function actionIndex()
+    {
+        $model = ['pdf1', 'pdf2'];
+        $page = new PageModel('Library', $this->renderPartial('index', compact('model')));
+        if ($this->isAjax()) {
+            return $page;
+        } else {
+            return $this->render(Yii::getAlias('@single_page'), compact('page'));
+        }
+
         return 'libraryIndex';
     }
 
-    public function actionUploadPdf() {
+    public function actionUploadPdf()
+    {
         return 'uploadPDf';
     }
-
 }

@@ -23,11 +23,11 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
 <html lang="<?= Yii::$app->language ?>" class="h-100">
 
 <head>
-    <title><?= Html::encode($this->title) ?></title>
+    <title id="title"><?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
 </head>
 
-<body class="d-flex flex-column h-100">
+<body id="body" class="d-flex flex-column h-100">
     <?php $this->beginBody() ?>
 
     <header id="header">
@@ -35,7 +35,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
         NavBar::begin([
             'brandLabel' => Yii::$app->name,
             'brandUrl' => Yii::$app->homeUrl,
-            'options' => ['class' => 'navbar-expand-md navbar-dark bg-dark']
+            'options' => ['id' => 'main-navbar', 'class' => 'navbar-expand-md navbar-dark bg-dark']
         ]);
         echo Nav::widget([
             'options' => ['class' => 'navbar-nav'],
@@ -65,10 +65,11 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
 
     <main id="main" class="flex-shrink-0" role="main">
         <?= Alert::widget() ?>
-        <?= $content ?>
+        
     </main>
 
     <?php $this->endBody() ?>
+    <?php $this->registerJsFile('js/main.js') ?>
 </body>
 
 </html>
