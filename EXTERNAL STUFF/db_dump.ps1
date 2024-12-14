@@ -1,0 +1,1 @@
+php yii migrate/create create_pdf_file_table --fields="name:string(150):notNull:unique,bookmark:integer:defaultValue(1)"

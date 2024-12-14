@@ -7,10 +7,8 @@
 
 use yii\bootstrap5\ActiveForm;
 use yii\bootstrap5\Html;
-use app\models\identity\LoginForm;
 
 // TODO view creates the model by its own???
-
 ?>
 
 <div id="library-container">
