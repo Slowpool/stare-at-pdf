@@ -45,7 +45,6 @@ class ViewerController extends BaseAjaxController
         return $this->executeIfAjaxOtherwiseRenderSinglePage(function () use ($pdf_name) {
             $url_for_pdf = isset($pdf_name) ? "uploads\\$pdf_name.pdf" : '';
             $page = new PageModel('Home', $this->renderPartial('index', ['url' => $url_for_pdf]), $this->request->url);
-            $this->response->format = Response::FORMAT_JSON;
             return $page;
         });
     }

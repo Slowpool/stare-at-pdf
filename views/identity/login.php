@@ -4,11 +4,11 @@
 /** @var yii\bootstrap5\ActiveForm $form */
 /** @var app\models\PageModel $page */
 
-/** @var app\models\LoginForm $model */
+/** @var app\models\identity\LoginForm $model */
 
 use yii\bootstrap5\ActiveForm;
 use yii\bootstrap5\Html;
-use app\models\LoginForm;
+use app\models\identity\LoginForm;
 
 // TODO view creates the model by its own???
 $model = new LoginForm();

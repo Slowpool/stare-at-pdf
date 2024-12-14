@@ -7,7 +7,7 @@
 
 use yii\bootstrap5\ActiveForm;
 use yii\bootstrap5\Html;
-use app\models\LoginForm;
+use app\models\identity\LoginForm;
 
 // TODO view creates the model by its own???
 
@@ -15,7 +15,7 @@ use app\models\LoginForm;
 
 <div id="library-container">
     the library content:
-    <?php foreach ($model as $some): ?>
-        <?= "$some<br>" ?>
+    <?php foreach ($model as $pdf): ?>
+        <?= "$pdf<br>" ?>
     <?php endforeach; ?>
 </div>

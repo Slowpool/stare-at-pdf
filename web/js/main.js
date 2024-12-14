@@ -67,10 +67,12 @@ function DescriptMethod(url) {
         case '/':
         case '':
         case '/login':
+        case '/library':
             $method = 'GET';
             break;
         case '/logout':
-        case 'send-credentials-to-login':
+        case '/send-credentials-to-login':
+        case '/upload-pdf':
             $method = 'POST';
             break;
         default:
@@ -114,7 +116,7 @@ function UpdatePage(response, url) {
 function LoadPdf() {
     // ajaxed pdfJs requires this stuff so that it can be displayed. 
     jQuery(function ($) {
-        $("#pdfjs-form-w0").submit();``
+        $("#pdfjs-form-w0").submit();
         jQuery('#pdfjs-form-w0').yiiActiveForm([], []);
     });
 }
