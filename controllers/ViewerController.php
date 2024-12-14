@@ -39,23 +39,20 @@ class ViewerController extends BaseAjaxController
         ];
     }
 
-    public function actionIndex()
+    // 
+    public function actionIndex($pdf_name)
     {
-        // TODO how to send it once and then return only jsons? attach some value to request?
-        // TODO pass url
-        if ($this->isAjax()) {
-            $url_for_pdf = 'uploads\semaphores.pdf';
-            
+        return $this->executeIfAjaxOtherwiseRenderSinglePage(function () use ($pdf_name) {
+            $url_for_pdf = isset($pdf_name) ? "uploads\\$pdf_name.pdf" : '';
             $page = new PageModel('Home', $this->renderPartial('index', ['url' => $url_for_pdf]), $this->request->url);
             $this->response->format = Response::FORMAT_JSON;
             return $page;
-        } else {
-            return $this->renderSinglePage();
-        }
+        });
     }
 
     // TODO remove
-    public function actionOldVersion() {
+    public function actionOldVersion()
+    {
         $result = $this->render('index');
         return $result;
     }

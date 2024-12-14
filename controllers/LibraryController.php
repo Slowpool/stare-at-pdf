@@ -38,15 +38,11 @@ class LibraryController extends BaseAjaxController
 
     public function actionIndex()
     {
-        $model = ['pdf1', 'pdf2'];
-        $page = new PageModel('Library', $this->renderPartial('index', compact('model')));
-        if ($this->isAjax()) {
+        return $this->executeIfAjaxOtherwiseRenderSinglePage(function () {
+            $model = ['pdf1', 'pdf2'];
+            $page = new PageModel('Library', $this->renderPartial('index', compact('model')), $this->request->url);
             return $page;
-        } else {
-            return $this->render(Yii::getAlias('@single_page'), compact('page'));
-        }
-
-        return 'libraryIndex';
+        });
     }
 
     public function actionUploadPdf()

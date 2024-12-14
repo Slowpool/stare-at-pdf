@@ -27,4 +27,12 @@ class BaseAjaxController extends Controller {
     public function renderSinglePage() {
         return $this->renderFile('@app/views/layouts/main.php');
     }
+
+    public function executeIfAjaxOtherwiseRenderSinglePage($callback) {
+        if ($this->isAjax()) {
+            return $callback();
+        } else {
+            return $this->renderSinglePage();
+        }
+    }
 }

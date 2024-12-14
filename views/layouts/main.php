@@ -11,7 +11,7 @@ use yii\bootstrap5\NavBar;
 
 AppAsset::register($this);
 yii\widgets\ActiveFormAsset::register($this);
-diecoding\pdfjs\ViewerAsset::register($this);
+// diecoding\pdfjs\ViewerAsset::register($this);
 
 $this->registerCsrfMetaTags();
 $this->registerMetaTag(['charset' => Yii::$app->charset], 'charset');
@@ -70,7 +70,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
     </main>
 
     <?php $this->endBody() ?>
-    <?php $this->registerJsFile('js/main.js') ?>
+    <?php $this->registerJsFile('/js/main.js') ?>
 </body>
 
 </html>

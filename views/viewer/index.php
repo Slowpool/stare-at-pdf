@@ -5,7 +5,7 @@
 ?>
 <div class="pdf-viewer-container">
     <?= \diecoding\pdfjs\PdfJs::widget([
-        'url' => 'uploads\semaphores.pdf',
+        'url' => $url,
         'options' => [
             'id' => 'pdf-viewer-widget',
             'style' => [

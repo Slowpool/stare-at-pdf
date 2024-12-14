@@ -23,7 +23,7 @@ function OnLoad() {
 
 function InitLinks() {
     links = document.getElementsByTagName('a');
-    for(var link of links) {
+    for (var link of links) {
         link.addEventListener('click', function (e) {
             e.preventDefault();
             AjaxLinkClick(e.target.getAttribute('href'));
@@ -45,7 +45,7 @@ function SendRequest(url) {
             return;
         }
         loaded = true;
-        if(xmlRequest.status == 200) {
+        if (xmlRequest.status == 200) {
             UpdatePage(JSON.parse(xmlRequest.responseText), url);
         }
         else {
@@ -62,7 +62,7 @@ function SendRequest(url) {
 
 function DescriptMethod(url) {
     url = url.replace(leftUrlPart, '');
-    // TODO how to handle query string?
+
     switch (url) {
         case '/':
         case '':
@@ -74,7 +74,19 @@ function DescriptMethod(url) {
             $method = 'POST';
             break;
         default:
-            throw new Error('Unknown url');
+            $method = undefined;
+    }
+
+    if ($method === undefined) {
+        if (url.startsWith('/stare-at/')) {
+            $method = 'GET';
+        }
+        /*
+            other checks
+        */
+        if ($method === undefined) {
+            throw new Error('unknown url');
+        }
     }
     return $method;
 }
@@ -86,23 +98,29 @@ function UpdatePage(response, url) {
         url: response.url,
     };
 
-    // ajaxed pdfJs requires this stuff to be displayed. 
-    jQuery(function ($) {
-        $("#pdfjs-form-w0").submit();
-    jQuery('#pdfjs-form-w0').yiiActiveForm([], []);
-    });
+    if (url.startsWith('/stare-at/') || url == '/') {
+        LoadPdf();
+    }
 
     page.title.innerHTML = data.selectedNav;
     page.content.innerHTML = data.content;
-    
+
     // document.title = data.title // TODO what does it do?
     window.history.pushState(data.content, data.selectedNav, url);
-    
+
     InitLinks();
 }
 
+function LoadPdf() {
+    // ajaxed pdfJs requires this stuff so that it can be displayed. 
+    jQuery(function ($) {
+        $("#pdfjs-form-w0").submit();``
+        jQuery('#pdfjs-form-w0').yiiActiveForm([], []);
+    });
+}
+
 function ShowLoading() {
-    if(!loaded) {
+    if (!loaded) {
         page.content.innerHTML = 'Loading...';
     }
 }
