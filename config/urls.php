@@ -11,5 +11,6 @@ return [
     'logout' => 'identity/logout',
     'login' => 'identity/login-form',
     'send-credentials-to-login' => 'identity/send-login-form',
-
+    // TODO remove
+    'old-version' => 'viewer/old-version',
 ];

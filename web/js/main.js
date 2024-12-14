@@ -86,6 +86,12 @@ function UpdatePage(response, url) {
         url: response.url,
     };
 
+    // ajaxed pdfJs requires this stuff to be displayed. 
+    jQuery(function ($) {
+        $("#pdfjs-form-w0").submit();
+    jQuery('#pdfjs-form-w0').yiiActiveForm([], []);
+    });
+
     page.title.innerHTML = data.selectedNav;
     page.content.innerHTML = data.content;
     

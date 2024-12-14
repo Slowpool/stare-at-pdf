@@ -10,6 +10,8 @@ use yii\bootstrap5\Nav;
 use yii\bootstrap5\NavBar;
 
 AppAsset::register($this);
+yii\widgets\ActiveFormAsset::register($this);
+diecoding\pdfjs\ViewerAsset::register($this);
 
 $this->registerCsrfMetaTags();
 $this->registerMetaTag(['charset' => Yii::$app->charset], 'charset');
@@ -65,7 +67,6 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
 
     <main id="main" class="flex-shrink-0" role="main">
         <?= Alert::widget() ?>
-        
     </main>
 
     <?php $this->endBody() ?>

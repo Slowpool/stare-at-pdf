@@ -25,6 +25,6 @@ class BaseAjaxController extends Controller {
     }
 
     public function renderSinglePage() {
-        return $this->renderPartial('//layouts/main');
+        return $this->renderFile('@app/views/layouts/main.php');
     }
 }
