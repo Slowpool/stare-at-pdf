@@ -8,6 +8,7 @@ use yii\web\Controller;
 use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\PageModel;
+use app\models\domain\PdfFileRecord;
 
 class LibraryController extends BaseAjaxController
 {
@@ -39,8 +40,8 @@ class LibraryController extends BaseAjaxController
     public function actionIndex()
     {
         return $this->executeIfAjaxOtherwiseRenderSinglePage(function () {
-            $model = ['pdf1', 'pdf2'];
-            $page = new PageModel('Library', $this->renderPartial('index', compact('model')), $this->request->url);
+            $pdfFiles = PdfFileRecord::getFilesOfUser(Yii::$app->user->username);
+            $page = new PageModel('Library', $this->renderPartial('index', compact('pdfFiles')), $this->request->url);
             return $page;
         });
     }

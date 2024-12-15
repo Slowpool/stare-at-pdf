@@ -19,7 +19,9 @@ $config = [
         '@home_view' => '//viewer/index.php',
         '@login_view' => '//identity/login.php',
         '@library_view' => '//library/index.php',
-        'scripts' => '@app/web/js',
+        '@scripts' => '@app/web/js',
+
+        '@uploads' => '@app/web/uploads'
     ],
     'components' => [
         'request' => [
