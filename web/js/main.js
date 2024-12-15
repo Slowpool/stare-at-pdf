@@ -22,21 +22,36 @@ function OnLoad() {
 }
 
 function InitLinks() {
-    links = document.getElementsByTagName('a');
-    for (var link of links) {
-        link.addEventListener('click', function (e) {
+    var anchor_links = document.getElementsByTagName('a');
+    for (var anchor of anchor_links) {
+        anchor.addEventListener('click', function (e) {
             e.preventDefault();
             AjaxLinkClick(e.target.getAttribute('href'));
             return false;
         });
     };
+
+    var form_links = document.getElementsByTagName('form');
+    for (var form of form_links) {
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            AjaxFormAction(e.target.getAttribute('action'), new FormData(e.target));
+            return false;
+        });
+    }
+
+    links = [...anchor_links, ...form_links];
 }
 
 function AjaxLinkClick(url) {
     SendRequest(url);
 }
 
-function SendRequest(url) {
+function AjaxFormAction(url, formData) {
+    SendRequest(url, formData);
+}
+
+function SendRequest(url, formData = null) {
     var xmlRequest = new XMLHttpRequest();
     xmlRequest.open(DescriptMethod(url), url, true);
     xmlRequest.setRequestHeader('X_REQUESTED_WITH', 'XMLHttpRequest');
@@ -57,7 +72,7 @@ function SendRequest(url) {
     loaded = false;
     ShowLoading();
 
-    xmlRequest.send();
+    xmlRequest.send(formData);
 }
 
 function DescriptMethod(url) {
@@ -93,22 +108,24 @@ function DescriptMethod(url) {
     return $method;
 }
 
-function UpdatePage(response, url) {
+function UpdatePage(response, requestedUrl) {
     data = {
         selectedNav: response.selected_nav,
         content: response.content,
         url: response.url,
     };
 
-    if (url.startsWith('/stare-at/') || url == '/') {
+    if (requestedUrl.startsWith('/stare-at/') || requestedUrl == '/') {
         LoadPdf();
     }
-
     page.title.innerHTML = data.selectedNav;
     page.content.innerHTML = data.content;
-
     // document.title = data.title // TODO what does it do?
-    window.history.pushState(data.content, data.selectedNav, url);
+    window.history.pushState(data.content, data.selectedNav, data.url);
+    // request may return url, which differs from the requested one
+    // if(requestedUrl !== data.url) {
+    //     window.history.pushState(data.content, data.selectedNav, data.url);
+    // }
 
     InitLinks();
 }

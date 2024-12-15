@@ -10,6 +10,7 @@ use yii\filters\VerbFilter;
 use app\models\identity\LoginForm;
 use app\models\ContactForm;
 use app\models\PageModel;
+use Override;
 
 class IdentityController extends BaseAjaxController
 {
@@ -61,22 +62,16 @@ class IdentityController extends BaseAjaxController
         return new PageModel('Login', $this->renderPartial(Yii::getAlias('@login_view'), $viewParams), Yii::$app->user->loginUrl);
     }
 
-    /** overriden */
-    public function goHomeAjax()
+    /** Overriden. Sends either login page (for unsigned user) or home page (pdf viewer)
+     * @param string $pdf_url
+     * ignored. i can't imagine any case when you can pick pdf url being on the login stage.
+     * This method using looks redundant everywhere. I forgot why i wanted to use it, but it defines one logic which applied everywhere.
+     */
+    public function goHomeAjax($pdf_url = '')
     {
         return Yii::$app->user->isGuest
             ? $this->createLoginPage([])
-            : $this->createHomePage('');
-    }
-
-    /**
-     * @return string
-     */
-    public function actionIndex()
-    {
-
-
-        return $this->render('index');
+            : parent::goHomeAjax('');
     }
 
     /**
@@ -87,11 +82,7 @@ class IdentityController extends BaseAjaxController
     public function actionLoginForm()
     {
         return $this->executeIfAjaxOtherwiseRenderSinglePage(function () {
-            if (!Yii::$app->user->isGuest) {
-                return parent::goHomeAjax();
-            }
-            $page = new PageModel('Login', $this->renderPartial(Yii::getAlias('@login_view')), '');
-            return $page;
+            return $this->goHomeAjax();
         });
     }
 
@@ -103,18 +94,20 @@ class IdentityController extends BaseAjaxController
     public function actionSendLoginForm()
     {
         return $this->executeIfAjaxOtherwiseRenderSinglePage(function () {
+            // a signed-in user tries to login
             if (!Yii::$app->user->isGuest) {
                 return $this->goHomeAjax();
             }
 
             $model = new LoginForm();
+            // a guest successfully logged-in
             if ($model->load(Yii::$app->request->post(), 'LoginForm') && $model->login()) {
                 return $this->goHomeAjax();
             }
 
-
             $model->password = '';
-            return $this->createLoginPage();
+            // a guest failed to log in
+            return $this->createLoginPage(compact('model'));
         });
     }
 
@@ -125,12 +118,9 @@ class IdentityController extends BaseAjaxController
      */
     public function actionLogout()
     {
-        Yii::$app->user->logout();
-
-        if ($this->isAjax()) {
+        return $this->executeIfAjaxOtherwiseRenderSinglePage(function () {
+            Yii::$app->user->logout();
             return $this->goHomeAjax();
-        } else {
-            return $this->goHome();
-        }
+        });
     }
 }

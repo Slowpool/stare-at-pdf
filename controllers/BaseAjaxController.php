@@ -29,6 +29,7 @@ class BaseAjaxController extends Controller
     }
 
     /** @return PageModel  */
+    /** Sends the page with pdf viewer */
     public function goHomeAjax($pdf_url = '')
     {
         return $this->createHomePage($pdf_url);
