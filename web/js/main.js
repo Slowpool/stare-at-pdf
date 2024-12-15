@@ -1,3 +1,23 @@
+const requestUrlActionMap = {
+    '/send-credentials-to-login': (request) => {
+        request.setRequestHeader('X-Gimme-Logout-Form', null);
+    },
+};
+
+const responseUrlActionMap = {
+    '/send-credentials-to-login': (response) => {
+        // when the response url is not a /login, that means, that log-in attempt was successful. although, here the header could be used, like 'x-logged-in-success'
+        if(response.url != '/login') {
+            // replaces Login with Logout *username*
+            page.navbarList.children[1].remove();
+            page.navbarList.appendChild(response.navbarItem);
+        }
+    },
+    '/logout': () => {
+
+    },
+};
+
 var links = null;
 var loaded = true;
 var data = {
@@ -11,7 +31,7 @@ var leftUrlPart = 'https://localhost:8080';
 
 var page = {
     title: document.getElementById('title'),
-    // mainNavBar: document.getElementById('main-navbar').getElementByClassName('container'),
+    navbarList: document.getElementById('w0'),
     content: document.getElementById('main'),
 };
 
@@ -52,27 +72,34 @@ function AjaxFormAction(url, formData) {
 }
 
 function SendRequest(url, formData = null) {
-    var xmlRequest = new XMLHttpRequest();
-    xmlRequest.open(DescriptMethod(url), url, true);
-    xmlRequest.setRequestHeader('X_REQUESTED_WITH', 'XMLHttpRequest');
-    xmlRequest.onreadystatechange = () => {
-        if (xmlRequest.readyState != 4) {
+    var xhr = new XMLHttpRequest();
+    xhr.open(DescriptMethod(url), url, true);
+    xhr.setRequestHeader('X_REQUESTED_WITH', 'XMLHttpRequest');
+
+    // seems worthy
+    var action = requestUrlActionMap[url];
+    if (action) {
+        action(xhr);
+    }
+
+    xhr.onreadystatechange = () => {
+        if (xhr.readyState != 4) {
             return;
         }
         loaded = true;
-        if (xmlRequest.status == 200) {
-            UpdatePage(JSON.parse(xmlRequest.responseText));
+        if (xhr.status == 200) {
+            UpdatePage(JSON.parse(xhr.responseText), url);
         }
         else {
             alert('error');
-            console.log(xmlRequest.status + ': ' + xmlRequest.statusText);
+            console.log(xhr.status + ': ' + xhr.statusText);
         }
     };
 
     loaded = false;
     ShowLoading();
 
-    xmlRequest.send(formData);
+    xhr.send(formData);
 }
 
 function DescriptMethod(url) {
@@ -108,34 +135,30 @@ function DescriptMethod(url) {
     return $method;
 }
 
-const urlActionMap = {
-    '/login': (response) => {
-        
-    },
-    '/logout': () => {
-
-    }
-};
-
-function UpdatePage(response) {
+function UpdatePage(response, url) {
     data = {
         selectedNav: response.selectedNav,
         content: response.content,
         url: response.url,
     };
 
-    var action = urlActionMap[data.url];
+    // now i don't like that the requested url differs from the url in the response.
+    var action = responseUrlActionMap[url];
     if (action) {
         action(response);
     }
-
+    // it should be in above mapper's action, but i don't know how to cut right part of /stare-at/. wait, it doesn't have a query string, so it can be easy cut
     if (data.url.startsWith('/stare-at/') || data.url == '/') {
         LoadPdf();
     }
     page.title.innerHTML = data.selectedNav;
     page.content.innerHTML = data.content;
     // document.title = data.title // TODO what does it do?
-    window.history.pushState(data.content, data.selectedNav, data.url);
+
+    window.history.pushState(data.content, data.selectedNav, url);
+    if (data.url !== url) {
+        window.history.pushState(data.content, data.selectedNav, data.url);
+    }
 
     InitLinks();
 }
