@@ -3,7 +3,7 @@
 /** @var yii\web\View $this */
 /** @var app\models\PageModel $page */
 
-$this->title = $page->selected_nav;
+$this->title = $page->selectedNav;
 ?>
 
 <div id="page-content">

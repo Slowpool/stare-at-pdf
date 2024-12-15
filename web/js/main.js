@@ -61,7 +61,7 @@ function SendRequest(url, formData = null) {
         }
         loaded = true;
         if (xmlRequest.status == 200) {
-            UpdatePage(JSON.parse(xmlRequest.responseText), url);
+            UpdatePage(JSON.parse(xmlRequest.responseText));
         }
         else {
             alert('error');
@@ -108,24 +108,34 @@ function DescriptMethod(url) {
     return $method;
 }
 
-function UpdatePage(response, requestedUrl) {
+const urlActionMap = {
+    '/login': (response) => {
+        
+    },
+    '/logout': () => {
+
+    }
+};
+
+function UpdatePage(response) {
     data = {
-        selectedNav: response.selected_nav,
+        selectedNav: response.selectedNav,
         content: response.content,
         url: response.url,
     };
 
-    if (requestedUrl.startsWith('/stare-at/') || requestedUrl == '/') {
+    var action = urlActionMap[data.url];
+    if (action) {
+        action(response);
+    }
+
+    if (data.url.startsWith('/stare-at/') || data.url == '/') {
         LoadPdf();
     }
     page.title.innerHTML = data.selectedNav;
     page.content.innerHTML = data.content;
     // document.title = data.title // TODO what does it do?
     window.history.pushState(data.content, data.selectedNav, data.url);
-    // request may return url, which differs from the requested one
-    // if(requestedUrl !== data.url) {
-    //     window.history.pushState(data.content, data.selectedNav, data.url);
-    // }
 
     InitLinks();
 }

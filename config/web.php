@@ -14,14 +14,17 @@ $config = [
         
         '@views' => '@app/views',
         '@main_layout' => '@views/layouts/main.php',
-        
         '@single_page' => '//single_page.php',
+        
         '@home_view' => '//viewer/index.php',
         '@login_view' => '//identity/login.php',
         '@library_view' => '//library/index.php',
-        '@scripts' => '@app/web/js',
+        
+        '@partial_nav_logout_form' => '//layouts/partial_nav_logout_form.php',
+        '@partial_nav_login' => '//layouts/partial_nav_login.php',
 
-        '@uploads' => '@app/web/uploads'
+        '@uploads' => '@app/web/uploads',
+        '@scripts' => '@app/web/js',
     ],
     'components' => [
         'request' => [

@@ -8,18 +8,18 @@ use yii\base\Model;
 
 class PageModel extends Model {
     
-    public string $selected_nav;
+    public string $selectedNav;
     public string $content;
     public string $url;
 
     public function rules() {
         return [
-            [['selected_nav', 'content', 'url'], 'required']
+            [['selectedNav', 'content', 'url'], 'required']
         ];
     }
 
-    public function __construct($selected_nav, $content, $url) {
-        $this->selected_nav = $selected_nav;
+    public function __construct($selectedNav, $content, $url) {
+        $this->selectedNav = $selectedNav;
         $this->content = $content;
         $this->url = $url;
     }

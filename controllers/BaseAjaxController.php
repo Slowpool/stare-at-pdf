@@ -14,6 +14,7 @@ class BaseAjaxController extends Controller
         return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
     }
 
+    // at first i've came up with this approach and thought it's good, but now it is starting look awkward due to each action begins with this method. 
     public function executeIfAjaxOtherwiseRenderSinglePage($callback)
     {
         if ($this->isAjax()) {

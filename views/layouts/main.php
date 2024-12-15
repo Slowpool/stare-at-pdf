@@ -44,21 +44,8 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
             'items' => [
                 ['label' => 'Library', 'url' => ['/library/index']],
                 Yii::$app->user->isGuest
-                    ? [
-                        'label' => 'Login',
-                        'url' => ['/login'],
-                        'options' => [
-                            'class' => 'login-button'
-                        ]
-                    ]
-                    : '<li class="nav-item">'
-                    . Html::beginForm(['/logout'])
-                    . Html::submitButton(
-                        'Logout (' . Yii::$app->user->identity->username . ')',
-                        ['class' => 'nav-link btn btn-link logout']
-                    )
-                    . Html::endForm()
-                    . '</li>'
+                    ? $this->render('partial_nav_login')
+                    : $this->render('partial_nav_logout_form')
             ]
         ]);
         NavBar::end();

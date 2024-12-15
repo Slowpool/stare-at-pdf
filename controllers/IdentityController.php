@@ -9,7 +9,7 @@ use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\identity\LoginForm;
 use app\models\ContactForm;
-use app\models\PageModel;
+use app\models\identity\IdentityPageModel;
 use Override;
 
 class IdentityController extends BaseAjaxController
@@ -59,7 +59,7 @@ class IdentityController extends BaseAjaxController
 
     public function createLoginPage($viewParams)
     {
-        return new PageModel('Login', $this->renderPartial(Yii::getAlias('@login_view'), $viewParams), Yii::$app->user->loginUrl);
+        return new IdentityPageModel('Login', $this->renderPartial(Yii::getAlias('@login_view'), $viewParams), Yii::$app->user->loginUrl, $this->renderPartial(Yii::getAlias('@partial_nav_login')));
     }
 
     /** Overriden. Sends either login page (for unsigned user) or home page (pdf viewer)
@@ -69,9 +69,15 @@ class IdentityController extends BaseAjaxController
      */
     public function goHomeAjax($pdf_url = '')
     {
-        return Yii::$app->user->isGuest
-            ? $this->createLoginPage([])
-            : parent::goHomeAjax('');
+        if (Yii::$app->user->isGuest) {
+            return $this->createLoginPage([]);
+        } else {
+            $page = parent::goHomeAjax('');
+            if (Yii::$app->request->headers->has('X-Gimme-Logout-Form')) {
+                $page = new IdentityPageModel($page, $this->render(Yii::getAlias('@partial_nav_logout_form')));
+            }
+            return $page;
+        }
     }
 
     /**
