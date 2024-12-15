@@ -3,6 +3,8 @@
 namespace app\models\domain;
 
 use Yii;
+use yii\db\ActiveRecord;
+use yii\web\IdentityInterface;
 
 /**
  * This is the model class for table "user".
@@ -15,8 +17,14 @@ use Yii;
  *
  * @property PdfFile[] $pdfFiles
  */
-class UserRecord extends \yii\db\ActiveRecord
+class UserRecord extends ActiveRecord implements IdentityInterface
 {
+    // public $id;
+    // public $name;
+    // public $password_hash;
+    // public $auth_key;
+    // public $access_token;
+
     /**
      * {@inheritdoc}
      */
@@ -59,38 +67,26 @@ class UserRecord extends \yii\db\ActiveRecord
      */
     public static function findIdentity($id)
     {
-        return self::find(); // TODO finish identity
+        return self::findOne($id);
     }
-
+    
     /**
      * {@inheritdoc}
      */
     public static function findIdentityByAccessToken($token, $type = null)
     {
-        foreach (self::$users as $user) {
-            if ($user['accessToken'] === $token) {
-                return new static($user);
-            }
-        }
-
-        return null;
+        return self::findOne(['access_token' => $token]);
     }
-
+    
     /**
      * Finds user by username
      *
      * @param string $username
      * @return static|null
      */
-    public static function findByUsername($username)
+    public static function findByName($name)
     {
-        foreach (self::$users as $user) {
-            if (strcasecmp($user['username'], $username) === 0) {
-                return new static($user);
-            }
-        }
-
-        return null;
+        return self::findOne(['name' => $name]);
     }
 
     /**
@@ -106,7 +102,7 @@ class UserRecord extends \yii\db\ActiveRecord
      */
     public function getAuthKey()
     {
-        return $this->authKey;
+        return $this->auth_key;
     }
 
     /**
@@ -114,7 +110,7 @@ class UserRecord extends \yii\db\ActiveRecord
      */
     public function validateAuthKey($authKey)
     {
-        return $this->authKey === $authKey;
+        return $this->auth_key === $authKey;
     }
 
     /**
@@ -125,7 +121,7 @@ class UserRecord extends \yii\db\ActiveRecord
      */
     public function validatePassword($password)
     {
-        return $this->password === $password;
+        return self::hashPassword($password) === $this->password_hash;
     }
 
     /**
@@ -136,5 +132,13 @@ class UserRecord extends \yii\db\ActiveRecord
     public function getPdfFiles()
     {
         return $this->hasMany(PdfFileRecord::class, ['user_id' => 'id']);
+    }
+
+    public function getUsername() {
+        return $this->name;
+    }
+
+    public static function hashPassword($password) {
+        return hash('haval256,4', $password);
     }
 }

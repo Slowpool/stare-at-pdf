@@ -34,6 +34,7 @@ class IdentityController extends BaseAjaxController
                 'class' => VerbFilter::class,
                 'actions' => [
                     'logout' => ['post'],
+                    'send-login-form' => ['post'],
                 ],
             ],
         ];
@@ -55,9 +56,20 @@ class IdentityController extends BaseAjaxController
         ];
     }
 
+    public function createLoginPage($viewParams)
+    {
+        return new PageModel('Login', $this->renderPartial(Yii::getAlias('@login_view'), $viewParams), Yii::$app->user->loginUrl);
+    }
+
+    /** overriden */
+    public function goHomeAjax()
+    {
+        return Yii::$app->user->isGuest
+            ? $this->createLoginPage([])
+            : $this->createHomePage('');
+    }
+
     /**
-     * Displays homepage.
-     *
      * @return string
      */
     public function actionIndex()
@@ -74,19 +86,13 @@ class IdentityController extends BaseAjaxController
      */
     public function actionLoginForm()
     {
-        $page = new PageModel('Login', $this->renderPartial(Yii::getAlias('@login_view')), '');
-        // TODO implement it via flags
-        if (self::isAjax()) {
+        return $this->executeIfAjaxOtherwiseRenderSinglePage(function () {
             if (!Yii::$app->user->isGuest) {
-                return $this->goHomeAjax();
+                return parent::goHomeAjax();
             }
-            return json_encode($page);
-        } else {
-            if (!Yii::$app->user->isGuest) {
-                return $this->goHome();
-            }
-            return $this->render(Yii::getAlias('@single_page'), compact('page'));
-        }
+            $page = new PageModel('Login', $this->renderPartial(Yii::getAlias('@login_view')), '');
+            return $page;
+        });
     }
 
     /**
@@ -96,28 +102,20 @@ class IdentityController extends BaseAjaxController
      */
     public function actionSendLoginForm()
     {
-        // TODO implement it via flags
-        // if (!self::isAjax()) {
-        //     if (!Yii::$app->user->isGuest) {
-        //         return $this->goHome();
-        //     }
-        // } else {
-        // }
-        if (!Yii::$app->user->isGuest) {
-            // return json_encode($this->);
-            // TODO override goHome 
-            return $this->goHome();
-        }
+        return $this->executeIfAjaxOtherwiseRenderSinglePage(function () {
+            if (!Yii::$app->user->isGuest) {
+                return $this->goHomeAjax();
+            }
 
-        $model = new LoginForm();
-        if ($model->load(Yii::$app->request->post()) && $model->login()) {
-            return $this->goBack();
-        }
+            $model = new LoginForm();
+            if ($model->load(Yii::$app->request->post(), 'LoginForm') && $model->login()) {
+                return $this->goHomeAjax();
+            }
 
-        $model->password = '';
-        return $this->render('login', [
-            'model' => $model,
-        ]);
+
+            $model->password = '';
+            return $this->createLoginPage();
+        });
     }
 
     /**

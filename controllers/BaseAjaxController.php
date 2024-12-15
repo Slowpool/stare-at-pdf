@@ -11,27 +11,7 @@ class BaseAjaxController extends Controller
 {
     public function isAjax()
     {
-        return (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest');
-    }
-
-    /** @return PageModel  */
-    public function goHomeAjax()
-    {
-        // TODO if unsigned user? (or in another app he might don't have required role)
-        return new PageModel(Yii::$app->name, $this->renderPartial(Yii::getAlias('@home_view'), ['url' => '']), Yii::$app->homeUrl);
-    }
-
-    /** @param PageModel $page */
-    /** This method renders single_page */
-    public function renderNotAjax($page)
-    {
-        // TODO probably remove
-        return $this->render(Yii::getAlias('@single_page'), compact('page'));
-    }
-
-    public function renderSinglePage()
-    {
-        return $this->renderFile(Yii::getAlias('@main_layout'));
+        return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
     }
 
     public function executeIfAjaxOtherwiseRenderSinglePage($callback)
@@ -42,5 +22,20 @@ class BaseAjaxController extends Controller
         } else {
             return $this->renderSinglePage();
         }
+    }
+
+    public function createHomePage($pdf_url) {
+        return new PageModel(Yii::$app->name, $this->renderPartial(Yii::getAlias('@home_view'), ['pdf_url' => $pdf_url]), Yii::$app->homeUrl);
+    }
+
+    /** @return PageModel  */
+    public function goHomeAjax($pdf_url = '')
+    {
+        return $this->createHomePage($pdf_url);
+    }
+
+    public function renderSinglePage()
+    {
+        return $this->renderFile(Yii::getAlias('@main_layout'));
     }
 }
