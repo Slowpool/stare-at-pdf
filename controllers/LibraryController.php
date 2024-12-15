@@ -40,7 +40,8 @@ class LibraryController extends BaseAjaxController
     public function actionIndex()
     {
         return $this->executeIfAjaxOtherwiseRenderSinglePage(function () {
-            $pdfFiles = PdfFileRecord::getFilesOfUser(Yii::$app->user->username);
+            // TODO file ids are redundant (view doesn't need them)
+            $pdfFiles = PdfFileRecord::getFilesOfUserAsArray(Yii::$app->user->username);
             $page = new PageModel('Library', $this->renderPartial('index', compact('pdfFiles')), $this->request->url);
             return $page;
         });

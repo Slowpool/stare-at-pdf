@@ -18,7 +18,7 @@ class m241215_093846_create_pdf_file_table extends Migration
         $this->createTable('{{%pdf_file}}', [
             'id' => $this->primaryKey(),
             'name' => $this->string(150)->notNull()->unique(),
-            'bookmark' => $this->notNull()->integer()->defaultValue(1),
+            'bookmark' => $this->integer()->notNull()->defaultValue(1),
             'user_id' => $this->integer()->notNull(),
         ]);
 
