@@ -8,6 +8,9 @@ const requestUrlActionMap = {
             request.setRequestHeader('X-Gimme-Login-Button', null);
         }
     },
+    '/logout': (request) => {
+        request.setRequestHeader('X-Gimme-Login-Button', null);
+    },
 };
 
 const responseUrlActionMap = {
@@ -173,7 +176,7 @@ function TrashDataHandling(requestedUrl) {
 function UpdateIdentityNavbarItemIfItReceived() {
     // when response contains new navbar, that means that in the request js asked for it via header. so, this script trusts server that it won't send new navbar when it wasn't requested
     if(data.identityNavItem) {
-        // checks last element (login or logout) (actually existence should be checked via id)
+        // gotcha. it must be implemented via container "identity-item", which will always exist in nav bar, but content will changes. and you won't have to mess around with insertAdjacentHTML-thing.
         if (page.navbarList.children[1]) {
             page.navbarList.children[1].remove();
         }

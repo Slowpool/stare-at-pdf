@@ -65,23 +65,12 @@ class PdfFileRecord extends \yii\db\ActiveRecord
     /** @return string[] */
     public static function getFilesOfUserAsArray($username)
     {
-        UserRecord::find()
-                  ->asArray()
-                  ->where(['name' => $username])
-                  ->all();
-        // $userDir = Yii::getAlias('@uploads') . "/$username";
-        // $fileNames = [];
-        // if (is_dir($userDir)) {
-        //     if ($dir = opendir($userDir)) {
-        //         while (($file = readdir($dir)) !== false) {
-        //             $fileNames[] = $file;
-        //         }
-        //         return $fileNames;
-        //     } else {
-        //         throw new \Exception('failed to open uploads');
-        //     }
-        // } else {
-        //     throw new \Exception('uploads isn\'t a directory');
-        // }
+        return self::find()
+            ->alias('pf')
+            ->asArray()
+            ->select(['pf.id', 'pf.name', 'pf.bookmark', 'pf.user_id'])
+            ->joinWith('user u') // probably ordinary join?
+            ->where(['u.name' => $username])
+            ->all();
     }
 }
