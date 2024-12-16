@@ -21,7 +21,7 @@ $config = [
         '@library_view' => '//library/index.php',
         
         '@partial_nav_logout_form' => '//layouts/partial_nav_logout_form.php',
-        '@partial_nav_login' => '//layouts/partial_nav_login.php',
+        '@partial_nav_login_button' => '//layouts/partial_nav_login.php',
 
         '@uploads' => '@app/web/uploads',
         '@scripts' => '@app/web/js',

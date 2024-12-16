@@ -10,8 +10,8 @@ use yii\bootstrap5\Nav;
 use yii\bootstrap5\NavBar;
 
 AppAsset::register($this);
+// pdf viewer requires it
 yii\widgets\ActiveFormAsset::register($this);
-// diecoding\pdfjs\ViewerAsset::register($this);
 
 $this->registerCsrfMetaTags();
 $this->registerMetaTag(['charset' => Yii::$app->charset], 'charset');
@@ -43,9 +43,10 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
             'options' => ['class' => 'navbar-nav'],
             'items' => [
                 ['label' => 'Library', 'url' => ['/library/index']],
-                Yii::$app->user->isGuest
-                    ? $this->render('partial_nav_login')
-                    : $this->render('partial_nav_logout_form')
+                // it's commented due to this nav item must be obtained via ajax
+                // Yii::$app->user->isGuest
+                //     ? $this->render('partial_nav_login')
+                //     : $this->render('partial_nav_logout_form')
             ]
         ]);
         NavBar::end();

@@ -7,6 +7,7 @@ use yii\web\Controller;
 use app\models\PageModel;
 use yii\web\Response;
 
+// TODO any ajax request does x2 requests each click. the 8th request does 8 requests instead of 1 end etc.
 class BaseAjaxController extends Controller
 {
     public function isAjax()

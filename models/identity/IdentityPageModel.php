@@ -16,12 +16,12 @@ class IdentityPageModel extends PageModel
         ];
     }
 
+    // sure it could be simpler
     public function __construct($pageModel, $navbarItem)
     {
-        foreach($pageModel as $property => $value) {
-            // waaat
-            $this->$property = $value;
-        }
+        $this->selectedNav = $pageModel->selectedNav;
+        $this->content = $pageModel->content;
+        $this->url = $pageModel->url;
         $this->navbarItem = $navbarItem;
     }
 }
