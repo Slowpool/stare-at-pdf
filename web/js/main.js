@@ -1,20 +1,25 @@
 const requestUrlActionMap = {
     '/send-credentials-to-login': (request) => {
-        // wait, if this header is attached ever, why to use it at all? 
-        request.setRequestHeader('X-Gimme-Logout-Form', null);
+        AskForIdentityAction(true);
+        // wait, if this header is attached ever, why to use it at all?
+        // request.setRequestHeader('X-Gimme-Logout-Form', null);
     },
+    // TODO use Gimme-Identity-Action instead of both current headers, ensuring action by server, but not by js. it simplifies everything several times. now it's a copy+past mud
     '/login': (request) => {
-        if (!page.navbarList.children[1]) {
+        if (!page.identityNavItemContainer.firstChild) {
             request.setRequestHeader('X-Gimme-Login-Button', null);
         }
     },
     '/logout': (request) => {
         request.setRequestHeader('X-Gimme-Login-Button', null);
     },
+    '/': (request) => {
+
+    }
 };
 
 const responseUrlActionMap = {
-    
+
 };
 
 var links = null;
@@ -33,6 +38,7 @@ var page = {
     title: document.getElementById('title'),
     navbarList: document.getElementById('w0'),
     content: document.getElementById('main'),
+    identityNavItemContainer: document.getElementById('identity-action-container'),
 };
 
 OnLoad();
@@ -75,6 +81,8 @@ function SendRequest(url, formData = null) {
     var xhr = new XMLHttpRequest();
     xhr.open(DescriptMethod(url), url, true);
     xhr.setRequestHeader('X_REQUESTED_WITH', 'XMLHttpRequest');
+
+    AskForIdentityAction(false);
 
     // seems worthy
     var action = requestUrlActionMap[url];
@@ -135,6 +143,13 @@ function DescriptMethod(url) {
     return $method;
 }
 
+/** @force (bool) means that client doesn't have identity action and he needs it anyway. */
+function AskForIdentityAction(force) {
+    if (!page.identityNavItemContainer.firstChild) {
+        request.setRequestHeader('X-Gimme-Identity-Action', null);
+    }
+}
+
 function UpdatePage(response, url) {
     data = {
         selectedNav: response.selectedNav,
@@ -175,7 +190,7 @@ function TrashDataHandling(requestedUrl) {
 /** Identity navbar item is login button or logout form */
 function UpdateIdentityNavbarItemIfItReceived() {
     // when response contains new navbar, that means that in the request js asked for it via header. so, this script trusts server that it won't send new navbar when it wasn't requested
-    if(data.identityNavItem) {
+    if (data.identityNavItem) {
         // gotcha. it must be implemented via container "identity-item", which will always exist in nav bar, but content will changes. and you won't have to mess around with insertAdjacentHTML-thing.
         if (page.navbarList.children[1]) {
             page.navbarList.children[1].remove();

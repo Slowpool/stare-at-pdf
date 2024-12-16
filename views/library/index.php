@@ -7,12 +7,15 @@
 
 use yii\bootstrap5\ActiveForm;
 use yii\bootstrap5\Html;
+use app\views\library\PdfFileCardGenerator;
 
 ?>
 
 <div id="library-container">
-    the library content:
-    <?php foreach ($pdfFiles as $pdf): ?>
-        <?= PdffileCardGenerator::generate($pdf['id'], $pdf['name'], $pdf['bookmark']) ?>
-    <?php endforeach; ?>
+    <h4>Welcome. The library content:</h4>
+    <ul id="all-files-list">
+        <?php foreach ($pdfFiles as $pdf): ?>
+            <?= PdfFileCardGenerator::generate($pdf['id'], $pdf['name'], $pdf['bookmark']) ?>
+        <?php endforeach; ?>
+    </ul>
 </div>

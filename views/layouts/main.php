@@ -43,10 +43,9 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
             'options' => ['class' => 'navbar-nav'],
             'items' => [
                 ['label' => 'Library', 'url' => ['/library/index']],
-                // it's commented due to this nav item must be obtained via ajax
-                // Yii::$app->user->isGuest
-                //     ? $this->render('partial_nav_login')
-                //     : $this->render('partial_nav_logout_form')
+                // login or logout
+                Html::beginTag('li', ['id' => 'identity-action-container', 'class' => 'nav-item'])
+                . Html::endTag('li'),
             ]
         ]);
         NavBar::end();

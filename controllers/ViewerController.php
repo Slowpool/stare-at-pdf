@@ -42,7 +42,7 @@ class ViewerController extends BaseAjaxController
     public function actionIndex($pdf_name)
     {
         return $this->executeIfAjaxOtherwiseRenderSinglePage(function () use ($pdf_name) {
-            $pdf_url = isset($pdf_name) ? "uploads\\$pdf_name.pdf" : '';
+            $pdf_url = isset($pdf_name) ? "uploads\\" . Yii::$app->user->identity->name . "\\$pdf_name.pdf" : '';
             $page = new PageModel('Home', $this->renderPartial('index', compact('pdf_url')), $this->request->url);
             return $page;
         });

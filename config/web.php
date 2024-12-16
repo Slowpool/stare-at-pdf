@@ -14,7 +14,6 @@ $config = [
         
         '@views' => '@app/views',
         '@main_layout' => '@views/layouts/main.php',
-        '@single_page' => '//single_page.php',
         
         '@home_view' => '//viewer/index.php',
         '@login_view' => '//identity/login.php',
