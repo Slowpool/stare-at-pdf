@@ -10,7 +10,7 @@ use yii\filters\VerbFilter;
 use app\models\PageModel;
 use app\models\domain\PdfFileRecord;
 
-class LibraryController extends BaseAjaxController
+class LibraryController extends AjaxControllerWithIdentityAction
 {
 
     public function behaviors()

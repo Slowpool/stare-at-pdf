@@ -9,7 +9,7 @@ use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\PageModel;
 
-class ViewerController extends BaseAjaxController
+class ViewerController extends AjaxControllerWithIdentityAction
 {
 
     public function behaviors()

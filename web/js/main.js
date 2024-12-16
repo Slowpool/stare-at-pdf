@@ -1,17 +1,12 @@
 const requestUrlActionMap = {
     '/send-credentials-to-login': (request) => {
-        AskForIdentityAction(true);
-        // wait, if this header is attached ever, why to use it at all?
-        // request.setRequestHeader('X-Gimme-Logout-Form', null);
+        AskForIdentityActionIfAbsent(request, true);
     },
-    // TODO use Gimme-Identity-Action instead of both current headers, ensuring action by server, but not by js. it simplifies everything several times. now it's a copy+past mud
     '/login': (request) => {
-        if (!page.identityNavItemContainer.firstChild) {
-            request.setRequestHeader('X-Gimme-Login-Button', null);
-        }
+        // AskForIdentityActionIfAbsent(request, true);
     },
     '/logout': (request) => {
-        request.setRequestHeader('X-Gimme-Login-Button', null);
+        AskForIdentityActionIfAbsent(request, true);
     },
     '/': (request) => {
 
@@ -44,45 +39,50 @@ var page = {
 OnLoad();
 
 function OnLoad() {
-    AjaxLinkClick(window.location.pathname);
+    SendAjaxRequest(window.location.pathname);
 }
 
-function InitLinks() {
-    var anchor_links = document.getElementsByTagName('a');
-    for (var anchor of anchor_links) {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            AjaxLinkClick(e.target.getAttribute('href'));
-            return false;
-        });
-    };
-
-    var form_links = document.getElementsByTagName('form');
-    for (var form of form_links) {
-        form.addEventListener('submit', function (e) {
-            e.preventDefault();
-            AjaxFormAction(e.target.getAttribute('action'), new FormData(e.target));
-            return false;
-        });
+// TODO this method assigns event listener to pdfjs widget (but mustn't)
+function UpdateLinks() {
+    links = [...document.getElementsByTagName('a'), ...document.getElementsByTagName('form')];
+    for (var link of links) {
+        var isForm = link.tagName == 'FORM'; // otherwise a
+        // this approach assigns handler once
+        if (isForm) {
+            if (!link.onsubmit) {
+                link.onsubmit = AjaxSubmitHandler;
+            }
+        }
+        else {
+            if (!link.onclick) {
+                links.onclick = AjaxClickHandler;
+            }
+        }
+        // link.addEventListener(isForm ? 'submit' : 'click', AjaxClickHandler);
     }
-
-    links = [...anchor_links, ...form_links];
 }
 
-function AjaxLinkClick(url) {
-    SendRequest(url);
+function AjaxSubmitHandler(e) {
+    AjaxActionHandler(e, true)
 }
 
-function AjaxFormAction(url, formData) {
-    SendRequest(url, formData);
+function AjaxClickHandler(e) {
+    AjaxActionHandler(e, false)
 }
 
-function SendRequest(url, formData = null) {
+function AjaxActionHandler(e, isForm) {
+    e.preventDefault();
+    SendAjaxRequest(e.target.getAttribute(isForm ? 'action' : 'href'), isForm ? new FormData(e.target) : null);
+    return false;
+}
+
+// i decided to mix AjaxClick and AjaxSubmit because they were the same
+function SendAjaxRequest(url, formData = null) {
     var xhr = new XMLHttpRequest();
     xhr.open(DescriptMethod(url), url, true);
     xhr.setRequestHeader('X_REQUESTED_WITH', 'XMLHttpRequest');
 
-    AskForIdentityAction(false);
+    AskForIdentityActionIfAbsent(xhr, false);
 
     // seems worthy
     var action = requestUrlActionMap[url];
@@ -126,27 +126,23 @@ function DescriptMethod(url) {
             $method = 'POST';
             break;
         default:
-            $method = undefined;
-    }
-
-    if ($method === undefined) {
-        if (url.startsWith('/stare-at/')) {
-            $method = 'GET';
-        }
-        /*
-            other checks
-        */
-        if ($method === undefined) {
-            throw new Error('unknown url');
-        }
+            if (url.startsWith('/stare-at/')) {
+                $method = 'GET';
+            }
+            /*
+                other checks
+            */
+            if ($method === undefined) {
+                throw new Error('unknown url');
+            }
     }
     return $method;
 }
 
 /** @force (bool) means that client doesn't have identity action and he needs it anyway. */
-function AskForIdentityAction(force) {
-    if (!page.identityNavItemContainer.firstChild) {
-        request.setRequestHeader('X-Gimme-Identity-Action', null);
+function AskForIdentityActionIfAbsent(request, force = false) {
+    if (force || !page.identityNavItemContainer.firstChild) {
+        request.setRequestHeader('X-Gimme-Identity-Action', '');
     }
 }
 
@@ -166,7 +162,7 @@ function UpdatePage(response, url) {
 
     TrashDataHandling(url);
 
-    InitLinks();
+    UpdateLinks();
 }
 
 /** Trash handling because the code is not coupled here and could be in
@@ -192,10 +188,11 @@ function UpdateIdentityNavbarItemIfItReceived() {
     // when response contains new navbar, that means that in the request js asked for it via header. so, this script trusts server that it won't send new navbar when it wasn't requested
     if (data.identityNavItem) {
         // gotcha. it must be implemented via container "identity-item", which will always exist in nav bar, but content will changes. and you won't have to mess around with insertAdjacentHTML-thing.
-        if (page.navbarList.children[1]) {
-            page.navbarList.children[1].remove();
-        }
-        page.navbarList.insertAdjacentHTML('beforeend', data.identityNavItem);
+        // if (page.navbarList.children[1]) {
+        //     page.navbarList.children[1].remove();
+        // }
+        // page.navbarList.insertAdjacentHTML('beforeend', data.identityNavItem);
+        page.identityNavItemContainer.innerHTML = data.identityNavItem;
     }
 }
 

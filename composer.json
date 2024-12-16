@@ -76,7 +76,7 @@
     "autoload": {
         "files": [
             "models\\PageModel.php",
-            "controllers\\BaseAjaxController.php",
+            "controllers\\AjaxControllerWithIdentityAction.php",
             "views\\library\\PdffileCardGenerator.php"
 
         ]
