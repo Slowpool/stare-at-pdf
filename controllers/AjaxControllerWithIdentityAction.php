@@ -22,11 +22,11 @@ class AjaxControllerWithIdentityAction extends Controller
         if ($this->isAjax()) {
             $this->response->format = Response::FORMAT_JSON;
             $page = $callback();
-            // adds login or logout button (depending upon current user status) in response if it requested and
+            // adds login or logout button (depending upon current user status) in response if it requested
             if (Yii::$app->request->headers->has('X-Gimme-Identity-Action')) {
-                $page = Yii::$app->user->isGuest
-                    ? new IdentityPageModel($page, $this->renderPartial(Yii::getAlias('@partial_nav_login_button')))
-                    : new IdentityPageModel($page, $this->renderPartial(Yii::getAlias('@partial_nav_logout_form')));
+                $page = new IdentityPageModel($page, $this->renderPartial(Yii::getAlias(Yii::$app->user->isGuest
+                    ? '@partial_nav_login_button'
+                    : '@partial_nav_logout_form')));
             }
             return $page;
         } else {
