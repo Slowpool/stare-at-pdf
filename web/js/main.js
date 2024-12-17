@@ -44,7 +44,7 @@ function OnLoad() {
 
 // TODO this method assigns event listener to pdfjs widget (but mustn't)
 function UpdateLinks() {
-    links = [...document.getElementsByTagName('a'), ...document.getElementsByTagName('form')];
+    links = document.getElementsByClassName('ajax-action');
     for (var link of links) {
         var isForm = link.tagName == 'FORM'; // otherwise a
         // this approach assigns handler once

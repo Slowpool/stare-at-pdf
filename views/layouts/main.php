@@ -42,7 +42,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
         echo Nav::widget([
             'options' => ['class' => 'navbar-nav'],
             'items' => [
-                ['label' => 'Library', 'url' => ['/library/index']],
+                ['label' => 'Library', 'url' => ['/library/index'], 'class' => 'ajax-action'],
                 // login or logout
                 Html::beginTag('li', ['id' => 'identity-action-container', 'class' => 'nav-item'])
                 . Html::endTag('li'),
