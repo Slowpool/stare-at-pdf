@@ -96,6 +96,7 @@ function SendAjaxRequest(url, formData = null) {
         }
         loaded = true;
         if (xhr.status == 200) {
+            // where is query stringggggggg
             UpdatePage(JSON.parse(xhr.responseText), url);
         }
         else {
@@ -147,18 +148,18 @@ function AskForIdentityActionIfAbsent(request, force = false) {
     }
 }
 
-function UpdatePage(response, url) {
+function UpdatePage(jsonResponse, url) {
     data = {
-        selectedNav: response.selectedNav,
-        content: response.content,
-        url: response.url,
-        identityNavItem: response.navbarItem,
+        selectedNav: jsonResponse.selectedNav,
+        content: jsonResponse.content,
+        url: jsonResponse.url,
+        identityNavItem: jsonResponse.navbarItem,
     };
 
     // now i don't like that the requested url differs from the url in the response.
-    var action = responseUrlActionMap[response.url];
+    var action = responseUrlActionMap[jsonResponse.url];
     if (action) {
-        action(response);
+        action(jsonResponse);
     }
 
     TrashDataHandling(url);
@@ -174,6 +175,7 @@ function TrashDataHandling(requestedUrl) {
     if (data.url.startsWith('/stare-at/') || data.url == '/') {
         LoadPdf();
     }
+    
     page.title.innerHTML = data.selectedNav;
     page.content.innerHTML = data.content;
     // document.title = data.title // TODO what does it do?
