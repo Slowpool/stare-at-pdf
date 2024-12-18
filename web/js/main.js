@@ -55,7 +55,7 @@ function UpdateLinks() {
         }
         else {
             if (!link.onclick) {
-                links.onclick = AjaxClickHandler;
+                link.onclick = AjaxClickHandler;
             }
         }
         // link.addEventListener(isForm ? 'submit' : 'click', AjaxClickHandler);
@@ -141,6 +141,7 @@ function DescriptMethod(url) {
 
 /** @force (bool) means that client doesn't have identity action and he needs it anyway. */
 function AskForIdentityActionIfAbsent(request, force = false) {
+    // TODO works wrong
     if (force || !page.identityNavItemContainer.firstChild) {
         request.setRequestHeader('X-Gimme-Identity-Action', '');
     }
@@ -197,7 +198,7 @@ function UpdateIdentityNavbarItemIfItReceived() {
 }
 
 function LoadPdf() {
-    // ajaxed pdfJs requires this stuff so that it can be displayed. 
+    // ajaxed pdfJs requires this stuff. otherwise it won't be displayed. 
     jQuery(function ($) {
         $("#pdfjs-form-w0").submit();
         jQuery('#pdfjs-form-w0').yiiActiveForm([], []);

@@ -37,12 +37,14 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
         NavBar::begin([
             'brandLabel' => Yii::$app->name,
             'brandUrl' => Yii::$app->homeUrl,
+            'brandOptions' => ['class' => 'ajax-action'],
             'options' => ['id' => 'main-navbar', 'class' => 'navbar-expand-md navbar-dark bg-dark']
         ]);
         echo Nav::widget([
             'options' => ['class' => 'navbar-nav'],
             'items' => [
-                ['label' => 'Library', 'url' => ['/library/index'], 'class' => 'ajax-action'],
+                Html::beginTag('li', ['class' => 'nav-item'])
+                . Html::a('Library', '/library', ['class' => 'ajax-action nav-link']),
                 // login or logout
                 Html::beginTag('li', ['id' => 'identity-action-container', 'class' => 'nav-item'])
                 . Html::endTag('li'),

@@ -22,6 +22,7 @@ $model = new LoginForm();
             <?php $form = ActiveForm::begin([
                 'id' => 'login-form',
                 'action' => '/send-credentials-to-login',
+                'options' => ['class' => 'ajax-action'],
                 'fieldConfig' => [
                     'template' => "{label}\n{input}\n{error}",
                     'labelOptions' => ['class' => 'col-lg-1 col-form-label mr-lg-3'],

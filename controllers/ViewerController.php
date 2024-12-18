@@ -8,6 +8,7 @@ use yii\web\Controller;
 use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\PageModel;
+use app\models\domain\PdfFileRecord;
 
 class ViewerController extends AjaxControllerWithIdentityAction
 {
@@ -39,12 +40,15 @@ class ViewerController extends AjaxControllerWithIdentityAction
         ];
     }
 
-    public function actionIndex($pdf_name)
+    public function actionIndex($pdfName, $page = null)
     {
-        return $this->executeIfAjaxOtherwiseRenderSinglePage(function () use ($pdf_name) {
-            $pdf_url = isset($pdf_name) ? "uploads\\" . Yii::$app->user->identity->name . "\\$pdf_name.pdf" : '';
-            $page = new PageModel('Home', $this->renderPartial('index', compact('pdf_url')), $this->request->url);
-            return $page;
+        return $this->executeIfAjaxOtherwiseRenderSinglePage(function () use ($pdfName, $page) {
+            $pdfSpecified = $pdfName == null ? false : true;
+            if ($pdfSpecified) {
+                $page = $page ?? PdfFileRecord::getBookmarkByFileName($pdfName);
+            }
+            $pageModel = new PageModel('Home', $this->renderPartial('index', compact('pdfName', 'page', 'pdfSpecified')), $this->request->url);
+            return $pageModel;
         });
     }
 

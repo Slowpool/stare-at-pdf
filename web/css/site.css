@@ -127,4 +127,5 @@ li.pdf-file-card {
     width: 30%;
     margin-inline: 5px;
     margin-block: 5px;
+    padding-inline: 3px;
 }

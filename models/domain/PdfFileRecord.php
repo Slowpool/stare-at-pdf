@@ -66,11 +66,19 @@ class PdfFileRecord extends \yii\db\ActiveRecord
     public static function getFilesOfUserAsArray($username)
     {
         return self::find()
-            ->alias('pf')
-            ->asArray()
-            ->select(['pf.id', 'pf.name', 'pf.bookmark', 'pf.user_id'])
-            ->joinWith('user u') // probably ordinary join?
-            ->where(['u.name' => $username])
-            ->all();
+                    ->alias('pf')
+                    ->asArray()
+                    ->select(['pf.id', 'pf.name', 'pf.bookmark', 'pf.user_id'])
+                    ->joinWith('user u') // probably ordinary join?
+                    ->where(['u.name' => $username])
+                    ->all();
+    }
+
+    public static function getBookmarkByFileName($file_name) {
+        return self::find()
+                    ->asArray()
+                    ->where(['name' => $file_name])
+                    ->one()
+                    ['bookmark'];
     }
 }

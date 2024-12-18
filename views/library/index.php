@@ -15,7 +15,7 @@ use app\views\library\PdfFileCardGenerator;
     <h4>Welcome. The library content:</h4>
     <ul id="all-files-list">
         <?php foreach ($pdfFiles as $pdf): ?>
-            <?= PdfFileCardGenerator::generate($pdf['id'], $pdf['name'], $pdf['bookmark']) ?>
+            <?= PdfFileCardGenerator::render($pdf['id'], $pdf['name'], $pdf['bookmark']) ?>
         <?php endforeach; ?>
     </ul>
 </div>
