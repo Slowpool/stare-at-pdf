@@ -4,13 +4,14 @@ namespace app\controllers;
 
 use Yii;
 use yii\filters\AccessControl;
-use yii\web\Controller;
 use yii\web\Response;
 use yii\filters\VerbFilter;
-use app\models\json_responses\PageResponse;
+use yii\web\UploadedFile;
+
+use app\models\jsonResponses\PageResponse;
+use app\models\jsonResponses\UploadFileResponse;
 use app\models\domain\PdfFileRecord;
 use app\models\library\NewFileModel;
-use yii\web\UploadedFile;
 
 class LibraryController extends AjaxControllerWithIdentityAction
 {
@@ -60,12 +61,12 @@ class LibraryController extends AjaxControllerWithIdentityAction
         return $this->executeIfAjaxOtherwiseRenderSinglePage(function () {
             $newFileModel = new NewFileModel();
             if (!$newFileModel->load(Yii::$app->request->post())) {
-                return $this->renderUploadFormWithError('Lack of file in request', $newFileModel);
+                return $this->createUploadFormWithError('Lack of file in request', $newFileModel);
             }
 
             $newFileModel->newFile = UploadedFile::getInstance($newFileModel, 'newFile');
             if (!$newFileModel->validate() || !$newFileModel->newFile) {
-                return $this->renderUploadFormWithError(
+                return $this->createUploadFormWithError(
                     // A
                     $newFileModel->errors['newFile'][0],
                     $newFileModel
@@ -74,7 +75,7 @@ class LibraryController extends AjaxControllerWithIdentityAction
 
             $pdfFile = new PdfFileRecord($newFileModel->newfile->baseName);
             if (!$pdfFile->save() || !$pdfFile->update()) {
-                return $this->renderUploadFormWithError(
+                return $this->createUploadFormWithError(
                     // A
                     $pdfFile->errors[0],
                     $newFileModel
@@ -82,19 +83,19 @@ class LibraryController extends AjaxControllerWithIdentityAction
             }
 
             $newFileModel = new NewFileModel();
-            return $this->renderUploadForm($newFileModel);
+            return $this->createUploadForm($newFileModel);
         });
         // A - show only one error == bad UX
     }
 
-    public function renderUploadFormWithError($error, $newFileModel)
+    public function createUploadFormWithError($error, $newFileModel)
     {
         $newFileModel->addError('newFile', $error);
-        return $this->renderUploadForm($newFileModel);
+        return $this->createUploadForm($newFileModel);
     }
 
-    public function renderUploadForm($newFileModel)
+    public function createUploadForm($newFileModel)
     {
-        return $this->renderPartial(Yii::getAlias('@partial_new_file_form'), compact('newFileModel'));
+        return new UploadFileResponse($this->renderPartial(Yii::getAlias('@partial_new_file_form'), compact('newFileModel')));
     }
 }

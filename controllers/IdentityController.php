@@ -9,7 +9,7 @@ use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\identity\LoginForm;
 use app\models\ContactForm;
-use app\models\json_responses\PageResponse;
+use app\models\jsonResponses\PageResponse;
 
 class IdentityController extends AjaxControllerWithIdentityAction
 {

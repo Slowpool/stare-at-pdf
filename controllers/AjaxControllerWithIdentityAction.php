@@ -4,9 +4,9 @@ namespace app\controllers;
 
 use Yii;
 use yii\web\Controller;
-use app\models\json_responses\PageResponse;
+use app\models\jsonResponses\PageResponse;
+use app\models\jsonResponses\PageResponseWithIdentityAction;
 use yii\web\Response;
-use app\models\identity\IdentityPageResponse;
 
 abstract class AjaxControllerWithIdentityAction extends Controller
 {
@@ -23,7 +23,7 @@ abstract class AjaxControllerWithIdentityAction extends Controller
             $page = $callback();
             // adds login or logout button (depending upon current user status) in response if it requested
             if (Yii::$app->request->headers->has('X-Gimme-Identity-Action')) {
-                $page = new IdentityPageResponse($page, $this->renderPartial(Yii::getAlias(Yii::$app->user->isGuest
+                $page = new PageResponseWithIdentityAction($page, $this->renderPartial(Yii::getAlias(Yii::$app->user->isGuest
                     ? '@partial_nav_login_button'
                     : '@partial_nav_logout_form')));
             }

@@ -1,10 +1,10 @@
 <?php
 
-namespace app\models\identity;
+namespace app\models\jsonResponses;
 
-use app\models\json_responses\PageResponse;
+use app\models\jsonResponses\PageResponse;
 
-class IdentityPageResponse extends PageResponse
+class PageResponseWithIdentityAction extends PageResponse
 {
     public $navbarItem;
 
@@ -16,15 +16,15 @@ class IdentityPageResponse extends PageResponse
         ];
     }
 
-    public function __construct($PageResponse, $navbarItem)
+    public function __construct($pageResponse, $navbarItem)
     {
         // yes. this thing absolutely must be implemented via flags like 0010101010. too much overhead
         $this->responseType = 'entire page with new identity action';
         
         // i'm sure it could be simpler
-        $this->selectedNav = $PageResponse->selectedNav;
-        $this->content = $PageResponse->content;
-        $this->url = $PageResponse->url;
+        $this->selectedNav = $pageResponse->selectedNav;
+        $this->content = $pageResponse->content;
+        $this->url = $pageResponse->url;
         
         $this->navbarItem = $navbarItem;
     }

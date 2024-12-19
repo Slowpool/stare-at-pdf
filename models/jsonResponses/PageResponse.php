@@ -1,6 +1,6 @@
 <?php
 
-namespace app\models\json_responses;
+namespace app\models\jsonResponses;
 
 class PageResponse extends JsonResponse {
     

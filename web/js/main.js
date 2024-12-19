@@ -157,6 +157,23 @@ function AskForIdentityActionIfAbsent(request, force = false) {
 }
 
 function HandleResponse(jsonResponse, url) {
+    ReadData();
+
+    // now i don't like that the requested url differs from the url in the response.
+    var action = responseUrlActionMap[url];
+    var cancelFullPageUpdate = false;
+    if (action) {
+        cancelFullPageUpdate = action(jsonResponse);
+    }
+
+    if (!cancelFullPageUpdate) {
+        TrashDataHandling(url);
+    };
+
+    UpdateLinks();
+}
+
+function ReadData() {
     switch (jsonResponse.responseType) {
         case 'entire page':
             data = {
@@ -178,21 +195,9 @@ function HandleResponse(jsonResponse, url) {
                 identityNavItem: jsonResponse.navbarItem,
             };
             break;
-
+        default:
+            throw new Error('unknown response type');
     }
-
-    // now i don't like that the requested url differs from the url in the response.
-    var action = responseUrlActionMap[url];
-    var cancelFullPageUpdate = false;
-    if (action) {
-        cancelFullPageUpdate = action(jsonResponse);
-    }
-
-    if (!cancelFullPageUpdate) {
-        TrashDataHandling(url);
-    };
-
-    UpdateLinks();
 }
 
 /** Updates entire page. Trash handling because the code is not coupled here and could
