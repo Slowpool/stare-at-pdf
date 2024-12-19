@@ -9,7 +9,7 @@ use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\identity\LoginForm;
 use app\models\ContactForm;
-use app\models\PageModel;
+use app\models\json_responses\PageResponse;
 
 class IdentityController extends AjaxControllerWithIdentityAction
 {
@@ -58,7 +58,7 @@ class IdentityController extends AjaxControllerWithIdentityAction
 
     public function createLoginPage($viewParams)
     {
-        return new PageModel('Login', $this->renderPartial(Yii::getAlias('@login_view'), $viewParams), Yii::$app->user->loginUrl);
+        return new PageResponse('Login', $this->renderPartial(Yii::getAlias('@login_view'), $viewParams), Yii::$app->user->loginUrl);
     }
 
     /** Overriden. Sends either login page (for unsigned user) or home page (pdf viewer)

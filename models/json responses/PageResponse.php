@@ -1,17 +1,13 @@
 <?php
 
-namespace app\models;
+namespace app\models\json_responses;
 
-use Yii;
-use yii\base\Model;
-
-
-class PageModel extends Model {
+class PageResponse extends JsonResponse {
     
     public string $selectedNav;
     public string $content;
-    public string $url;
 
+    // TODO why did i add it if it is never being validated?
     public function rules() {
         return [
             [['selectedNav', 'content', 'url'], 'required']
@@ -19,6 +15,9 @@ class PageModel extends Model {
     }
 
     public function __construct($selectedNav, $content, $url) {
+        // yes, i could have used constants here, but idk yet how to agree php constants with js constants. probably it doesn't matter at all. 
+        $this->responseType = 'entire page';
+        
         $this->selectedNav = $selectedNav;
         $this->content = $content;
         $this->url = $url;

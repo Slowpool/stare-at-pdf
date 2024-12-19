@@ -4,12 +4,11 @@ namespace app\controllers;
 
 use Yii;
 use yii\web\Controller;
-use app\models\PageModel;
+use app\models\json_responses\PageResponse;
 use yii\web\Response;
-use app\models\identity\IdentityPageModel;
+use app\models\identity\IdentityPageResponse;
 
-// TODO any ajax request does x2 requests each click. the 8th request does 8 requests instead of 1 end etc.
-class AjaxControllerWithIdentityAction extends Controller
+abstract class AjaxControllerWithIdentityAction extends Controller
 {
     public function isAjax()
     {
@@ -24,7 +23,7 @@ class AjaxControllerWithIdentityAction extends Controller
             $page = $callback();
             // adds login or logout button (depending upon current user status) in response if it requested
             if (Yii::$app->request->headers->has('X-Gimme-Identity-Action')) {
-                $page = new IdentityPageModel($page, $this->renderPartial(Yii::getAlias(Yii::$app->user->isGuest
+                $page = new IdentityPageResponse($page, $this->renderPartial(Yii::getAlias(Yii::$app->user->isGuest
                     ? '@partial_nav_login_button'
                     : '@partial_nav_logout_form')));
             }
@@ -36,10 +35,10 @@ class AjaxControllerWithIdentityAction extends Controller
 
     public function createHomePage($pdfName, $pdfSpecified, $page)
     {
-        return new PageModel(Yii::$app->name, $this->renderPartial(Yii::getAlias('@home_view'), compact('pdfName', 'page', 'pdfSpecified')), Yii::$app->homeUrl);
+        return new PageResponse(Yii::$app->name, $this->renderPartial(Yii::getAlias('@home_view'), compact('pdfName', 'page', 'pdfSpecified')), Yii::$app->homeUrl);
     }
 
-    /** @return PageModel  */
+    /** @return PageResponse  */
     /** Sends the page with pdf viewer */
     public function goHomeAjax($pdfName = '', $pdfSpecified = false, $page = 0)
     {

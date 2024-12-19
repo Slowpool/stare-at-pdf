@@ -7,7 +7,7 @@ use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\Response;
 use yii\filters\VerbFilter;
-use app\models\PageModel;
+use app\models\json_responses\PageResponse;
 use app\models\domain\PdfFileRecord;
 
 class ViewerController extends AjaxControllerWithIdentityAction
@@ -47,8 +47,8 @@ class ViewerController extends AjaxControllerWithIdentityAction
             if ($pdfSpecified) {
                 $page = $page ?? PdfFileRecord::getBookmarkByFileName($pdfName);
             }
-            $pageModel = $this->goHomeAjax($pdfName, $pdfSpecified, $page);
-            return $pageModel;
+            $PageResponse = $this->goHomeAjax($pdfName, $pdfSpecified, $page);
+            return $PageResponse;
         });
     }
 

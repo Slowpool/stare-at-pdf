@@ -19,9 +19,11 @@ const requestUrlActionMap = {
     },
 };
 
+/** @return bool value, indicates whether the response was handled completely. For example, when response returns only new form file, this method is supposed to handle it completely and return true */
 const responseUrlActionMap = {
-    '/upload-pdf': (response) => {
-        
+    '/upload-pdf': (jsonResponse) => {
+        document.getElementById('new-file-container').innerHTML = jsonResponse.newForm;
+        return true;
     },
 };
 
@@ -50,23 +52,22 @@ function OnLoad() {
     SendAjaxRequest(window.location.pathname);
 }
 
-// TODO this method assigns event listener to pdfjs widget (but mustn't)
 function UpdateLinks() {
     links = document.getElementsByClassName('ajax-action');
     for (var link of links) {
-        var isForm = link.tagName == 'FORM'; // otherwise a
+        var isForm = link.tagName == 'FORM';
         // this approach assigns handler once
         if (isForm) {
             if (!link.onsubmit) {
                 link.onsubmit = AjaxSubmitHandler;
             }
         }
+        // otherwise <a>
         else {
             if (!link.onclick) {
                 link.onclick = AjaxClickHandler;
             }
         }
-        // link.addEventListener(isForm ? 'submit' : 'click', AjaxClickHandler);
     }
 }
 
@@ -99,7 +100,7 @@ function SendAjaxRequest(url, formData = null) {
         loaded = true;
         if (xhr.status == 200) {
             // where is query stringggggggg
-            UpdatePage(JSON.parse(xhr.responseText), url);
+            HandleResponse(JSON.parse(xhr.responseText), url);
         }
         else {
             alert('error');
@@ -114,7 +115,7 @@ function SendAjaxRequest(url, formData = null) {
     }
 
     loaded = false;
-    // TODO don't show when file is being uploaded
+    
     xhr.send(formData);
 }
 
@@ -155,30 +156,51 @@ function AskForIdentityActionIfAbsent(request, force = false) {
     }
 }
 
-function UpdatePage(jsonResponse, url) {
-    data = {
-        selectedNav: jsonResponse.selectedNav,
-        content: jsonResponse.content,
-        url: jsonResponse.url,
-        identityNavItem: jsonResponse.navbarItem,
-    };
+function HandleResponse(jsonResponse, url) {
+    switch (jsonResponse.responseType) {
+        case 'entire page':
+            data = {
+                selectedNav: jsonResponse.selectedNav,
+                content: jsonResponse.content,
+                url: jsonResponse.url,
+            };
+            break;
+        case 'new file form':
+            data = {
+                newFileForm: jsonResponse.newForm,
+            };
+            break;
+        case 'entire page with new identity action':
+            data = {
+                selectedNav: jsonResponse.selectedNav,
+                content: jsonResponse.content,
+                url: jsonResponse.url,
+                identityNavItem: jsonResponse.navbarItem,
+            };
+            break;
+
+    }
 
     // now i don't like that the requested url differs from the url in the response.
     var action = responseUrlActionMap[url];
+    var cancelFullPageUpdate = false;
     if (action) {
-        action(jsonResponse);
+        cancelFullPageUpdate = action(jsonResponse);
     }
 
-    TrashDataHandling(url);
+    if (!cancelFullPageUpdate) {
+        TrashDataHandling(url);
+    };
 
     UpdateLinks();
 }
 
-/** Trash handling because the code is not coupled here and could be in
- * any order (almost). also this meth will become greater and greater, so needs some divising on little methods. */
+/** Updates entire page. Trash handling because the code is not coupled here and could
+ * be in any order (almost). also this meth will become greater and greater, so
+ * it needs some divising on less methods. */
 function TrashDataHandling(requestedUrl) {
     UpdateIdentityNavbarItemIfItReceived();
-    // it should be in above mapper's action, but i don't know how to cut right part of /stare-at/. wait, it doesn't have a query string, so it can be easy cut
+    // it should be in above actions mapper
     if (data.url.startsWith('/stare-at/') || data.url == '/') {
         LoadPdf();
     }

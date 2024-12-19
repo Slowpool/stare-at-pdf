@@ -7,7 +7,7 @@ use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\Response;
 use yii\filters\VerbFilter;
-use app\models\PageModel;
+use app\models\json_responses\PageResponse;
 use app\models\domain\PdfFileRecord;
 use app\models\library\NewFileModel;
 use yii\web\UploadedFile;
@@ -41,7 +41,7 @@ class LibraryController extends AjaxControllerWithIdentityAction
 
     public function createIndexPage($pdfFiles, $newFileModel)
     {
-        return new PageModel('Library', $this->renderPartial('index', compact('pdfFiles', 'newFileModel')), $this->request->url);
+        return new PageResponse('Library', $this->renderPartial('index', compact('pdfFiles', 'newFileModel')), $this->request->url);
     }
 
     public function actionIndex()

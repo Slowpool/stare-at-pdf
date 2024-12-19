@@ -2,7 +2,7 @@
 
 /** @var yii\web\View $this */
 /** @var yii\bootstrap5\ActiveForm $form */
-/** @var app\models\PageModel $page */
+/** @var app\models\json_responses\PageResponse $page */
 
 /** @var app\models\identity\LoginForm $model */
 
