@@ -1,20 +1,28 @@
 const requestUrlActionMap = {
+    // some actions require entire body loading, other - only one element content (like upload new file form)
+
     '/send-credentials-to-login': (request) => {
+        ShowLoading(); // wait, here could be not entire loading.
         AskForIdentityActionIfAbsent(request, true);
     },
     '/login': (request) => {
+        ShowLoading();
         // AskForIdentityActionIfAbsent(request, true);
     },
     '/logout': (request) => {
+        ShowLoading();
         AskForIdentityActionIfAbsent(request, true);
     },
-    '/': (request) => {
-
-    }
+    '/upload-pdf': (request) => {
+        // thus the page must be opened (user should open the page /library at first, and only then send the request. otherwise ShowLoading will throw an exception. but who would send POST requests without opened browser?)
+        ShowLoading(document.getElementById('new-file-container'));
+    },
 };
 
 const responseUrlActionMap = {
-
+    '/upload-pdf': (response) => {
+        
+    },
 };
 
 var links = null;
@@ -31,7 +39,7 @@ var leftUrlPart = 'https://localhost:8080';
 
 var page = {
     title: document.getElementById('title'),
-    navbarList: document.getElementById('w0'),
+    navbarList: document.getElementById('w0'), // probably useless
     content: document.getElementById('main'),
     identityNavItemContainer: document.getElementById('identity-action-container'),
 };
@@ -84,12 +92,6 @@ function SendAjaxRequest(url, formData = null) {
 
     AskForIdentityActionIfAbsent(xhr, false);
 
-    // seems worthy
-    var action = requestUrlActionMap[url];
-    if (action) {
-        action(xhr);
-    }
-
     xhr.onreadystatechange = () => {
         if (xhr.readyState != 4) {
             return;
@@ -105,9 +107,14 @@ function SendAjaxRequest(url, formData = null) {
         }
     };
 
-    loaded = false;
-    ShowLoading();
+    // seems worthy
+    var action = requestUrlActionMap[url];
+    if (action) {
+        action(xhr);
+    }
 
+    loaded = false;
+    // TODO don't show when file is being uploaded
     xhr.send(formData);
 }
 
@@ -157,7 +164,7 @@ function UpdatePage(jsonResponse, url) {
     };
 
     // now i don't like that the requested url differs from the url in the response.
-    var action = responseUrlActionMap[jsonResponse.url];
+    var action = responseUrlActionMap[url];
     if (action) {
         action(jsonResponse);
     }
@@ -175,7 +182,7 @@ function TrashDataHandling(requestedUrl) {
     if (data.url.startsWith('/stare-at/') || data.url == '/') {
         LoadPdf();
     }
-    
+
     page.title.innerHTML = data.selectedNav;
     page.content.innerHTML = data.content;
     // document.title = data.title // TODO what does it do?
@@ -199,6 +206,7 @@ function UpdateIdentityNavbarItemIfItReceived() {
     }
 }
 
+// TODO must be in viewer.js
 function LoadPdf() {
     // ajaxed pdfJs requires this stuff. otherwise it won't be displayed. 
     jQuery(function ($) {
@@ -207,8 +215,9 @@ function LoadPdf() {
     });
 }
 
-function ShowLoading() {
+/** @loadingScope a tag, where to display loading  */
+function ShowLoading(loadingScope = page.content) {
     if (!loaded) {
-        page.content.innerHTML = 'Loading...';
+        loadingScope.innerHTML = 'Loading...';
     }
 }

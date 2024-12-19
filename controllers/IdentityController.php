@@ -62,15 +62,16 @@ class IdentityController extends AjaxControllerWithIdentityAction
     }
 
     /** Overriden. Sends either login page (for unsigned user) or home page (pdf viewer)
-     * @param string $pdf_url
-     * ignored. i can't imagine any case when you can pick pdf url being on the login stage.
-     * This method using looks redundant everywhere. I forgot why i wanted to use it, but it defines one logic which applied everywhere.
+     * @param string $pdf_url IGNORED inherited param. i can't imagine any case when you have a need to pick pdf url being on the login stage.
+     * The using of this method looks redundant everywhere. I forgot why i wanted to use it. Otherwise it defines one logic which applied everywhere.
+     * @param bool $pdfSpecified IGNORED inherited param.
+     * @param string $page IGNORED inherited param.
      */
-    public function goHomeAjax($pdf_url = '')
+    public function goHomeAjax($pdfName = '', $pdfSpecified = false, $page = 0)
     {
         return Yii::$app->user->isGuest
             ? $this->createLoginPage([])
-            : parent::goHomeAjax('');
+            : parent::goHomeAjax();
     }
 
     /**

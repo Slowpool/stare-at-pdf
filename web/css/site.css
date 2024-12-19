@@ -98,7 +98,6 @@ a.desc:after {
 body,
 main {
     height: 100%;
-    overflow: hidden;
 }
 
 .navbar-nav {
@@ -122,13 +121,18 @@ main {
     flex-direction: column;
 }
 
-li.pdf-file-card {
+li.pdf-file-card,
+.form-control {
     border: 2px solid #1e5184;
-    width: 30%;
     padding-inline: 10px;
     padding-block: 5px;
     margin-block: 5px;
 }
+
+li.pdf-file-card {
+    width: 30%;
+}
+
 
 #library-title {
     padding-block: 20px;
@@ -142,9 +146,8 @@ li.pdf-file-card {
 
 #upload-file-form,
 .pdf-file-card,
+.form-control,
 button,
-input
-{
+input {
     border-radius: 10px;
-
 }

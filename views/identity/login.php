@@ -10,7 +10,7 @@ use yii\bootstrap5\ActiveForm;
 use yii\bootstrap5\Html;
 use app\models\identity\LoginForm;
 
-// TODO view creates the model by its own???
+// TODO view creates the model by its own??? // obviously it's wrong, remove it
 $model = new LoginForm();
 
 ?>

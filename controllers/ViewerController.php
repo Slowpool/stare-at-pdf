@@ -47,7 +47,7 @@ class ViewerController extends AjaxControllerWithIdentityAction
             if ($pdfSpecified) {
                 $page = $page ?? PdfFileRecord::getBookmarkByFileName($pdfName);
             }
-            $pageModel = new PageModel('Home', $this->renderPartial('index', compact('pdfName', 'page', 'pdfSpecified')), $this->request->url);
+            $pageModel = $this->goHomeAjax($pdfName, $pdfSpecified, $page);
             return $pageModel;
         });
     }

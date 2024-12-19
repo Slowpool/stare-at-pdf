@@ -67,7 +67,7 @@ class LibraryController extends AjaxControllerWithIdentityAction
             if (!$newFileModel->validate() || !$newFileModel->newFile) {
                 return $this->renderUploadFormWithError(
                     // A
-                    $newFileModel->errors[0],
+                    $newFileModel->errors['newFile'][0],
                     $newFileModel
                 );
             }
@@ -87,14 +87,14 @@ class LibraryController extends AjaxControllerWithIdentityAction
         // A - show only one error == bad UX
     }
 
-    public function renderUploadFormWithError($error, $model)
+    public function renderUploadFormWithError($error, $newFileModel)
     {
-        $model->addError('newFile', $error);
-        return $this->renderUploadForm($model);
+        $newFileModel->addError('newFile', $error);
+        return $this->renderUploadForm($newFileModel);
     }
 
-    public function renderUploadForm($model)
+    public function renderUploadForm($newFileModel)
     {
-        return $this->renderPartial(Yii::getAlias('@partial_new_file_form'), compact('model'));
+        return $this->renderPartial(Yii::getAlias('@partial_new_file_form'), compact('newFileModel'));
     }
 }

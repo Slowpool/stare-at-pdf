@@ -34,16 +34,16 @@ class AjaxControllerWithIdentityAction extends Controller
         }
     }
 
-    public function createHomePage($pdf_url)
+    public function createHomePage($pdfName, $pdfSpecified, $page)
     {
-        return new PageModel(Yii::$app->name, $this->renderPartial(Yii::getAlias('@home_view'), ['pdf_url' => $pdf_url]), Yii::$app->homeUrl);
+        return new PageModel(Yii::$app->name, $this->renderPartial(Yii::getAlias('@home_view'), compact('pdfName', 'page', 'pdfSpecified')), Yii::$app->homeUrl);
     }
 
     /** @return PageModel  */
     /** Sends the page with pdf viewer */
-    public function goHomeAjax($pdf_url = '')
+    public function goHomeAjax($pdfName = '', $pdfSpecified = false, $page = 0)
     {
-        return $this->createHomePage($pdf_url);
+        return $this->createHomePage($pdfName, $pdfSpecified, $page);
     }
 
     public function renderSinglePage()
