@@ -113,7 +113,7 @@ main {
 }
 
 #library-container {
-    padding: 30px;
+    padding-inline: 30px;
 }
 
 #all-files-list {
@@ -125,7 +125,26 @@ main {
 li.pdf-file-card {
     border: 2px solid #1e5184;
     width: 30%;
-    margin-inline: 5px;
+    padding-inline: 10px;
+    padding-block: 5px;
     margin-block: 5px;
-    padding-inline: 3px;
+}
+
+#library-title {
+    padding-block: 20px;
+}
+
+#upload-file-form {
+    padding: 10px;
+    border: 2px solid black;
+    margin-bottom: 20px;
+}
+
+#upload-file-form,
+.pdf-file-card,
+button,
+input
+{
+    border-radius: 10px;
+
 }

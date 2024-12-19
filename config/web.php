@@ -21,13 +21,13 @@ $config = [
         
         '@partial_nav_logout_form' => '//layouts/partial_nav_logout_form.php',
         '@partial_nav_login_button' => '//layouts/partial_nav_login.php',
+        '@partial_new_file_form' => '//library/partial_new_file_form.php',
 
         '@uploads' => '@app/web/uploads',
         '@scripts' => '@app/web/js',
     ],
     'components' => [
         'request' => [
-            // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
             'cookieValidationKey' => 'Grx0TYPqpD-LAEbdgbayRShvE2FtzVkz',
         ],
         'cache' => [

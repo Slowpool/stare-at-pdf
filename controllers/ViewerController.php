@@ -52,13 +52,6 @@ class ViewerController extends AjaxControllerWithIdentityAction
         });
     }
 
-    // TODO remove
-    public function actionOldVersion()
-    {
-        $result = $this->render('index');
-        return $result;
-    }
-
     // TODO temporary stuff
     public function actionError()
     {
