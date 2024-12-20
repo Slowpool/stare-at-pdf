@@ -80,9 +80,10 @@ class LibraryController extends AjaxControllerWithIdentityAction
                 );
             }
 
-            // TODO difference between UploadedFile->baseName and name
-            $pdfFileRecord = new PdfFileRecord($newFileModel->newFile->name);
-            if (!$pdfFileRecord->save()) { // || !$pdfFileRecord->refresh()) { // there's no need in id
+            // q: difference between UploadedFile->baseName and name
+            // a: baseName has no extension
+            $pdfFileRecord = new PdfFileRecord($newFileModel->newFile->baseName);
+            if (!$pdfFileRecord->save()) {
                 return $this->createFailedUploadFormWithError(
                     // A
                     $pdfFileRecord->errors[0],

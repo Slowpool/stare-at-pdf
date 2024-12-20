@@ -18,9 +18,6 @@ const requestUrlActionMap = {
     '/upload-pdf': (request) => {
         // thus the page must be opened (user should open the page /library at first, and only then send the request. otherwise ShowLoading will throw an exception. but who would send POST requests without opened browser?)
         ShowLoading(document.getElementById('new-file-container'));
-        if(data.newPdfCard) {
-            document.getElementById('all-files-list').insertAdjacentHTML('beforeend', data.newPdfCard);
-        }
     },
     '/library': (request) => {
         ShowLoading();
@@ -31,6 +28,9 @@ const requestUrlActionMap = {
 const responseUrlActionMap = {
     '/upload-pdf': (jsonResponse) => {
         document.getElementById('new-file-container').innerHTML = jsonResponse.newForm;
+        if(data.newPdfCard) {
+            document.getElementById('all-files-list').insertAdjacentHTML('beforeend', data.newPdfCard);
+        }
         return true;
     },
 };
