@@ -11,4 +11,7 @@ abstract class JsonResponse extends Model {
     public string $responseType;
     public string $url;
 
+    public function __construct($url) {
+        $this->url = $url;
+    }
 }

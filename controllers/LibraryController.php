@@ -9,7 +9,7 @@ use yii\filters\VerbFilter;
 use yii\web\UploadedFile;
 
 use app\models\jsonResponses\PageResponse;
-use app\models\jsonResponses\UploadFileResponse;
+use app\models\jsonResponses\FailedToUploadFileResponse;
 use app\models\domain\PdfFileRecord;
 use app\models\library\NewFileModel;
 
@@ -96,6 +96,6 @@ class LibraryController extends AjaxControllerWithIdentityAction
 
     public function createUploadForm($newFileModel)
     {
-        return new UploadFileResponse($this->renderPartial(Yii::getAlias('@partial_new_file_form'), compact('newFileModel')));
+        return new FailedToUploadFileResponse($this->renderPartial(Yii::getAlias('@partial_new_file_form'), compact('newFileModel')));
     }
 }

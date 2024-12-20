@@ -18,14 +18,10 @@ class PageResponseWithIdentityAction extends PageResponse
 
     public function __construct($pageResponse, $navbarItem)
     {
+        parent::__construct($pageResponse->selectedNav, $pageResponse->content, $pageResponse->url);
         // yes. this thing absolutely must be implemented via flags like 0010101010. too much overhead
         $this->responseType = 'entire page with new identity action';
-        
-        // i'm sure it could be simpler
-        $this->selectedNav = $pageResponse->selectedNav;
-        $this->content = $pageResponse->content;
-        $this->url = $pageResponse->url;
-        
+
         $this->navbarItem = $navbarItem;
     }
 }

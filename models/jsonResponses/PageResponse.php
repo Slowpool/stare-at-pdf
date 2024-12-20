@@ -15,12 +15,12 @@ class PageResponse extends JsonResponse {
     }
 
     public function __construct($selectedNav, $content, $url) {
+        parent::__construct($url);
         // yes, i could have used constants here, but idk yet how to agree php constants with js constants. probably it doesn't matter at all. 
         $this->responseType = 'entire page';
         
         $this->selectedNav = $selectedNav;
         $this->content = $content;
-        $this->url = $url;
     }
 }
 

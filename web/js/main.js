@@ -1,21 +1,29 @@
 const requestUrlActionMap = {
+    '/': (request) => {
+        ShowLoading();
+    },
     // some actions require entire body loading, other - only one element content (like upload new file form)
 
     '/send-credentials-to-login': (request) => {
         ShowLoading(); // wait, here could be not entire loading.
-        AskForIdentityActionIfAbsent(request, true);
+        AskForIdentityActionIfAbsent(request, true); // actually mustn't be forced. in case of fail the Login button should stay still
     },
     '/login': (request) => {
         ShowLoading();
-        // AskForIdentityActionIfAbsent(request, true);
     },
     '/logout': (request) => {
         ShowLoading();
-        AskForIdentityActionIfAbsent(request, true);
+        AskForIdentityActionIfAbsent(request, true); // assumes that logout has 100% success
     },
     '/upload-pdf': (request) => {
         // thus the page must be opened (user should open the page /library at first, and only then send the request. otherwise ShowLoading will throw an exception. but who would send POST requests without opened browser?)
         ShowLoading(document.getElementById('new-file-container'));
+        if(data.newPdfCard) {
+            document.getElementById('all-files-list').insertAdjacentHTML('beforeend', data.newPdfCard);
+        }
+    },
+    '/library': (request) => {
+        ShowLoading();
     },
 };
 
@@ -91,7 +99,8 @@ function SendAjaxRequest(url, formData = null) {
     xhr.open(DescriptMethod(url), url, true);
     xhr.setRequestHeader('X_REQUESTED_WITH', 'XMLHttpRequest');
 
-    AskForIdentityActionIfAbsent(xhr, false);
+    // ensures login/logout button if user just came the page 
+    AskForIdentityActionIfAbsent(xhr);
 
     xhr.onreadystatechange = () => {
         if (xhr.readyState != 4) {
@@ -108,14 +117,13 @@ function SendAjaxRequest(url, formData = null) {
         }
     };
 
+    loaded = false;
     // seems worthy
     var action = requestUrlActionMap[url];
     if (action) {
         action(xhr);
     }
 
-    loaded = false;
-    
     xhr.send(formData);
 }
 
@@ -157,7 +165,7 @@ function AskForIdentityActionIfAbsent(request, force = false) {
 }
 
 function HandleResponse(jsonResponse, url) {
-    ReadData();
+    ReadData(jsonResponse);
 
     // now i don't like that the requested url differs from the url in the response.
     var action = responseUrlActionMap[url];
@@ -173,26 +181,35 @@ function HandleResponse(jsonResponse, url) {
     UpdateLinks();
 }
 
-function ReadData() {
+function ReadData(jsonResponse) {
+    // i feel like this is a little workaround here. sorry.
     switch (jsonResponse.responseType) {
         case 'entire page':
             data = {
+                url: jsonResponse.url, // duplicate
                 selectedNav: jsonResponse.selectedNav,
                 content: jsonResponse.content,
-                url: jsonResponse.url,
-            };
-            break;
-        case 'new file form':
-            data = {
-                newFileForm: jsonResponse.newForm,
             };
             break;
         case 'entire page with new identity action':
             data = {
+                url: jsonResponse.url, // duplicate
                 selectedNav: jsonResponse.selectedNav,
                 content: jsonResponse.content,
-                url: jsonResponse.url,
                 identityNavItem: jsonResponse.navbarItem,
+            };
+            break;
+        case 'new file form':
+            data = {
+                url: jsonResponse.url, // duplicate
+                newFileForm: jsonResponse.newForm,
+            };
+            break;
+        case 'new file form with previous uploaded pdf card':
+            data = {
+                url: jsonResponse.url, // duplicate
+                newFileForm: jsonResponse.newForm,
+                newPdfCard: jsonResponse.newPdfCard,
             };
             break;
         default:
