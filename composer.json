@@ -79,8 +79,9 @@
             "models\\jsonResponses\\PageResponse.php",
             "models\\jsonResponses\\PageResponseWithIdentityAction.php",
             "models\\jsonResponses\\FailedToUploadFileResponse.php",
+            "models\\jsonResponses\\FileSuccessfullyUploadedResponse.php",
             "controllers\\AjaxControllerWithIdentityAction.php",
-            "views\\library\\PdfFileCardGenerator.php"
+            "views\\library\\PdfCardGenerator.php"
 
         ]
     }

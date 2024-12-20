@@ -17,16 +17,17 @@ use app\models\domain\UserRecord;
  */
 class PdfFileRecord extends \yii\db\ActiveRecord
 {
-    public $id;
-    public $name;
-    public $bookmark;
-    public $user_id;
+    // https://qna.habr.com/q/425831?ysclid=m4wxkml2dl503187584
+    // public $id;
+    // public $name;
+    // public $bookmark;
+    // public $user_id;
 
     public function __construct($fileName) {
         $this->name = $fileName;
-        // still not sure that default values should be set this way
-        $this->bookmark = 0;
         $this->user_id = Yii::$app->user->identity->id;
+        // still not sure that default values should be set this way
+        $this->bookmark = 1;
     }
 
     /**
@@ -43,6 +44,7 @@ class PdfFileRecord extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
+            [['id', 'name', 'bookmark', 'user_id'], 'safe'],
             [['name', 'user_id'], 'required'],
             [['bookmark', 'user_id'], 'integer'],
             [['name'], 'string', 'max' => 150],

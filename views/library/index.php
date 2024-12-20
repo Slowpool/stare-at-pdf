@@ -4,7 +4,7 @@
 /** @var yii\bootstrap5\ActiveForm $form */
 /** @var array[] $pdfFiles */
 
-use app\views\library\PdfFileCardGenerator;
+use app\views\library\PdfCardGenerator;
 
 ?>
 
@@ -14,8 +14,8 @@ use app\views\library\PdfFileCardGenerator;
         <?= $this->render(Yii::getAlias('@partial_new_file_form'), compact('newFileModel')) ?>
     </div>
     <ul id="all-files-list">
-        <?php foreach ($pdfFiles as $pdf): ?>
-            <?= PdfFileCardGenerator::render($pdf['id'], $pdf['name'], $pdf['bookmark']) ?>
+        <?php foreach ($pdfCards as $pdfCard): ?>
+            <?= PdfCardGenerator::render($pdfCard) ?>
         <?php endforeach; ?>
     </ul>
 </div>

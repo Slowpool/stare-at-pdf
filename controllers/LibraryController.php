@@ -10,7 +10,10 @@ use yii\web\UploadedFile;
 
 use app\models\jsonResponses\PageResponse;
 use app\models\jsonResponses\FailedToUploadFileResponse;
+use app\models\jsonResponses\FileSuccessfullyUploadedResponse;
 use app\models\domain\PdfFileRecord;
+use app\views\library\PdfCardGenerator;
+use app\models\library\PdfCardModel;
 use app\models\library\NewFileModel;
 
 class LibraryController extends AjaxControllerWithIdentityAction
@@ -40,19 +43,23 @@ class LibraryController extends AjaxControllerWithIdentityAction
         ];
     }
 
-    public function createIndexPage($pdfFiles, $newFileModel)
+    public function createIndexPage($pdfCards, $newFileModel)
     {
-        return new PageResponse('Library', $this->renderPartial('index', compact('pdfFiles', 'newFileModel')), $this->request->url);
+        return new PageResponse('Library', $this->renderPartial('index', compact('pdfCards', 'newFileModel')), $this->request->url);
     }
 
     public function actionIndex()
     {
         return $this->executeIfAjaxOtherwiseRenderSinglePage(function () {
-            // TODO add view model for pdf files
             $pdfFiles = PdfFileRecord::getFilesOfUserAsArray(Yii::$app->user->identity->name);
+            // should be in automapper-like class
+            $pdfCards = [];
+            foreach ($pdfFiles as $pdfFile) {
+                $pdfCards[] = new PdfCardModel($pdfFile['name'], $pdfFile['bookmark']);
+            }
             $newFileModel = new NewFileModel();
             $newFileModel->newFile = null;
-            return $this->createIndexPage($pdfFiles, $newFileModel);
+            return $this->createIndexPage($pdfCards, $newFileModel);
         });
     }
 
@@ -61,41 +68,52 @@ class LibraryController extends AjaxControllerWithIdentityAction
         return $this->executeIfAjaxOtherwiseRenderSinglePage(function () {
             $newFileModel = new NewFileModel();
             if (!$newFileModel->load(Yii::$app->request->post())) {
-                return $this->createUploadFormWithError('Lack of file in request', $newFileModel);
+                return $this->createFailedUploadFormWithError('Lack of file in request', $newFileModel);
             }
 
             $newFileModel->newFile = UploadedFile::getInstance($newFileModel, 'newFile');
             if (!$newFileModel->validate() || !$newFileModel->newFile) {
-                return $this->createUploadFormWithError(
+                return $this->createFailedUploadFormWithError(
                     // A
                     $newFileModel->errors['newFile'][0],
                     $newFileModel
                 );
             }
 
-            $pdfFile = new PdfFileRecord($newFileModel->newfile->baseName);
-            if (!$pdfFile->save() || !$pdfFile->update()) {
-                return $this->createUploadFormWithError(
+            // TODO difference between UploadedFile->baseName and name
+            $pdfFileRecord = new PdfFileRecord($newFileModel->newFile->name);
+            if (!$pdfFileRecord->save()) { // || !$pdfFileRecord->refresh()) { // there's no need in id
+                return $this->createFailedUploadFormWithError(
                     // A
-                    $pdfFile->errors[0],
+                    $pdfFileRecord->errors[0],
                     $newFileModel
                 );
             }
 
+            $dir = Yii::getAlias('@uploads') . "/" . Yii::$app->user->identity->name;
+            // mkdir($dir); // TODO ensure
+            $newFileModel->newFile->saveAs("$dir/" . $newFileModel->newFile->name);
+
+            $pdfCard = new PdfCardModel($pdfFileRecord->name, $pdfFileRecord->bookmark);
             $newFileModel = new NewFileModel();
-            return $this->createUploadForm($newFileModel);
+            return $this->createSuccessfulUploadFileForm($newFileModel, $pdfCard);
         });
         // A - show only one error == bad UX
     }
 
-    public function createUploadFormWithError($error, $newFileModel)
+    public function createFailedUploadFormWithError($error, $newFileModel)
     {
         $newFileModel->addError('newFile', $error);
-        return $this->createUploadForm($newFileModel);
+        return $this->createFailedUploadForm($newFileModel);
     }
 
-    public function createUploadForm($newFileModel)
+    public function createFailedUploadForm($newFileModel)
     {
-        return new FailedToUploadFileResponse($this->renderPartial(Yii::getAlias('@partial_new_file_form'), compact('newFileModel')));
+        return new FailedToUploadFileResponse($this->renderPartial(Yii::getAlias('@partial_new_file_form'), compact('newFileModel')), Yii::$app->request->url);
+    }
+
+    public function createSuccessfulUploadFileForm($newFileModel, $newPdfCard)
+    {
+        return new FileSuccessfullyUploadedResponse($this->createFailedUploadForm($newFileModel), PdfCardGenerator::render($newPdfCard));
     }
 }

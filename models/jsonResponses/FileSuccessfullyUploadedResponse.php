@@ -2,14 +2,14 @@
 
 namespace app\models\jsonResponses;
 
-// TODO inheritance names look strange
+// TODO bad names
 class FileSuccessfullyUploadedResponse extends FailedToUploadFileResponse
 {
     public $newPdfCard;
 
-    public function __construct($newForm, $url, $newPdfCard)
+    public function __construct($failedToUploadFileResponse, $newPdfCard)
     {
-        parent::__construct($newForm, $url);
+        parent::__construct($failedToUploadFileResponse->newForm, $failedToUploadFileResponse->url);
 
         $this->responseType = 'new file form with previous uploaded pdf card';
 

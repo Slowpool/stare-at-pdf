@@ -1,10 +1,11 @@
 <?php
 
-namespace models\library;
+namespace app\models\library;
+
 use Yii;
 use yii\base\Model;
 
-class PdfFileLibraryModel extends Model {
+class PdfCardModel extends Model {
     public string $name;
     public int $bookmark;
 
