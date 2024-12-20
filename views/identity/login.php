@@ -46,7 +46,7 @@ $model = new LoginForm();
             <?php ActiveForm::end(); ?>
 
             <div style="color:#999;">
-                You may login with <strong>john/john</strong>
+                You may login with <strong>john/john</strong> or <strong>admin/admin</strong>
             </div>
         </div>
 </div>
