@@ -23,7 +23,8 @@ class PdfFileRecord extends \yii\db\ActiveRecord
     // public $bookmark;
     // public $user_id;
 
-    public function __construct($fileName) {
+    public function __construct($fileName)
+    {
         $this->name = $fileName;
         $this->user_id = Yii::$app->user->identity->id;
         // still not sure that default values should be set this way
@@ -48,7 +49,12 @@ class PdfFileRecord extends \yii\db\ActiveRecord
             [['name', 'user_id'], 'required'],
             [['bookmark', 'user_id'], 'integer'],
             [['name'], 'string', 'max' => 150],
-            [['name'], 'unique'],
+            [
+                ['name', 'user_id'],
+                'unique',
+                'targetAttribute' => ['name', 'user_id'],
+                'message' => 'You already have the book with this name in your library'
+            ],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => UserRecord::class, 'targetAttribute' => ['user_id' => 'id']],
         ];
     }
@@ -80,19 +86,19 @@ class PdfFileRecord extends \yii\db\ActiveRecord
     public static function getFilesOfUserAsArray($username)
     {
         return self::find()
-                    ->alias('pf')
-                    ->asArray()
-                    ->select(['pf.id', 'pf.name', 'pf.bookmark', 'pf.user_id'])
-                    ->joinWith('user u') // probably ordinary join?
-                    ->where(['u.name' => $username])
-                    ->all();
+            ->alias('pf')
+            ->asArray()
+            ->select(['pf.id', 'pf.name', 'pf.bookmark', 'pf.user_id'])
+            ->joinWith('user u') // probably ordinary join?
+            ->where(['u.name' => $username])
+            ->all();
     }
 
-    public static function getBookmarkByFileName($file_name) {
+    public static function getBookmarkByFileName($file_name)
+    {
         return self::find()
-                    ->asArray()
-                    ->where(['name' => $file_name])
-                    ->one()
-                    ['bookmark'];
+            ->asArray()
+            ->where(['name' => $file_name])
+            ->one()['bookmark'];
     }
 }

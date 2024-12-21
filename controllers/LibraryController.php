@@ -86,7 +86,7 @@ class LibraryController extends AjaxControllerWithIdentityAction
             if (!$pdfFileRecord->save()) {
                 return $this->createFailedUploadFormWithError(
                     // A
-                    $pdfFileRecord->errors[0],
+                    $pdfFileRecord->errors['newFile'][0],
                     $newFileModel
                 );
             }
