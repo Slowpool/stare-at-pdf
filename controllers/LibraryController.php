@@ -43,7 +43,7 @@ class LibraryController extends AjaxControllerWithIdentityAction
         ];
     }
 
-    public function createIndexPage($pdfCards, $newFileModel)
+    public function createIndexPage($pdfCards, $newFileModel): PageResponse
     {
         return new PageResponse('Library', $this->renderPartial('index', compact('pdfCards', 'newFileModel')), $this->request->url);
     }
@@ -102,18 +102,18 @@ class LibraryController extends AjaxControllerWithIdentityAction
         // A - show only one error == bad UX
     }
 
-    public function createFailedUploadFormWithError($error, $newFileModel)
+    public function createFailedUploadFormWithError($error, $newFileModel): FailedToUploadFileResponse
     {
         $newFileModel->addError('newFile', $error);
         return $this->createFailedUploadForm($newFileModel);
     }
 
-    public function createFailedUploadForm($newFileModel)
+    public function createFailedUploadForm($newFileModel): FailedToUploadFileResponse
     {
         return new FailedToUploadFileResponse($this->renderPartial(Yii::getAlias('@partial_new_file_form'), compact('newFileModel')), Yii::$app->request->url);
     }
 
-    public function createSuccessfulUploadFileForm($newFileModel, $newPdfCard)
+    public function createSuccessfulUploadFileForm($newFileModel, $newPdfCard): FileSuccessfullyUploadedResponse
     {
         return new FileSuccessfullyUploadedResponse($this->createFailedUploadForm($newFileModel), PdfCardGenerator::render($newPdfCard));
     }

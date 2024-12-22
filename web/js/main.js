@@ -1,9 +1,8 @@
-const requestUrlActionMap = {
+const urlActionMapBeforeRequest = {
     '/': (request) => {
         ShowLoading();
     },
     // some actions require entire body loading, other - only one element content (like upload new file form)
-
     '/send-credentials-to-login': (request) => {
         ShowLoading(); // wait, here could be not entire loading.
         AskForIdentityActionIfAbsent(request, true); // actually mustn't be forced. in case of fail the Login button should stay still
@@ -25,10 +24,10 @@ const requestUrlActionMap = {
 };
 
 /** @return bool value, indicates whether the response was handled completely. For example, when response returns only new form file, this method is supposed to handle it completely and return true */
-const responseUrlActionMap = {
+const urlActionMapAfterRequest = {
     '/upload-pdf': (jsonResponse) => {
         document.getElementById('new-file-container').innerHTML = jsonResponse.newForm;
-        if(data.newPdfCard) {
+        if (data.newPdfCard) {
             document.getElementById('all-files-list').insertAdjacentHTML('beforeend', data.newPdfCard);
         }
         return true;
@@ -119,7 +118,7 @@ function SendAjaxRequest(url, formData = null) {
 
     loaded = false;
     // seems worthy
-    var action = requestUrlActionMap[url];
+    var action = urlActionMapBeforeRequest[url];
     if (action) {
         action(xhr);
     }
@@ -158,7 +157,6 @@ function DescriptMethod(url) {
 
 /** @force (bool) means that client doesn't have identity action and he needs it anyway. */
 function AskForIdentityActionIfAbsent(request, force = false) {
-    // TODO works wrong
     if (force || !page.identityNavItemContainer.firstChild) {
         request.setRequestHeader('X-Gimme-Identity-Action', '');
     }
@@ -168,7 +166,7 @@ function HandleResponse(jsonResponse, url) {
     ReadData(jsonResponse);
 
     // now i don't like that the requested url differs from the url in the response.
-    var action = responseUrlActionMap[url];
+    var action = urlActionMapAfterRequest[url];
     var cancelFullPageUpdate = false;
     if (action) {
         cancelFullPageUpdate = action(jsonResponse);
@@ -224,6 +222,7 @@ function TrashDataHandling(requestedUrl) {
     UpdateIdentityNavbarItemIfItReceived();
     // it should be in above actions mapper
     if (data.url.startsWith('/stare-at/') || data.url == '/') {
+        FixWrongPdfUrl();
         LoadPdf();
     }
 
@@ -250,7 +249,16 @@ function UpdateIdentityNavbarItemIfItReceived() {
     }
 }
 
+// TODO must be in viewer.js (also could be inside LoadPdf)
+/** \diecoding\pdfjs\PdfJs::widget() generates widget with encoded characters in url, even when it is passed decoded. So "#page=30" will be "%23page%3D30", that will be ignored by "pdfjs?file=..." ajax request and the page number from cookies will be opened anywway. i didn't find another solution rather than merely change the generated form action via js. */
+function FixWrongPdfUrl() {
+    // TODO finish it off
+    // var form = document.getElementById('pdfjs-form-w0');
+    // form.action = form.action.replace('%3D', '=').replace('%23', '#');
+}
+
 // TODO must be in viewer.js
+/** I just copied it from \diecoding\pdfjs\PdfJs::widget() */
 function LoadPdf() {
     // ajaxed pdfJs requires this stuff. otherwise it won't be displayed. 
     jQuery(function ($) {

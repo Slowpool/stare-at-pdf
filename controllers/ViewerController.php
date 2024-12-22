@@ -40,8 +40,16 @@ class ViewerController extends AjaxControllerWithIdentityAction
         ];
     }
 
+    public function createHomePage($pdfName, $pdfSpecified, $bookmark): PageResponse {
+        $page = parent::createHomePage($pdfName, $pdfSpecified, $bookmark);
+        if($pdfSpecified)
+            $page->url = "/stare-at/$pdfName";
+        return $page;
+    }
+
     public function actionIndex($pdfName, $page = null)
     {
+        // TODO "/stare-at/book" url becomes "/"
         return $this->executeIfAjaxOtherwiseRenderSinglePage(function () use ($pdfName, $page) {
             $pdfSpecified = $pdfName == null ? false : true;
             if ($pdfSpecified) {
@@ -52,7 +60,7 @@ class ViewerController extends AjaxControllerWithIdentityAction
         });
     }
 
-    // TODO temporary stuff
+    // TODO temporary stuff (it doesn't work)
     public function actionError()
     {
         return $this->render('error');

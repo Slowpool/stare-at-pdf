@@ -98,6 +98,8 @@ a.desc:after {
 body,
 main {
     height: 100%;
+    /* TODO works a little wrong */
+    overflow: hidden;
 }
 
 .navbar-nav {

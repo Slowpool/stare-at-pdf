@@ -8,7 +8,11 @@ return [
         'defaults' => ['pdfName' => null]
     ],
     // here pdfName doesn't have extension. file *semaphores.pdf* has to be specified as *stare-at/semaphores*
-    'stare-at/<pdfName>' => 'viewer/index',
+    [
+        'pattern' => 'stare-at/<pdfName>',
+        'route' => 'viewer/index',
+        // 'encoreUrl' => 'false',
+    ],
     // library
     'library' => 'library/index',
     'upload-pdf' => 'library/upload-pdf',

@@ -13,7 +13,7 @@ use app\models\domain\UserRecord;
  * @property int $bookmark
  * @property int $user_id
  *
- * @property User $user
+ * @property UserRecord $user
  */
 class PdfFileRecord extends \yii\db\ActiveRecord
 {
@@ -89,7 +89,7 @@ class PdfFileRecord extends \yii\db\ActiveRecord
             ->alias('pf')
             ->asArray()
             ->select(['pf.id', 'pf.name', 'pf.bookmark', 'pf.user_id'])
-            ->joinWith('user u') // probably ordinary join?
+            ->joinWith('user u') // TODO probably ordinary join?
             ->where(['u.name' => $username])
             ->all();
     }
