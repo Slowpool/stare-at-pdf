@@ -264,6 +264,8 @@ function LoadPdf() {
 
         form.submit();
         form.yiiActiveForm([], []);
+        
+        //AddCustomFunctions(); // TODO this must be executed after receiving the form
     });
 }
 
@@ -272,4 +274,16 @@ function ShowLoading(loadingScope = page.content) {
     if (!loaded) {
         loadingScope.innerHTML = 'Loading...';
     }
+}
+
+function AddCustomFunctions() {
+    AddBookmarkButton();
+
+}
+
+function AddBookmarkButton() {
+    var button = document.createElement('button');
+    button.setAttribute('id', 'saveBookmark');
+    button.setAttribute('class', 'toolbarButton');
+    $('#editorModeButtons').prepend(button);
 }

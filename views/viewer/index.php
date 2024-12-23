@@ -3,13 +3,15 @@
 /** @var yii\web\View $this */
 /** @var $bookmark must not be null */
 
+use \diecoding\pdfjs\PdfJs;
+
 ?>
 <div class="pdf-viewer-container">
     <?php
     $pdfUrl = $pdfSpecified ? "uploads/" . Yii::$app->user->identity->name . "/$pdfName.pdf#page=$bookmark" : '';
     ?>
 
-    <?= \diecoding\pdfjs\PdfJs::widget([
+    <?= PdfJs::widget([
         'url' => $pdfUrl,
         // 'encodeUrl' => false,
         'options' => [
@@ -22,6 +24,10 @@
             // 'enableClientValidation' => false,
             // 'openWithFragmentIdentifier' => 'true',
             // 'disableAutoFetch' => 'true',
+        ],
+        'sections' => [
+            'viewLayers' => false,
+            'viewAttachments' => false,
         ],
     ]); ?>
 </div>
