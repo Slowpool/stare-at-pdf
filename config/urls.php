@@ -9,6 +9,7 @@ return [
     ],
     // here pdfName doesn't have extension. file *semaphores.pdf* has to be specified as *stare-at/semaphores*
     [
+        // TODO point in url after stare-at/ displays Page not found
         'pattern' => 'stare-at/<pdfName>',
         'route' => 'viewer/index',
         // 'encoreUrl' => 'false',

@@ -222,7 +222,6 @@ function TrashDataHandling(requestedUrl) {
     UpdateIdentityNavbarItemIfItReceived();
     // it should be in above actions mapper
     if (data.url.startsWith('/stare-at/') || data.url == '/') {
-        FixWrongPdfUrl();
         LoadPdf();
     }
 
@@ -230,6 +229,7 @@ function TrashDataHandling(requestedUrl) {
     page.content.innerHTML = data.content;
     // document.title = data.title // TODO what does it do?
 
+    // TODO in spite of url updating, <- and -> doesn't work in browser
     window.history.pushState(data.content, data.selectedNav, requestedUrl);
     if (data.url !== requestedUrl) {
         window.history.pushState(data.content, data.selectedNav, data.url);
@@ -249,21 +249,21 @@ function UpdateIdentityNavbarItemIfItReceived() {
     }
 }
 
-// TODO must be in viewer.js (also could be inside LoadPdf)
-/** \diecoding\pdfjs\PdfJs::widget() generates widget with encoded characters in url, even when it is passed decoded. So "#page=30" will be "%23page%3D30", that will be ignored by "pdfjs?file=..." ajax request and the page number from cookies will be opened anywway. i didn't find another solution rather than merely change the generated form action via js. */
-function FixWrongPdfUrl() {
-    // TODO finish it off
-    // var form = document.getElementById('pdfjs-form-w0');
-    // form.action = form.action.replace('%3D', '=').replace('%23', '#');
-}
-
 // TODO must be in viewer.js
 /** I just copied it from \diecoding\pdfjs\PdfJs::widget() */
 function LoadPdf() {
     // ajaxed pdfJs requires this stuff. otherwise it won't be displayed. 
     jQuery(function ($) {
-        $("#pdfjs-form-w0").submit();
-        jQuery('#pdfjs-form-w0').yiiActiveForm([], []);
+        var form = $("#pdfjs-form-w0");
+
+        /** \diecoding\pdfjs\PdfJs::widget() generates widget with encoded characters in url, even when it is passed decoded. So "#page=30" will be "%23page%3D30", that will be ignored by "pdfjs?file=..." ajax request and the page number from cookies will be opened anywway. i didn't find another solution rather than merely change the generated form action via js. */
+        function FixWrongPdfUrl() {
+            form[0].action = form[0].action.replace('%3D', '=').replace('%23', '#');
+        }
+        FixWrongPdfUrl();
+
+        form.submit();
+        form.yiiActiveForm([], []);
     });
 }
 

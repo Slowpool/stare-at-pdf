@@ -10,8 +10,7 @@
     ?>
 
     <?= \diecoding\pdfjs\PdfJs::widget([
-        // 'url' => $pdfUrl,
-        'url' => '/uploads/slowpool/polish_A1.pdf#page=80',
+        'url' => $pdfUrl,
         // 'encodeUrl' => false,
         'options' => [
             'id' => 'pdf-viewer-widget',
