@@ -2,14 +2,12 @@
 
 namespace app\models\jsonResponses;
 
-class FailedToUploadFileResponse extends JsonResponse
+class FailedToUploadFileResponse extends UrllessJsonResponse
 {
     public $newForm;
 
-    public function __construct($newForm, $url)
+    public function __construct($newForm)
     {
-        parent::__construct($url);
-
         $this->responseType = 'new file form';
 
         $this->newForm = $newForm;

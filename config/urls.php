@@ -7,6 +7,7 @@ return [
         'route' => 'viewer/index',
         'defaults' => ['pdfName' => null]
     ],
+    'update-bookmark' => 'viewer/update-bookmark',
     // here pdfName doesn't have extension. file *semaphores.pdf* has to be specified as *stare-at/semaphores*
     [
         // TODO point in url after stare-at/ displays Page not found

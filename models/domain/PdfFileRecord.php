@@ -94,11 +94,27 @@ class PdfFileRecord extends \yii\db\ActiveRecord
             ->all();
     }
 
-    public static function getBookmarkByFileName($file_name)
+    public static function getBookmarkByFileName($pdfName)
+    {
+        return self::findByName($pdfName)['bookmark'];
+    }
+
+    public static function findByName($pdfName): self
     {
         return self::find()
             ->asArray()
-            ->where(['name' => $file_name])
-            ->one()['bookmark'];
+            ->where(['name' => $pdfName])
+            ->one();
+    }
+
+    public static function updateBookmark(string $pdfName, int $newBookmark): bool
+    {
+        try {
+            $pdfFile = self::findByName($pdfName);
+            $pdfFile->bookmark = $newBookmark;
+            return $pdfFile->update();
+        } catch (\Exception) {
+            return false;
+        }
     }
 }

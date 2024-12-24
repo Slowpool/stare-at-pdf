@@ -10,17 +10,11 @@ use yii\web\Response;
 
 abstract class AjaxControllerWithIdentityAction extends Controller
 {
-    public function isAjax(): bool
-    {
-        // TODO debug
-        return Yii::$app->request->headers->has('X_REQUESTED_WITH') && strtolower(Yii::$app->request->headers->get('X_REQUESTED_WITH')) == 'xmlhttprequest';
-    }
-
     // at first i've came up with this approach and thought it's good, but now it is starting look awkward due to each action begins with this method. 
-    public function executeIfAjaxOtherwiseRenderSinglePage($callback): PageResponse | string
+    public function executeIfAjaxOtherwiseRenderSinglePage($callback): PageResponse|string
     {
         if ($this->isAjax()) {
-            $this->response->format = Response::FORMAT_JSON;
+            $this->ResponseFormatJson();
             $page = $callback();
             // adding login or logout button (depending upon current user status) in response if it requested
             if (Yii::$app->request->headers->has('X-Gimme-Identity-Action')) {
@@ -33,7 +27,17 @@ abstract class AjaxControllerWithIdentityAction extends Controller
             return $this->renderSinglePage();
         }
     }
-    
+
+    public function isAjax(): bool
+    {
+        return Yii::$app->request->headers->has('X_REQUESTED_WITH') && strtolower(Yii::$app->request->headers->get('X_REQUESTED_WITH')) == 'xmlhttprequest';
+    }
+
+    public function ResponseFormatJson(): void
+    {
+        $this->response->format = Response::FORMAT_JSON;
+    }
+
     public function createHomePage($pdfName, $pdfSpecified, $bookmark): PageResponse
     {
         return new PageResponse(Yii::$app->name, $this->renderPartial(Yii::getAlias('@home_view'), compact('pdfName', 'bookmark', 'pdfSpecified')), Yii::$app->homeUrl);

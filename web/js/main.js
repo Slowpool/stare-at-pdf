@@ -32,6 +32,9 @@ const urlActionMapAfterRequest = {
         }
         return true;
     },
+    '/update-bookmark': (jsonResponse) => {
+        // TODO handle result displaying
+    },
 };
 
 var links = null;
@@ -199,7 +202,6 @@ function ReadData(jsonResponse) {
             break;
         case 'new file form':
             data = {
-                url: jsonResponse.url, // duplicate
                 newFileForm: jsonResponse.newForm,
             };
             break;
@@ -209,6 +211,9 @@ function ReadData(jsonResponse) {
                 newFileForm: jsonResponse.newForm,
                 newPdfCard: jsonResponse.newPdfCard,
             };
+            break;
+            case 'bookmark update result':
+                data = jsonResponse.updateResult;
             break;
         default:
             throw new Error('unknown response type');

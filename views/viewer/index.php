@@ -28,6 +28,6 @@ use \diecoding\pdfjs\PdfJs;
         'sections' => [
             'viewLayers' => false,
             'viewAttachments' => false,
-        ],
+        ]
     ]); ?>
 </div>
