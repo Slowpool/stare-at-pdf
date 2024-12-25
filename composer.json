@@ -75,11 +75,13 @@
     ],
     "autoload": {
         "files": [
+            "models\\jsonResponses\\UrllessJsonResponse.php",
             "models\\jsonResponses\\JsonResponse.php",
             "models\\jsonResponses\\PageResponse.php",
             "models\\jsonResponses\\PageResponseWithIdentityAction.php",
             "models\\jsonResponses\\FailedToUploadFileResponse.php",
             "models\\jsonResponses\\FileSuccessfullyUploadedResponse.php",
+            "models\\jsonResponses\\BookmarkUpdateResponse.php",
             "controllers\\AjaxControllerWithIdentityAction.php",
             "views\\library\\PdfCardGenerator.php"
 
