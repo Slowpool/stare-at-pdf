@@ -4,9 +4,11 @@ namespace app\controllers;
 
 use Yii;
 use yii\filters\AccessControl;
-use yii\web\Response;
 use yii\filters\VerbFilter;
+use yii\web\Response;
 use yii\web\UploadedFile;
+use yii\web\ServerErrorHttpException;
+use yii\helpers\FileHelper;
 
 use app\models\jsonResponses\PageResponse;
 use app\models\jsonResponses\FailedToUploadFileResponse;
@@ -14,7 +16,6 @@ use app\models\jsonResponses\FileSuccessfullyUploadedResponse;
 use app\models\domain\PdfFileRecord;
 use app\models\library\PdfCardModel;
 use app\models\library\NewFileModel;
-use yii\web\ServerErrorHttpException;
 
 class LibraryController extends AjaxControllerWithIdentityAction
 {
@@ -84,11 +85,14 @@ class LibraryController extends AjaxControllerWithIdentityAction
                 $newFileModel
             );
         }
-
+        
+        // '.' ruins the pretty url matching. i tried everything, nothing helped except this
+        $validPdfName = str_replace('.', '-', $newFileModel->newFile->basename);
         // q: difference between UploadedFile->baseName and name
         // a: baseName has no extension
-        $pdfFileRecord = new PdfFileRecord($newFileModel->newFile->baseName);
+        $pdfFileRecord = new PdfFileRecord($validPdfName);
         if (!$pdfFileRecord->save()) {
+            // TODO it doesn't handle file deleting
             return $this->createFailedUploadFormWithError(
                 // A
                 $pdfFileRecord->errors['newFile'][0],
@@ -97,13 +101,11 @@ class LibraryController extends AjaxControllerWithIdentityAction
         }
         // A - show only one error == bad UX
         
-        $uploads = Yii::getAlias('@uploads');
+        // files handling
         try {
-            // files handling
-            self::EnsureDir($uploads);
-            $pdfDir = "$uploads/" . Yii::$app->user->identity->name;
-            self::EnsureDir($pdfDir);
-            $newFileModel->newFile->saveAs("$pdfDir/" . $newFileModel->newFile->name);
+            $pdfDir = self::getUserUploadsPath();
+            self::ensureDirRecursively($pdfDir);
+            $newFileModel->newFile->saveAs("$pdfDir/$validPdfName.pdf");
         }
         catch (\Exception) {
             return $this->createFailedUploadFormWithError(
@@ -111,15 +113,25 @@ class LibraryController extends AjaxControllerWithIdentityAction
                 $newFileModel
             );
         }
-        
+
         $pdfCard = new PdfCardModel($pdfFileRecord->name, $pdfFileRecord->bookmark);
         $newFileModel = new NewFileModel();
         return $this->createSuccessfulUploadFileForm($newFileModel, $pdfCard);
     }
 
-    public static function EnsureDir($dir): void {
-        if(!is_dir($dir))
-            mkdir($dir);
+     
+    /**
+     * Returns folder with uploads for current user
+     * @return string
+     */
+    public static function getUserUploadsPath(): string {
+        return Yii::getAlias('@uploads') . '/' . Yii::$app->user->identity->name;
+    }
+    
+    public static function ensureDirRecursively($dir): void
+    {
+        if (!is_dir($dir))
+            FileHelper::createDirectory($dir);
     }
 
     public function createFailedUploadFormWithError($error, $newFileModel): FailedToUploadFileResponse
