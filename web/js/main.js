@@ -183,7 +183,7 @@ function HandleResponse(jsonResponse, url) {
 }
 
 function ReadData(jsonResponse) {
-    // i feel like this is a little workaround here. sorry.
+    // i feel like a little workaround is here. sorry.
     switch (jsonResponse.responseType) {
         case 'entire page':
             data = {
@@ -267,9 +267,15 @@ function LoadPdf() {
         }
         FixWrongPdfUrl();
 
+        // ObservePdfLoadingToAddCustomFunctions();
         form.submit();
         form.yiiActiveForm([], []);
         
+        // workaround time
+        // setTimeout(function() {
+        //     AddCustomFunctions();
+        // }, 8000)
+
         //AddCustomFunctions(); // TODO this must be executed after receiving the form
     });
 }
@@ -290,5 +296,7 @@ function AddBookmarkButton() {
     var button = document.createElement('button');
     button.setAttribute('id', 'saveBookmark');
     button.setAttribute('class', 'toolbarButton');
-    $('#editorModeButtons').prepend(button);
+    var toolbar = $('#editorModeButtons');
+    // doesn't work // UPD: i'd been trying to access the iframe's element from the outer js.
+    toolbar.prepend(button);
 }
