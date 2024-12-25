@@ -2,7 +2,7 @@
 
 namespace app\models\jsonResponses;
 
-class FailedToUploadFileResponse extends UrllessJsonResponse
+class FailedToUploadFileResponse extends JsonResponse
 {
     public $newForm;
 

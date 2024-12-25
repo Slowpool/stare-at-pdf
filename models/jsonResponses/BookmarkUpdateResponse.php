@@ -2,9 +2,9 @@
 
 namespace app\models\jsonResponses;
 
-use app\models\jsonResponses\UrllessJsonResponse;
+use app\models\jsonResponses\JsonResponse;
 
-class BookmarkUpdateResponse extends UrllessJsonResponse {
+class BookmarkUpdateResponse extends JsonResponse {
     public bool $updateResult;
     public function __construct($updateResult) {
         $this->responseType = 'bookmark update result';

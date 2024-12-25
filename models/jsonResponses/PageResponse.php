@@ -2,8 +2,7 @@
 
 namespace app\models\jsonResponses;
 
-class PageResponse extends JsonResponse {
-    
+class PageResponse extends JsonRedirectResponse {
     public string $selectedNav;
     public string $content;
 

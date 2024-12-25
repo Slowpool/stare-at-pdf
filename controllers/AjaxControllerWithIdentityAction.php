@@ -11,7 +11,7 @@ use yii\web\Response;
 abstract class AjaxControllerWithIdentityAction extends Controller
 {
     // at first i've came up with this approach and thought it's good, but now it is starting look awkward due to each action begins with this method. 
-    public function executeIfAjaxOtherwiseRenderSinglePage($callback): PageResponse|string
+    public function executeIfAjaxOtherwiseRenderSinglePage($callback): PageResponse|PageResponseWithIdentityAction|string
     {
         if ($this->isAjax()) {
             $this->ResponseFormatJson();

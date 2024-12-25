@@ -12,7 +12,6 @@ use app\models\jsonResponses\PageResponse;
 use app\models\jsonResponses\FailedToUploadFileResponse;
 use app\models\jsonResponses\FileSuccessfullyUploadedResponse;
 use app\models\domain\PdfFileRecord;
-use app\views\library\PdfCardGenerator;
 use app\models\library\PdfCardModel;
 use app\models\library\NewFileModel;
 use yii\web\ServerErrorHttpException;
@@ -68,6 +67,7 @@ class LibraryController extends AjaxControllerWithIdentityAction
      * Returns only json.
      * @throws \yii\web\ServerErrorHttpException
      */
+    // TODO throws error. debug it
     public function actionUploadPdf(): FailedToUploadFileResponse|FileSuccessfullyUploadedResponse
     {
         $this->ResponseFormatJson();
@@ -97,7 +97,6 @@ class LibraryController extends AjaxControllerWithIdentityAction
         }
         // A - show only one error == bad UX
         
-
         $uploads = Yii::getAlias('@uploads');
         try {
             // files handling
@@ -107,8 +106,10 @@ class LibraryController extends AjaxControllerWithIdentityAction
             $newFileModel->newFile->saveAs("$pdfDir/" . $newFileModel->newFile->name);
         }
         catch (\Exception) {
-            // TODO explore exceptions handling
-            throw new ServerErrorHttpException('Something went wrong');
+            return $this->createFailedUploadFormWithError(
+                "Failed to save file",
+                $newFileModel
+            );
         }
         
         $pdfCard = new PdfCardModel($pdfFileRecord->name, $pdfFileRecord->bookmark);
@@ -129,11 +130,11 @@ class LibraryController extends AjaxControllerWithIdentityAction
 
     public function createFailedUploadForm($newFileModel): FailedToUploadFileResponse
     {
-        return new FailedToUploadFileResponse($this->renderPartial(Yii::getAlias('@partial_new_file_form'), compact('newFileModel')), Yii::$app->request->url);
+        return new FailedToUploadFileResponse($this->renderPartial(Yii::getAlias('@partial_new_file_form'), compact('newFileModel')));
     }
 
     public function createSuccessfulUploadFileForm($newFileModel, $newPdfCard): FileSuccessfullyUploadedResponse
     {
-        return new FileSuccessfullyUploadedResponse($this->createFailedUploadForm($newFileModel), PdfCardGenerator::render($newPdfCard));
+        return new FileSuccessfullyUploadedResponse($this->createFailedUploadForm($newFileModel), $this->renderPartial(Yii::getAlias('@partial_pdf_card'), ['pdfCard' => $newPdfCard]));
     }
 }

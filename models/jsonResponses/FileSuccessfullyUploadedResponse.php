@@ -9,7 +9,7 @@ class FileSuccessfullyUploadedResponse extends FailedToUploadFileResponse
 
     public function __construct($failedToUploadFileResponse, $newPdfCard)
     {
-        parent::__construct($failedToUploadFileResponse->newForm, $failedToUploadFileResponse->url);
+        parent::__construct($failedToUploadFileResponse->newForm);
 
         $this->responseType = 'new file form with previous uploaded pdf card';
 

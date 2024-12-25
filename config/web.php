@@ -22,6 +22,8 @@ $config = [
         '@partial_nav_logout_form' => '//layouts/partial_nav_logout_form.php',
         '@partial_nav_login_button' => '//layouts/partial_nav_login.php',
         '@partial_new_file_form' => '//library/partial_new_file_form.php',
+        '@partial_pdf_card' => '//library/partial_pdf_card.php',
+
 
         '@uploads' => '@app/web/uploads',
         '@scripts' => '@app/web/js',

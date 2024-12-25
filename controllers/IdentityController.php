@@ -10,6 +10,7 @@ use yii\filters\VerbFilter;
 use app\models\identity\LoginForm;
 use app\models\ContactForm;
 use app\models\jsonResponses\PageResponse;
+use app\models\jsonResponses\PageResponseWithIdentityAction;
 
 class IdentityController extends AjaxControllerWithIdentityAction
 {
@@ -56,7 +57,7 @@ class IdentityController extends AjaxControllerWithIdentityAction
         ];
     }
 
-    public function createLoginPage($viewParams)
+    public function createLoginPage($viewParams): PageResponse
     {
         return new PageResponse('Login', $this->renderPartial(Yii::getAlias('@login_view'), $viewParams), Yii::$app->user->loginUrl);
     }
@@ -67,7 +68,7 @@ class IdentityController extends AjaxControllerWithIdentityAction
      * @param bool $pdfSpecified IGNORED inherited param.
      * @param string $page IGNORED inherited param.
      */
-    public function goHomeAjax($pdfName = '', $pdfSpecified = false, $page = 0)
+    public function goHomeAjax($pdfName = '', $pdfSpecified = false, $page = 0): PageResponse
     {
         return Yii::$app->user->isGuest
             ? $this->createLoginPage([])
@@ -79,9 +80,9 @@ class IdentityController extends AjaxControllerWithIdentityAction
      *
      * @return Response|string
      */
-    public function actionLoginForm()
+    public function actionLoginForm(): PageResponse|PageResponseWithIdentityAction|string
     {
-        return $this->executeIfAjaxOtherwiseRenderSinglePage(function () {
+        return $this->executeIfAjaxOtherwiseRenderSinglePage(function (): PageResponse {
             return $this->goHomeAjax();
         });
     }
@@ -91,9 +92,9 @@ class IdentityController extends AjaxControllerWithIdentityAction
      *
      * @return Response|string
      */
-    public function actionSendLoginForm()
+    public function actionSendLoginForm(): PageResponse|PageResponseWithIdentityAction|string
     {
-        return $this->executeIfAjaxOtherwiseRenderSinglePage(function () {
+        return $this->executeIfAjaxOtherwiseRenderSinglePage(function (): PageResponse {
             // a signed-in user tries to login
             if (!Yii::$app->user->isGuest) {
                 return $this->goHomeAjax();
@@ -113,12 +114,11 @@ class IdentityController extends AjaxControllerWithIdentityAction
 
     /**
      * Logout action.
-     *
      * @return Response
      */
-    public function actionLogout()
+    public function actionLogout(): PageResponse|PageResponseWithIdentityAction|string
     {
-        return $this->executeIfAjaxOtherwiseRenderSinglePage(function () {
+        return $this->executeIfAjaxOtherwiseRenderSinglePage(function (): PageResponse {
             Yii::$app->user->logout();
             return $this->goHomeAjax();
         });

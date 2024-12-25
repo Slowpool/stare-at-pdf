@@ -4,8 +4,6 @@
 /** @var yii\bootstrap5\ActiveForm $form */
 /** @var array[] $pdfFiles */
 
-use app\views\library\PdfCardGenerator;
-
 ?>
 
 <div id="library-container">
@@ -15,7 +13,7 @@ use app\views\library\PdfCardGenerator;
     </div>
     <ul id="all-files-list">
         <?php foreach ($pdfCards as $pdfCard): ?>
-            <?= PdfCardGenerator::render($pdfCard) ?>
+            <?= $this->render(Yii::getAlias('@partial_pdf_card'), compact('pdfCard')) ?>
         <?php endforeach; ?>
     </ul>
 </div>
