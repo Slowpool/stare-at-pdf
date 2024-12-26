@@ -36,7 +36,6 @@ const mapSecondaryPageElementsAfterRequest = {
             uploadFileForm: document.getElementById('new-file-container'),
         }
     },
-    asdfasd fasd fsd fd fd fd culprit
     // TODO it must be executed earlier
     '/stare-at': () => {
         secondaryPageElements = {
@@ -199,11 +198,6 @@ function HandleResponse(jsonResponse, url) {
 
     // now i don't like that the requested url differs from the url in the response.
 
-    var secondaryPageElementsAction = mapSecondaryPageElementsAfterRequest[CutVariableData(url)];
-    if (secondaryPageElementsAction) {
-        secondaryPageElementsAction();
-    }
-
     var action = mapSpecialActionAfterRequest[CutVariableData(url)];
     if (action) {
         // special action like /upload-pdf or /update-bookmark
@@ -268,10 +262,15 @@ function CutVariableData(url) {
  * it needs some divising on less methods. */
 function TrashDataHandling(requestedUrl) {
     UpdateIdentityNavbarItemIfItReceived();
-
+    
     mandatoryPageElements.title.innerHTML = data.selectedNav;
     mandatoryPageElements.content.innerHTML = data.content;
     // document.title = data.title // TODO what does it do?
+
+    var secondaryPageElementsAction = mapSecondaryPageElementsAfterRequest[CutVariableData(requestedUrl)];
+    if (secondaryPageElementsAction) {
+        secondaryPageElementsAction();
+    }
 
     // TODO in spite of url updating, <- and -> doesn't work in browser
     window.history.pushState(data.content, data.selectedNav, requestedUrl);

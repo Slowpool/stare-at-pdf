@@ -23,12 +23,19 @@ class PdfFileRecord extends \yii\db\ActiveRecord
     // public $bookmark;
     // public $user_id;
 
-    public function __construct($fileName)
+    /**
+     * ActiveRecord requires empty constructor, so it can not be overriden. So, use this method to initiate \app\models\domain\PdfFileRecord with params. 
+     * @param \app\models\domain\PdfFileRecord $fileName
+     * @return \app\models\domain\PdfFileRecord
+     */
+    public static function explicitConstructor($fileName): self
     {
-        $this->name = $fileName;
-        $this->user_id = Yii::$app->user->identity->id;
+        $record = new self;
+        $record->name = $fileName;
+        $record->user_id = Yii::$app->user->identity->id;
         // still not sure that default values should be set this way
-        $this->bookmark = 1;
+        $record->bookmark = 1;
+        return $record;
     }
 
     /**
@@ -96,14 +103,16 @@ class PdfFileRecord extends \yii\db\ActiveRecord
 
     public static function getBookmarkByFileName($pdfName)
     {
-        return self::findByName($pdfName)['bookmark'];
+        return self::findByName($pdfName, true)['bookmark'];
     }
 
-    public static function findByName($pdfName): self
+    public static function findByName(string $pdfName, bool $asArray = false): self|array
     {
-        return self::find()
-            ->asArray()
-            ->where(['name' => $pdfName])
+        $pdfFile = self::find();
+        if ($asArray) {
+            $pdfFile = $pdfFile->asArray();
+        }
+        return $pdfFile->where(['name' => $pdfName])
             ->one();
     }
 

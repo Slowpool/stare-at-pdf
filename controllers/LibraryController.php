@@ -91,7 +91,7 @@ class LibraryController extends AjaxControllerWithIdentityAction
         $validPdfName = str_replace('.', '-', $newFileModel->newFile->basename);
         // q: difference between UploadedFile->baseName and name
         // a: baseName has no extension
-        $pdfFileRecord = new PdfFileRecord($validPdfName);
+        $pdfFileRecord = PdfFileRecord::explicitConstructor($validPdfName);
         if (!$pdfFileRecord->save()) {
             // TODO it doesn't handle file deleting
             return $this->createFailedUploadFormWithError(
