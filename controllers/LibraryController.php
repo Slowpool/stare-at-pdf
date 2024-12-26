@@ -9,6 +9,7 @@ use yii\web\Response;
 use yii\web\UploadedFile;
 use yii\web\ServerErrorHttpException;
 use yii\helpers\FileHelper;
+use yii\helpers\UserUploadsPathMaker;
 
 use app\models\jsonResponses\PageResponse;
 use app\models\jsonResponses\FailedToUploadFileResponse;
@@ -103,9 +104,10 @@ class LibraryController extends AjaxControllerWithIdentityAction
         
         // files handling
         try {
-            $pdfDir = self::getUserUploadsPath();
+            $pdfDir = UserUploadsPathMaker::getUserUploadsPath();
             self::ensureDirRecursively($pdfDir);
-            $newFileModel->newFile->saveAs("$pdfDir/$validPdfName.pdf");
+
+            $newFileModel->newFile->saveAs(UserUploadsPathMaker::toFile($validPdfName));
         }
         catch (\Exception) {
             return $this->createFailedUploadFormWithError(
@@ -117,15 +119,6 @@ class LibraryController extends AjaxControllerWithIdentityAction
         $pdfCard = new PdfCardModel($pdfFileRecord->name, $pdfFileRecord->bookmark);
         $newFileModel = new NewFileModel();
         return $this->createSuccessfulUploadFileForm($newFileModel, $pdfCard);
-    }
-
-     
-    /**
-     * Returns folder with uploads for current user
-     * @return string
-     */
-    public static function getUserUploadsPath(): string {
-        return Yii::getAlias('@uploads') . '/' . Yii::$app->user->identity->name;
     }
     
     public static function ensureDirRecursively($dir): void

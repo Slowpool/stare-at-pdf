@@ -82,7 +82,8 @@
             "models\\jsonResponses\\FailedToUploadFileResponse.php",
             "models\\jsonResponses\\FileSuccessfullyUploadedResponse.php",
             "models\\jsonResponses\\BookmarkUpdateResponse.php",
-            "controllers\\AjaxControllerWithIdentityAction.php"
+            "controllers\\AjaxControllerWithIdentityAction.php",
+            "components\\helpers\\UserUploadsPathMaker.php"
         ]
     }
 }

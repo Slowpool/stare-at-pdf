@@ -21,19 +21,24 @@ const urlActionMapBeforeRequest = {
     '/library': (request) => {
         ShowLoading();
     },
+    '/update-bookmark': (request) => {
+        ShowLoading(document.getElementById('update-bookmark-container'));
+    }
 };
 
 /** @return bool value, indicates whether the response was handled completely. For example, when response returns only new form file, this method is supposed to handle it completely and return true */
 const urlActionMapAfterRequest = {
-    '/upload-pdf': (jsonResponse) => {
-        document.getElementById('new-file-container').innerHTML = jsonResponse.newForm;
+    '/upload-pdf': () => {
+        document.getElementById('new-file-container').innerHTML = data.newForm;
         if (data.newPdfCard) {
             document.getElementById('all-files-list').insertAdjacentHTML('beforeend', data.newPdfCard);
         }
         return true;
     },
-    '/update-bookmark': (jsonResponse) => {
-        // TODO handle result displaying
+    '/update-bookmark': () => {
+        document.getElementById('update-bookmark-container').innerHTML = data.newForm;
+        alert(data.bookmarkUpdated ? 'success' : 'failed');
+        return true;
     },
 };
 
@@ -142,6 +147,7 @@ function DescriptMethod(url) {
         case '/logout':
         case '/send-credentials-to-login':
         case '/upload-pdf':
+        case '/update-bookmark':
             $method = 'POST';
             break;
         default:
@@ -172,7 +178,7 @@ function HandleResponse(jsonResponse, url) {
     var action = urlActionMapAfterRequest[url];
     var cancelFullPageUpdate = false;
     if (action) {
-        cancelFullPageUpdate = action(jsonResponse);
+        cancelFullPageUpdate = action();
     }
 
     if (!cancelFullPageUpdate) {
@@ -212,8 +218,11 @@ function ReadData(jsonResponse) {
                 newPdfCard: jsonResponse.newPdfCard,
             };
             break;
-            case 'bookmark update result':
-                data = jsonResponse.updateResult;
+        case 'bookmark update result':
+            data = {
+                bookmarkUpdated: jsonResponse.updateResult,
+                newForm: jsonResponse.newForm,
+            }
             break;
         default:
             throw new Error('unknown response type');
@@ -270,7 +279,7 @@ function LoadPdf() {
         // ObservePdfLoadingToAddCustomFunctions();
         form.submit();
         form.yiiActiveForm([], []);
-        
+
         // workaround time
         // setTimeout(function() {
         //     AddCustomFunctions();

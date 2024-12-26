@@ -55,12 +55,12 @@ class ViewerController extends AjaxControllerWithIdentityAction
     public function actionIndex($pdfName, $page = null): PageResponse|PageResponseWithIdentityAction|string
     {
         return $this->executeIfAjaxOtherwiseRenderSinglePage(function () use ($pdfName, $page): PageResponse {
-            $pdfSpecified = $pdfName == null ? false : true;
+            $pdfSpecified = $pdfName != null;
             if ($pdfSpecified) {
                 $page = $page ?? PdfFileRecord::getBookmarkByFileName($pdfName);
             }
-            $PageResponse = $this->goHomeAjax($pdfName, $pdfSpecified, $page);
-            return $PageResponse;
+            $pageResponse = $this->goHomeAjax($pdfName, $pdfSpecified, $page);
+            return $pageResponse;
         });
     }
 
@@ -78,11 +78,11 @@ class ViewerController extends AjaxControllerWithIdentityAction
             return $this->createBookmarkUpdateResponse(false);
         }
 
-        return $this->createBookmarkUpdateResponse(PdfFileRecord::updateBookmark($model->pdfName, $model->newBookmark));
+        return $this->createBookmarkUpdateResponse(PdfFileRecord::updateBookmark($model->pdfName, $model->newBookmark), $model->pdfName);
     }
 
-    public function createBookmarkUpdateResponse($result): BookmarkUpdateResponse
+    public function createBookmarkUpdateResponse(bool $success, string $pdfName = ''): BookmarkUpdateResponse
     {
-        return new BookmarkUpdateResponse($result);
+        return new BookmarkUpdateResponse($success, $this->renderPartial(Yii::getAlias('@partial_new_bookmark_form'), compact('pdfName')));
     }
 }
