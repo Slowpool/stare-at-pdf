@@ -1,7 +1,12 @@
-const urlActionMapBeforeRequest = {
+const mapMainActionBeforeRequest = {
+    // pdf viewer
     '/': (request) => {
         ShowLoading();
     },
+    '/update-bookmark': (request) => {
+        ShowLoading(document.getElementById('update-bookmark-container'));
+    },
+    // identity
     // some actions require entire body loading, other - only one element content (like upload new file form)
     '/send-credentials-to-login': (request) => {
         ShowLoading(); // wait, here could be not entire loading.
@@ -14,6 +19,7 @@ const urlActionMapBeforeRequest = {
         ShowLoading();
         AskForIdentityActionIfAbsent(request, true); // assumes that logout has 100% success
     },
+    // library
     '/upload-pdf': (request) => {
         // thus the page must be opened (user should open the page /library at first, and only then send the request. otherwise ShowLoading will throw an exception. but who would send POST requests without opened browser?)
         ShowLoading(document.getElementById('new-file-container'));
@@ -21,29 +27,57 @@ const urlActionMapBeforeRequest = {
     '/library': (request) => {
         ShowLoading();
     },
-    '/update-bookmark': (request) => {
-        ShowLoading(document.getElementById('update-bookmark-container'));
-    }
+};
+
+// gotcha. it's a middleware.
+const mapSecondaryPageElementsAfterRequest = {
+    '/library': () => {
+        secondaryPageElements = {
+            uploadFileForm: document.getElementById('new-file-container'),
+        }
+    },
+    asdfasd fasd fsd fd fd fd culprit
+    // TODO it must be executed earlier
+    '/stare-at': () => {
+        secondaryPageElements = {
+            updateBookmarkForm: document.getElementById('update-bookmark-container'),
+        }
+    },
+
 };
 
 /** @return bool value, indicates whether the response was handled completely. For example, when response returns only new form file, this method is supposed to handle it completely and return true */
-const urlActionMapAfterRequest = {
+const mapSpecialActionAfterRequest = {
+    // pdf viewer
+    '/': () => {
+        // smells like workaround. like the whole this script.
+        TrashDataHandling('/');
+        LoadPdf();
+    },
+    '/stare-at': () => {
+        TrashDataHandling('/');
+        LoadPdf();
+    },
+    '/update-bookmark': () => {
+        secondaryPageElements.updateBookmarkForm.innerHTML = data.newForm;
+        alert(data.bookmarkUpdated ? 'success' : 'failed');
+    },
+    // library
     '/upload-pdf': () => {
-        document.getElementById('new-file-container').innerHTML = data.newForm;
+        secondaryPageElements.uploadFileForm.innerHTML = data.newForm;
         if (data.newPdfCard) {
             document.getElementById('all-files-list').insertAdjacentHTML('beforeend', data.newPdfCard);
         }
-        return true;
-    },
-    '/update-bookmark': () => {
-        document.getElementById('update-bookmark-container').innerHTML = data.newForm;
-        alert(data.bookmarkUpdated ? 'success' : 'failed');
-        return true;
+        LoadPdf();
     },
 };
 
+// TODO override in production
+var leftUrlPart = 'https://localhost:8080';
 var links = null;
 var loaded = true;
+var secondaryPageElements = null;
+
 var data = {
     selectedNav: "", // home or library
     content: "",
@@ -51,10 +85,7 @@ var data = {
     identityNavItem: "", // login or logout
 };
 
-// TODO override in production
-var leftUrlPart = 'https://localhost:8080';
-
-var page = {
+var mandatoryPageElements = {
     title: document.getElementById('title'),
     navbarList: document.getElementById('w0'), // probably useless
     content: document.getElementById('main'),
@@ -125,8 +156,7 @@ function SendAjaxRequest(url, formData = null) {
     };
 
     loaded = false;
-    // seems worthy
-    var action = urlActionMapBeforeRequest[url];
+    var action = mapMainActionBeforeRequest[url];
     if (action) {
         action(xhr);
     }
@@ -137,11 +167,12 @@ function SendAjaxRequest(url, formData = null) {
 function DescriptMethod(url) {
     url = url.replace(leftUrlPart, '');
 
-    switch (url) {
+    switch (CutVariableData(url)) {
+        case '': // TODO is it possible?
         case '/':
-        case '':
         case '/login':
         case '/library':
+        case '/stare-at':
             $method = 'GET';
             break;
         case '/logout':
@@ -151,22 +182,14 @@ function DescriptMethod(url) {
             $method = 'POST';
             break;
         default:
-            if (url.startsWith('/stare-at/')) {
-                $method = 'GET';
-            }
-            /*
-                other checks
-            */
-            if ($method === undefined) {
-                throw new Error('unknown url');
-            }
+            throw new Error('unknown url');
     }
     return $method;
 }
 
 /** @force (bool) means that client doesn't have identity action and he needs it anyway. */
 function AskForIdentityActionIfAbsent(request, force = false) {
-    if (force || !page.identityNavItemContainer.firstChild) {
+    if (force || !mandatoryPageElements.identityNavItemContainer.firstChild) {
         request.setRequestHeader('X-Gimme-Identity-Action', '');
     }
 }
@@ -175,13 +198,19 @@ function HandleResponse(jsonResponse, url) {
     ReadData(jsonResponse);
 
     // now i don't like that the requested url differs from the url in the response.
-    var action = urlActionMapAfterRequest[url];
-    var cancelFullPageUpdate = false;
-    if (action) {
-        cancelFullPageUpdate = action();
+
+    var secondaryPageElementsAction = mapSecondaryPageElementsAfterRequest[CutVariableData(url)];
+    if (secondaryPageElementsAction) {
+        secondaryPageElementsAction();
     }
 
-    if (!cancelFullPageUpdate) {
+    var action = mapSpecialActionAfterRequest[CutVariableData(url)];
+    if (action) {
+        // special action like /upload-pdf or /update-bookmark
+        action();
+    }
+    else {
+        // returns entire new page, like /library
         TrashDataHandling(url);
     };
 
@@ -229,18 +258,19 @@ function ReadData(jsonResponse) {
     }
 }
 
+/** Implemented workaroundly. Returns the same url except when it is url with values in route like "/stare-at/some pdf". Then returns stable part (/stare-at in that case) */
+function CutVariableData(url) {
+    return url.startsWith('/stare-at/') ? '/stare-at' : url;
+}
+
 /** Updates entire page. Trash handling because the code is not coupled here and could
  * be in any order (almost). also this meth will become greater and greater, so
  * it needs some divising on less methods. */
 function TrashDataHandling(requestedUrl) {
     UpdateIdentityNavbarItemIfItReceived();
-    // it should be in above actions mapper
-    if (data.url.startsWith('/stare-at/') || data.url == '/') {
-        LoadPdf();
-    }
 
-    page.title.innerHTML = data.selectedNav;
-    page.content.innerHTML = data.content;
+    mandatoryPageElements.title.innerHTML = data.selectedNav;
+    mandatoryPageElements.content.innerHTML = data.content;
     // document.title = data.title // TODO what does it do?
 
     // TODO in spite of url updating, <- and -> doesn't work in browser
@@ -259,7 +289,7 @@ function UpdateIdentityNavbarItemIfItReceived() {
         //     page.navbarList.children[1].remove();
         // }
         // page.navbarList.insertAdjacentHTML('beforeend', data.identityNavItem);
-        page.identityNavItemContainer.innerHTML = data.identityNavItem;
+        mandatoryPageElements.identityNavItemContainer.innerHTML = data.identityNavItem;
     }
 }
 
@@ -290,7 +320,7 @@ function LoadPdf() {
 }
 
 /** @loadingScope a tag, where to display loading  */
-function ShowLoading(loadingScope = page.content) {
+function ShowLoading(loadingScope = mandatoryPageElements.content) {
     if (!loaded) {
         loadingScope.innerHTML = 'Loading...';
     }

@@ -74,7 +74,7 @@ class ViewerController extends AjaxControllerWithIdentityAction
     {
         $this->ResponseFormatJson();
         $model = new UpdateBookmarkModel;
-        if (!$model->load(Yii::$app->request->post())) {
+        if (!$model->load(Yii::$app->request->post(), '')) {
             return $this->createBookmarkUpdateResponse(false);
         }
 
