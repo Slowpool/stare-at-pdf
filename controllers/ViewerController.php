@@ -15,7 +15,6 @@ use app\models\jsonResponses\BookmarkUpdateResponse;
 
 class ViewerController extends AjaxControllerWithIdentityAction
 {
-
     public function behaviors()
     {
         return [
@@ -57,7 +56,7 @@ class ViewerController extends AjaxControllerWithIdentityAction
         return $this->executeIfAjaxOtherwiseRenderSinglePage(function () use ($pdfName, $page): PageResponse {
             $pdfSpecified = $pdfName != null;
             if ($pdfSpecified) {
-                $page = $page ?? PdfFileRecord::getBookmarkByFileName($pdfName);
+                $page ??= PdfFileRecord::getBookmarkByFileName($pdfName);
             }
             $pageResponse = $this->goHomeAjax($pdfName, $pdfSpecified, $page);
             return $pageResponse;
@@ -74,14 +73,14 @@ class ViewerController extends AjaxControllerWithIdentityAction
     {
         $this->ResponseFormatJson();
         $model = new UpdateBookmarkModel;
-        if (!$model->load(Yii::$app->request->post(), '')) {
-            return $this->createBookmarkUpdateResponse(false);
+        if (!$model->load(Yii::$app->request->post(), '') || !$model->validate()) {
+            return $this->createBookmarkUpdateResponse(false, $model->pdfName ?? '');
         }
 
         return $this->createBookmarkUpdateResponse(PdfFileRecord::updateBookmark($model->pdfName, $model->newBookmark), $model->pdfName);
     }
 
-    public function createBookmarkUpdateResponse(bool $success, string $pdfName = ''): BookmarkUpdateResponse
+    public function createBookmarkUpdateResponse(bool $success, string $pdfName): BookmarkUpdateResponse
     {
         return new BookmarkUpdateResponse($success, $this->renderPartial(Yii::getAlias('@partial_new_bookmark_form'), compact('pdfName')));
     }

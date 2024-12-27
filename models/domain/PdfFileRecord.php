@@ -103,23 +103,23 @@ class PdfFileRecord extends \yii\db\ActiveRecord
 
     public static function getBookmarkByFileName($pdfName)
     {
-        return self::findByName($pdfName, true)['bookmark'];
+        return self::findByNameForCurrentUser($pdfName, true)['bookmark'];
     }
 
-    public static function findByName(string $pdfName, bool $asArray = false): self|array
+    public static function findByNameForCurrentUser(string $pdfName, bool $asArray = false): self|array
     {
         $pdfFile = self::find();
         if ($asArray) {
             $pdfFile = $pdfFile->asArray();
         }
-        return $pdfFile->where(['name' => $pdfName])
+        return $pdfFile->where(['name' => $pdfName, 'user_id' => Yii::$app->user->identity->id])
             ->one();
     }
 
     public static function updateBookmark(string $pdfName, int $newBookmark): bool
     {
         try {
-            $pdfFile = self::findByName($pdfName);
+            $pdfFile = self::findByNameForCurrentUser($pdfName);
             $pdfFile->bookmark = $newBookmark;
             return $pdfFile->update();
         } catch (\Exception) {

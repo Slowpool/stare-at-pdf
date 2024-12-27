@@ -54,7 +54,7 @@ const mapSpecialActionAfterRequest = {
         LoadPdf();
     },
     '/stare-at': () => {
-        TrashDataHandling('/');
+        TrashDataHandling('/stare-at');
         LoadPdf();
     },
     '/update-bookmark': () => {
@@ -166,7 +166,7 @@ function SendAjaxRequest(url, formData = null) {
 function DescriptMethod(url) {
     url = url.replace(leftUrlPart, '');
 
-    switch (CutVariableData(url)) {
+    switch (CutRouteValues(url)) {
         case '': // TODO is it possible?
         case '/':
         case '/login':
@@ -198,7 +198,7 @@ function HandleResponse(jsonResponse, url) {
 
     // now i don't like that the requested url differs from the url in the response.
 
-    var action = mapSpecialActionAfterRequest[CutVariableData(url)];
+    var action = mapSpecialActionAfterRequest[CutRouteValues(url)];
     if (action) {
         // special action like /upload-pdf or /update-bookmark
         action();
@@ -253,7 +253,7 @@ function ReadData(jsonResponse) {
 }
 
 /** Implemented workaroundly. Returns the same url except when it is url with values in route like "/stare-at/some pdf". Then returns stable part (/stare-at in that case) */
-function CutVariableData(url) {
+function CutRouteValues(url) {
     return url.startsWith('/stare-at/') ? '/stare-at' : url;
 }
 
@@ -267,7 +267,7 @@ function TrashDataHandling(requestedUrl) {
     mandatoryPageElements.content.innerHTML = data.content;
     // document.title = data.title // TODO what does it do?
 
-    var secondaryPageElementsAction = mapSecondaryPageElementsAfterRequest[CutVariableData(requestedUrl)];
+    var secondaryPageElementsAction = mapSecondaryPageElementsAfterRequest[CutRouteValues(requestedUrl)];
     if (secondaryPageElementsAction) {
         secondaryPageElementsAction();
     }
