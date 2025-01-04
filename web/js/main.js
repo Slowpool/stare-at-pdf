@@ -28,24 +28,23 @@ const mapMainActionBeforeRequest = {
         ShowLoading(secondaryPageElements.uploadFileForm);
     },
     '/add-new-category': (request) => {
-        ShowLoading(secondaryPageElements.addNewCategoryForm)
+        ShowLoading(secondaryPageElements.addNewCategoryForm);
     },
 };
 
-// gotcha. it's a middleware.
+// gotcha. this is a middleware.
 const mapSecondaryPageElementsAfterRequest = {
     '/library': () => {
         secondaryPageElements = {
             uploadFileForm: document.getElementById('new-file-container'),
             addNewCategoryForm: document.getElementById('new-category-container'),
             allFilesList: document.getElementById('all-files-list'),
-        }
+        };
     },
-    // TODO it must be executed earlier
     '/stare-at': () => {
         secondaryPageElements = {
             updateBookmarkForm: document.getElementById('update-bookmark-container'),
-        }
+        };
     },
 
 };
@@ -72,7 +71,11 @@ const mapSpecialActionAfterRequest = {
         if (data.newPdfCard) {
             secondaryPageElements.allFilesList.insertAdjacentHTML('beforeend', data.newPdfCard);
         }
-        // LoadPdf();
+    },
+    '/add-new-category': () => {
+        secondaryPageElements.addNewCategoryForm.innerHTML = data.newForm;
+        alert(data.categoryAdded ? 'successfully added' : 'failed to add');
+        // TODO add new category to each pdf card category selector??
     },
 };
 
@@ -168,6 +171,7 @@ function SendAjaxRequest(url, formData = null) {
     xhr.send(formData);
 }
 
+// TODO actually it is stored in form 
 function DescriptMethod(url) {
     url = url.replace(leftUrlPart, '');
 
@@ -183,6 +187,7 @@ function DescriptMethod(url) {
         case '/send-credentials-to-login':
         case '/upload-pdf':
         case '/update-bookmark':
+        case '/add-new-category':
             $method = 'POST';
             break;
         default:
@@ -236,19 +241,25 @@ function ReadData(jsonResponse) {
             break;
         case 'new file form':
             data = {
-                newFileForm: jsonResponse.newForm,
+                newForm: jsonResponse.newForm,
             };
             break;
         case 'new file form with previous uploaded pdf card':
             data = {
                 url: jsonResponse.url, // duplicate
-                newFileForm: jsonResponse.newForm,
+                newForm: jsonResponse.newForm,
                 newPdfCard: jsonResponse.newPdfCard,
             };
             break;
         case 'bookmark update result':
             data = {
                 bookmarkUpdated: jsonResponse.updateResult,
+                newForm: jsonResponse.newForm,
+            }
+            break;
+        case 'new category add result':
+            data = {
+                categoryAdded: jsonResponse.updateResult,
                 newForm: jsonResponse.newForm,
             }
             break;
@@ -267,7 +278,7 @@ function CutRouteValues(url) {
  * it needs some divising on less methods. */
 function TrashDataHandling(requestedUrl) {
     UpdateIdentityNavbarItemIfItReceived();
-    
+
     mandatoryPageElements.title.innerHTML = data.selectedNav;
     mandatoryPageElements.content.innerHTML = data.content;
     // document.title = data.title // TODO what does it do?

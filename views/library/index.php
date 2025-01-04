@@ -16,6 +16,9 @@
             <li id="new-category-container" class="nav-item">
                 <?= $this->render(Yii::getAlias('@partial_new_category_form'), compact('newCategoryModel')) ?>
             </li>
+            <li id="assign-category-container" class="nav-item">
+                <?= $this->render(Yii::getAlias('@partial_assign_category_form'), compact('assignCategoryModel', 'pdfFileIds', 'categoryIds')) ?>
+            </li>
         </ul>
     </nav>
     <ul id="all-files-list">

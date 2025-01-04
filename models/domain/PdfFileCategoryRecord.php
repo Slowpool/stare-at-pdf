@@ -34,8 +34,8 @@ class PdfFileCategoryRecord extends \yii\db\ActiveRecord
             [['user_id', 'name'], 'unique', 'targetAttribute' => ['user_id', 'name']],
             [['user_id'], 'integer'],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => UserRecord::class, 'targetAttribute' => ['user_id' => 'id']],
-            [['name'], 'string', 'min' => 1, 'max' => Yii::getAlias('@MAX_CATEGORY_NAME_LENGTH')],
-            [['color'], 'string', 'length' => Yii::getAlias('@CATEGORY_COLOR_LENGTH')],
+            [['name'], 'string', 'min' => 1, 'max' => (int) Yii::getAlias('@MAX_CATEGORY_NAME_LENGTH')],
+            [['color'], 'string', 'length' => (int) Yii::getAlias('@CATEGORY_COLOR_LENGTH')],
         ];
     }
 
@@ -62,10 +62,20 @@ class PdfFileCategoryRecord extends \yii\db\ActiveRecord
         return $this->hasOne(UserRecord::class, ['id' => 'user_id']);
     }
 
-    public function explicitConstructor(string $name, string $color) {
+    public function explicitConstructor(string $name, string $color)
+    {
         $this->user_id = Yii::$app->user->identity->id;
 
         $this->name = $name;
         $this->color = $color;
+    }
+
+    public static function getCategoryIdsAndNames()
+    {
+        return self::find()
+            ->asArray()
+            ->select(['name', 'id'])
+            ->where(['user_id' => Yii::$app->user->identity->id])
+            ->all();
     }
 }

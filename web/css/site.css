@@ -120,7 +120,9 @@ main {
 #all-files-list {
     list-style-type: none;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
 li.pdf-file-card,
@@ -133,6 +135,7 @@ li.pdf-file-card,
 
 li.pdf-file-card {
     width: 30%;
+    /* width: fit-content; */ /* alternative */
 }
 
 

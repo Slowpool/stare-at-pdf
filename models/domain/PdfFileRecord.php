@@ -90,12 +90,15 @@ class PdfFileRecord extends \yii\db\ActiveRecord
     }
 
     /** @return string[] */
-    public static function getFilesOfUserAsArray($username)
+    public static function getFilesOfUserAsArray($username, $fieldsToSelect = ['id', 'name', 'bookmark', 'user_id'])
     {
+        for($i = 0 ; $i < 0; $i++) {
+            $fieldsToSelect[$i] = 'pf.' . $fieldsToSelect[$i];
+        };
         return self::find()
             ->alias('pf')
             ->asArray()
-            ->select(['pf.id', 'pf.name', 'pf.bookmark', 'pf.user_id'])
+            ->select($fieldsToSelect)
             ->joinWith('user u') // TODO probably ordinary join?
             ->where(['u.name' => $username])
             ->all();
@@ -125,5 +128,9 @@ class PdfFileRecord extends \yii\db\ActiveRecord
         } catch (\Exception) {
             return false;
         }
+    }
+
+    public static function getPdfFileIdsAndNames(): array {
+        return self::getFilesOfUserAsArray(['id', 'name']);
     }
 }

@@ -20,6 +20,7 @@ use app\models\domain\PdfFileCategoryRecord;
 use app\models\library\PdfCardModel;
 use app\models\library\NewFileModel;
 use app\models\library\NewCategoryModel;
+use app\models\library\AssignCategoryModel;
 
 class LibraryController extends AjaxControllerWithIdentityAction
 {
@@ -48,9 +49,11 @@ class LibraryController extends AjaxControllerWithIdentityAction
         ];
     }
 
-    public function createIndexPage($pdfCards, $newFileModel, $newCategoryModel): PageResponse
+    public function createIndexPage($pdfCards, $newFileModel, $newCategoryModel, $assignCategoryModel): PageResponse
     {
-        return new PageResponse('Library', $this->renderPartial('index', compact('pdfCards', 'newFileModel', 'newCategoryModel')), $this->request->url);
+        $categoryIds = PdfFileCategoryRecord::getCategoryIdsAndNames();
+        $pdfFileIds = PdfFileRecord::getPdfFileIdsAndNames();
+        return new PageResponse('Library', $this->renderPartial('index', compact('pdfCards', 'newFileModel', 'newCategoryModel', 'assignCategoryModel',  'pdfFileIds', 'categoryIds')), $this->request->url);
     }
 
     public function actionIndex(): PageResponse|string
@@ -62,12 +65,11 @@ class LibraryController extends AjaxControllerWithIdentityAction
             foreach ($pdfFiles as $pdfFile) {
                 $pdfCards[] = new PdfCardModel($pdfFile['name'], $pdfFile['bookmark']);
             }
-            $newFileModel = new NewFileModel();
-            $newFileModel->newFile = null;
+            $newFileModel = new NewFileModel(); 
             $newCategoryModel = new NewCategoryModel();
-            $newCategoryModel->name = '';
-            $newCategoryModel->color = '';
-            return $this->createIndexPage($pdfCards, $newFileModel, $newCategoryModel);
+            $assignCategoryModel = new AssignCategoryModel();
+            // TODO add category to pdf card
+            return $this->createIndexPage($pdfCards, $newFileModel, $newCategoryModel, $assignCategoryModel);
         });
     }
 
