@@ -4,13 +4,13 @@ const mapMainActionBeforeRequest = {
         ShowLoading();
     },
     '/update-bookmark': (request) => {
-        ShowLoading(document.getElementById('update-bookmark-container'));
+        ShowLoading(secondaryPageElements.uploadFileForm);
     },
     // identity
     // some actions require entire body loading, other - only one element content (like upload new file form)
     '/send-credentials-to-login': (request) => {
         ShowLoading(); // wait, here could be not entire loading.
-        AskForIdentityActionIfAbsent(request, true); // actually mustn't be forced. in case of fail the Login button should stay still
+        AskForIdentityActionIfAbsent(request, true); // actually mustn't be forced. in case of fail the Login button will be refreshed, but it should stay still
     },
     '/login': (request) => {
         ShowLoading();
@@ -20,12 +20,15 @@ const mapMainActionBeforeRequest = {
         AskForIdentityActionIfAbsent(request, true); // assumes that logout has 100% success
     },
     // library
-    '/upload-pdf': (request) => {
-        // thus the page must be opened (user should open the page /library at first, and only then send the request. otherwise ShowLoading will throw an exception. but who would send POST requests without opened browser?)
-        ShowLoading(document.getElementById('new-file-container'));
-    },
     '/library': (request) => {
         ShowLoading();
+    },
+    '/upload-pdf': (request) => {
+        // thus the page must be opened (user should open the page /library at first, and only then send the request. otherwise ShowLoading will throw an exception. but who would send POST requests without opened browser?)
+        ShowLoading(secondaryPageElements.uploadFileForm);
+    },
+    '/add-new-category': (request) => {
+        ShowLoading(secondaryPageElements.addNewCategoryForm)
     },
 };
 
@@ -34,6 +37,8 @@ const mapSecondaryPageElementsAfterRequest = {
     '/library': () => {
         secondaryPageElements = {
             uploadFileForm: document.getElementById('new-file-container'),
+            addNewCategoryForm: document.getElementById('new-category-container'),
+            allFilesList: document.getElementById('all-files-list'),
         }
     },
     // TODO it must be executed earlier
@@ -65,9 +70,9 @@ const mapSpecialActionAfterRequest = {
     '/upload-pdf': () => {
         secondaryPageElements.uploadFileForm.innerHTML = data.newForm;
         if (data.newPdfCard) {
-            document.getElementById('all-files-list').insertAdjacentHTML('beforeend', data.newPdfCard);
+            secondaryPageElements.allFilesList.insertAdjacentHTML('beforeend', data.newPdfCard);
         }
-        LoadPdf();
+        // LoadPdf();
     },
 };
 

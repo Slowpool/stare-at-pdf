@@ -9,6 +9,9 @@ $config = [
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'aliases' => [
+        '@MAX_CATEGORY_NAME_LENGTH' => 50,
+        '@CATEGORY_COLOR_LENGTH' => 6,
+
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',
         
@@ -24,6 +27,8 @@ $config = [
         '@partial_new_file_form' => '//library/partial_new_file_form.php',
         '@partial_pdf_card' => '//library/partial_pdf_card.php',
         '@partial_new_bookmark_form' => '//viewer/partial_new_bookmark_form.php',
+        '@partial_new_category_form' => '//library/partial_new_category_form.php',
+        
         '@uploads' => '@app/web/uploads',
         '@scripts' => '@app/web/js',
     ],

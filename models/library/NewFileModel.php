@@ -2,7 +2,6 @@
 
 namespace app\models\library;
 
-use yii\web\UploadedFile;
 use yii\base\Model;
 
 class NewFileModel extends Model {

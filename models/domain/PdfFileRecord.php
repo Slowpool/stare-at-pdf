@@ -25,7 +25,7 @@ class PdfFileRecord extends \yii\db\ActiveRecord
 
     /**
      * ActiveRecord requires empty constructor, so it can not be overriden. So, use this method to initiate \app\models\domain\PdfFileRecord with params. 
-     * @param \app\models\domain\PdfFileRecord $fileName
+     * @param string $fileName
      * @return \app\models\domain\PdfFileRecord
      */
     public static function explicitConstructor($fileName): self

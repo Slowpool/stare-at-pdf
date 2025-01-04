@@ -8,9 +8,16 @@
 
 <div id="library-container">
     <h4 id="library-title">Welcome. The library content:</h4>
-    <div id="new-file-container">
-        <?= $this->render(Yii::getAlias('@partial_new_file_form'), compact('newFileModel')) ?>
-    </div>
+    <nav id="library-toolbar">
+        <ul id="library-toolbar-ul" class="navbar-nav nav">
+            <li id="new-file-container" class="nav-item">
+                <?= $this->render(Yii::getAlias('@partial_new_file_form'), compact('newFileModel')) ?>
+            </li>
+            <li id="new-category-container" class="nav-item">
+                <?= $this->render(Yii::getAlias('@partial_new_category_form'), compact('newCategoryModel')) ?>
+            </li>
+        </ul>
+    </nav>
     <ul id="all-files-list">
         <?php foreach ($pdfCards as $pdfCard): ?>
             <?= $this->render(Yii::getAlias('@partial_pdf_card'), compact('pdfCard')) ?>

@@ -140,10 +140,13 @@ li.pdf-file-card {
     padding-block: 20px;
 }
 
-#new-file-container {
+#new-file-container,
+#new-category-container {
     border: 2px solid black;
     margin-bottom: 20px;
     padding: 10px;
+    margin-left: 5px;
+    width: fit-content;
 }
 
 #upload-file-form,
@@ -156,5 +159,12 @@ input {
 }
 
 #update-bookmark-container {
-    width: fit-content;
+    width: 30%;
+}
+
+#library-toolbar-ul {
+    list-style-type: none;
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
 }

@@ -2,8 +2,6 @@
 
 namespace app\models\jsonResponses;
 
-use app\models\jsonResponses\JsonResponse;
-
 class BookmarkUpdateResponse extends JsonResponse {
     public bool $updateResult;
     public string $newForm;

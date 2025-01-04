@@ -18,6 +18,7 @@ return [
     // library
     'library' => 'library/index',
     'upload-pdf' => 'library/upload-pdf',
+    'add-new-category' => 'library/add-new-category',
     // identity
     'logout' => 'identity/logout',
     'login' => 'identity/login-form',
