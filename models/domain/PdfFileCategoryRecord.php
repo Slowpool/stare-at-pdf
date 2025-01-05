@@ -16,6 +16,16 @@ use Yii;
  */
 class PdfFileCategoryRecord extends \yii\db\ActiveRecord
 {
+    public static function explicitConstructor(string $name, string $color): self
+    {
+        $record = new self;
+        $record->user_id = Yii::$app->user->identity->id;
+
+        $record->name = $name;
+        $record->color = $color;
+        return $record;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -60,14 +70,6 @@ class PdfFileCategoryRecord extends \yii\db\ActiveRecord
     public function getUser()
     {
         return $this->hasOne(UserRecord::class, ['id' => 'user_id']);
-    }
-
-    public function explicitConstructor(string $name, string $color)
-    {
-        $this->user_id = Yii::$app->user->identity->id;
-
-        $this->name = $name;
-        $this->color = $color;
     }
 
     public static function getCategoryIdsAndNames()

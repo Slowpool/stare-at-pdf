@@ -29,7 +29,7 @@ $config = [
         '@partial_new_bookmark_form' => '//viewer/partial_new_bookmark_form.php',
         '@partial_new_category_form' => '//library/partial_new_category_form.php',
         '@partial_assign_category_form' => '//library/partial_assign_category_form.php',
-
+        
         '@uploads' => '@app/web/uploads',
         '@scripts' => '@app/web/js',
     ],

@@ -15,8 +15,10 @@ use app\models\jsonResponses\PageResponse;
 use app\models\jsonResponses\FailedToUploadFileResponse;
 use app\models\jsonResponses\FileSuccessfullyUploadedResponse;
 use app\models\jsonResponses\AddNewCategoryResponse;
+use app\models\jsonResponses\AssignCategoryResponse;
 use app\models\domain\PdfFileRecord;
 use app\models\domain\PdfFileCategoryRecord;
+use app\models\domain\PdfFileCategoryEntryRecord;
 use app\models\library\PdfCardModel;
 use app\models\library\AddedPdfModel;
 use app\models\library\NewFileModel;
@@ -78,21 +80,17 @@ class LibraryController extends AjaxControllerWithIdentityAction
      * Returns only json.
      * @throws \yii\web\ServerErrorHttpException
      */
-    public function actionUploadPdf(): FailedToUploadFileResponse|FileSuccessfullyUploadedResponse
+    public function actionCreatePdfFile(): FailedToUploadFileResponse|FileSuccessfullyUploadedResponse
     {
         $this->ResponseFormatJson();
         $newFileModel = new NewFileModel();
         if (!$newFileModel->load(Yii::$app->request->post())) {
-            return $this->createFailedUploadFormWithError('Lack of file in request', $newFileModel);
+            return $this->createFailedUploadFormWithError($newFileModel, 'Lack of file in request');
         }
 
         $newFileModel->newFile = UploadedFile::getInstance($newFileModel, 'newFile');
         if (!$newFileModel->validate() || !$newFileModel->newFile) {
-            return $this->createFailedUploadFormWithError(
-                // A
-                $newFileModel->errors['newFile'][0],
-                $newFileModel
-            );
+            return $this->createFailedUploadFormWithError($newFileModel);
         }
 
         // '.' ruins the pretty url matching. i tried everything, nothing helped except this
@@ -103,12 +101,11 @@ class LibraryController extends AjaxControllerWithIdentityAction
         if (!$pdfFileRecord->save()) {
             // TODO handle file deleting
             return $this->createFailedUploadFormWithError(
-                // A
-                $pdfFileRecord->errors['newFile'][0],
-                $newFileModel
+                // TODO add all errors. (show only one error == bad UX)
+                $newFileModel,
+                $pdfFileRecord->errors['newFile'][0]
             );
         }
-        // A - show only one error == bad UX
 
         // files handling
         try {
@@ -118,8 +115,8 @@ class LibraryController extends AjaxControllerWithIdentityAction
             $newFileModel->newFile->saveAs(UserUploadsPathHelper::toFile($validPdfName));
         } catch (\Exception) {
             return $this->createFailedUploadFormWithError(
+                $newFileModel,
                 "Failed to save file",
-                $newFileModel
             );
         }
 
@@ -135,9 +132,11 @@ class LibraryController extends AjaxControllerWithIdentityAction
             FileHelper::createDirectory($dir);
     }
 
-    public function createFailedUploadFormWithError($error, $newFileModel): FailedToUploadFileResponse
+    public function createFailedUploadFormWithError($newFileModel, $error = null): FailedToUploadFileResponse
     {
-        $newFileModel->addError('newFile', $error);
+        if ($error) {
+            $newFileModel->addError('newFile', $error);
+        }
         return $this->createFailedUploadForm($newFileModel);
     }
 
@@ -151,7 +150,7 @@ class LibraryController extends AjaxControllerWithIdentityAction
         return new FileSuccessfullyUploadedResponse($this->createFailedUploadForm($newFileModel), $this->renderPartial(Yii::getAlias('@partial_pdf_card'), ['pdfCard' => $newPdfCard]), $addedPdfModel);
     }
 
-    public function actionAddNewCategory(): AddNewCategoryResponse
+    public function actionCreateNewCategory(): AddNewCategoryResponse
     {
         $this->ResponseFormatJson();
 
@@ -161,8 +160,7 @@ class LibraryController extends AjaxControllerWithIdentityAction
             return $this->createAddNewCategoryResponse();
         }
 
-        $pdfFileCategoryRecord = new PdfFileCategoryRecord();
-        $pdfFileCategoryRecord->explicitConstructor($newCategoryModel->name, $newCategoryModel->color);
+        $pdfFileCategoryRecord = PdfFileCategoryRecord::explicitConstructor($newCategoryModel->name, $newCategoryModel->color);
         if (!$pdfFileCategoryRecord->save()) {
             // domainly incorrect data
             return $this->createAddNewCategoryResponse();
@@ -182,8 +180,28 @@ class LibraryController extends AjaxControllerWithIdentityAction
         return new AddNewCategoryResponse($addedCategoryModel != null, $this->renderPartial(Yii::getAlias('@partial_new_category_form'), ['newCategoryModel' => new NewCategoryModel()]), $addedCategoryModel);
     }
 
-    public function actionAssignCategory()
+    public function actionCreatePdfFileCategoryEntry(): AssignCategoryResponse
     {
-        
+        $this->ResponseFormatJson();
+
+        $assignCategoryModel = new AssignCategoryModel;
+        if (!$assignCategoryModel->load(Yii::$app->request->post(), '')) {
+            return $this->createCategoryAssigningResponse(false, $assignCategoryModel, 'Request', 'Lack of data');
+        }
+
+        $pdfCategoryEntryRecord = PdfFileCategoryEntryRecord::explicitConstructor($assignCategoryModel->pdfFileId, $assignCategoryModel->categoryId);
+        if (!$pdfCategoryEntryRecord->save()) {
+            return $this->createCategoryAssigningResponse(false, $assignCategoryModel);
+        }
+
+        return $this->createCategoryAssigningResponse(true, new AssignCategoryModel);
+    }
+
+    public function createCategoryAssigningResponse(bool $assigningResult, AssignCategoryModel $assignCategoryModel, string $errorAttribute = null, string $error = null): AssignCategoryResponse
+    {
+        if ($errorAttribute) {
+            $assignCategoryModel->addError($errorAttribute, $error);
+        }
+        return new AssignCategoryResponse($assigningResult, $this->renderPartial(Yii::getAlias('@partial_assign_category_form'), compact('assignCategoryModel')));
     }
 }

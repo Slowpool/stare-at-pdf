@@ -1,10 +1,12 @@
 <?php
 
+use app\models\library\AssignCategoryModel;
 use yii\bootstrap5\ActiveForm;
 use yii\bootstrap5\Html;
 
-// dropDownList() requires it
+/** @param AssignCategoryModel $assignCategoryModel */
 
+// dropDownList() requires this
 $pdfFileIds = MapIdsToNames($pdfFileIds);
 $categoryIds = MapIdsToNames($categoryIds);
 

@@ -16,6 +16,14 @@ use Yii;
  */
 class PdfFileCategoryEntryRecord extends \yii\db\ActiveRecord
 {
+    public static function explicitConstructor(int $pdfFileId, int $categoryId): self
+    {
+        $record = new self;
+        $record->pdf_file_id = $pdfFileId;
+        $record->category_id = $categoryId;
+        return $record;
+    }
+    
     /**
      * {@inheritdoc}
      */

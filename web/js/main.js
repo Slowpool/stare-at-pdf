@@ -4,7 +4,7 @@ const mapMainActionBeforeRequest = {
         ShowLoading();
     },
     '/update-bookmark': (request) => {
-        ShowLoading(secondaryPageElements.uploadFileForm);
+        ShowLoading(secondaryPageElements.updateBookmarkForm);
     },
     // identity
     // some actions require entire body loading, other - only one element content (like upload new file form)
@@ -29,6 +29,9 @@ const mapMainActionBeforeRequest = {
     },
     '/add-new-category': (request) => {
         ShowLoading(secondaryPageElements.addNewCategoryForm);
+    },
+    '/assign-category': (request) => {
+        ShowLoading(secondaryPageElements.assignCategoryForm);
     },
 };
 
@@ -83,9 +86,16 @@ const mapSpecialActionAfterRequest = {
             AddOptionToSelect('#assigncategorymodel-categoryid', data.addedCategory);
         }
     },
+    '/assign-category': () => {
+        secondaryPageElements.assignCategoryForm.innerHTML = data.newForm;
+        alert(data.categoryAssigned ? 'successfully added' : 'failed to add');
+        if (data.addedCategory) {
+            AddOptionToSelect('#assigncategorymodel-categoryid', data.addedCategory);
+        }
+    },
 };
 
-function AddOptionToSelect(selectorId, {id, name}) {
+function AddOptionToSelect(selectorId, { id, name }) {
     var select = secondaryPageElements.assignCategoryForm.querySelector(selectorId);
     var pdfFileOption = document.createElement('option');
     // TODO xss??
@@ -200,9 +210,10 @@ function DescriptMethod(url) {
             break;
         case '/logout':
         case '/send-credentials-to-login':
-        case '/upload-pdf':
         case '/update-bookmark':
+        case '/upload-pdf':
         case '/add-new-category':
+        case '/assign-category':
             $method = 'POST';
             break;
         default:
@@ -278,6 +289,12 @@ function ReadData(jsonResponse) {
                 categoryAdded: jsonResponse.updateResult,
                 newForm: jsonResponse.newForm,
                 addedCategory: jsonResponse.addedCategoryModel,
+            }
+            break;
+        case 'category assigning result':
+            data = {
+                categoryAssigned: jsonResponse.updateResult,
+                newForm: jsonResponse.newForm,
             }
             break;
         default:

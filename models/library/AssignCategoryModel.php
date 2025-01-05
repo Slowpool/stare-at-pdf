@@ -13,4 +13,7 @@ class AssignCategoryModel extends Model {
             [['pdfFileId', 'categoryId'], 'required'],
         ];
     }
+    public function formName() {
+        return '';
+    }
 }
