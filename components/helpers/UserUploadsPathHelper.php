@@ -4,7 +4,7 @@ namespace yii\helpers;
 
 use Yii;
 
-class UserUploadsPathMaker {
+class UserUploadsPathHelper {
     public static function getUserUploadsPath(): string {
         return Yii::getAlias('@uploads') . "/" . Yii::$app->user->identity->name;
     }

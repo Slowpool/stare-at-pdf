@@ -9,7 +9,7 @@ use yii\web\Response;
 use yii\web\UploadedFile;
 use yii\web\ServerErrorHttpException;
 use yii\helpers\FileHelper;
-use yii\helpers\UserUploadsPathMaker;
+use yii\helpers\UserUploadsPathHelper;
 
 use app\models\jsonResponses\PageResponse;
 use app\models\jsonResponses\FailedToUploadFileResponse;
@@ -21,6 +21,7 @@ use app\models\library\PdfCardModel;
 use app\models\library\NewFileModel;
 use app\models\library\NewCategoryModel;
 use app\models\library\AssignCategoryModel;
+use app\models\library\AddedCategoryModel;
 
 class LibraryController extends AjaxControllerWithIdentityAction
 {
@@ -59,7 +60,7 @@ class LibraryController extends AjaxControllerWithIdentityAction
     public function actionIndex(): PageResponse|string
     {
         return $this->executeIfAjaxOtherwiseRenderSinglePage(function (): PageResponse {
-            $pdfFiles = PdfFileRecord::getFilesOfUserAsArray(Yii::$app->user->identity->name);
+            $pdfFiles = PdfFileRecord::getFilesOfUserAsArray();
             // should be in automapper-like class
             $pdfCards = [];
             foreach ($pdfFiles as $pdfFile) {
@@ -112,10 +113,10 @@ class LibraryController extends AjaxControllerWithIdentityAction
 
         // files handling
         try {
-            $pdfDir = UserUploadsPathMaker::getUserUploadsPath();
+            $pdfDir = UserUploadsPathHelper::getUserUploadsPath();
             self::ensureDirRecursively($pdfDir);
 
-            $newFileModel->newFile->saveAs(UserUploadsPathMaker::toFile($validPdfName));
+            $newFileModel->newFile->saveAs(UserUploadsPathHelper::toFile($validPdfName));
         } catch (\Exception) {
             return $this->createFailedUploadFormWithError(
                 "Failed to save file",
@@ -157,21 +158,26 @@ class LibraryController extends AjaxControllerWithIdentityAction
         $newCategoryModel = new NewCategoryModel();
         if (!$newCategoryModel->load(Yii::$app->request->post(), '') || !$newCategoryModel->validate()) {
             // lack of data
-            return $this->createAddNewCategoryPage(false);
+            return $this->createAddNewCategoryResponse();
         }
 
         $pdfFileCategoryRecord = new PdfFileCategoryRecord();$pdfFileCategoryRecord->explicitConstructor($newCategoryModel->name, $newCategoryModel->color);
         if(!$pdfFileCategoryRecord->save()) {
             // domainly incorrect data
-            return $this->createAddNewCategoryPage(false);
+            return $this->createAddNewCategoryResponse();
         }
 
-        // TODO also return new category to add it to each pdf card
-        return $this->createAddNewCategoryPage(true);
+        $addedCategoryModel = new AddedCategoryModel($pdfFileCategoryRecord->name, $pdfFileCategoryRecord->id);
+        return $this->createAddNewCategoryResponse($addedCategoryModel);
     }
 
-    public function createAddNewCategoryPage(bool $addResult): AddNewCategoryResponse
+    /**
+     * When $addedCategoryModel is provided, returned response is successful adding of new category. Otherwise - as failed one.
+     * @param mixed $addedCategoryModel
+     * @return \app\models\jsonResponses\AddNewCategoryResponse
+     */
+    public function createAddNewCategoryResponse(AddedCategoryModel $addedCategoryModel = null): AddNewCategoryResponse
     {
-        return new AddNewCategoryResponse($addResult, $this->renderPartial(Yii::getAlias('@partial_new_category_form'), ['newCategoryModel' => new NewCategoryModel()]));
+        return new AddNewCategoryResponse($addedCategoryModel != null, $this->renderPartial(Yii::getAlias('@partial_new_category_form'), ['newCategoryModel' => new NewCategoryModel()]), $addedCategoryModel);
     }
 }

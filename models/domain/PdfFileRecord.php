@@ -90,9 +90,9 @@ class PdfFileRecord extends \yii\db\ActiveRecord
     }
 
     /** @return string[] */
-    public static function getFilesOfUserAsArray($username, $fieldsToSelect = ['id', 'name', 'bookmark', 'user_id'])
+    public static function getFilesOfUserAsArray($fieldsToSelect = ['id', 'name', 'bookmark', 'user_id'])
     {
-        for($i = 0 ; $i < 0; $i++) {
+        for($i = 0 ; $i < sizeof($fieldsToSelect); $i++) {
             $fieldsToSelect[$i] = 'pf.' . $fieldsToSelect[$i];
         };
         return self::find()
@@ -100,16 +100,16 @@ class PdfFileRecord extends \yii\db\ActiveRecord
             ->asArray()
             ->select($fieldsToSelect)
             ->joinWith('user u') // TODO probably ordinary join?
-            ->where(['u.name' => $username])
+            ->where(['u.name' => Yii::$app->user->identity->name])
             ->all();
     }
 
     public static function getBookmarkByFileName($pdfName)
     {
-        return self::findByNameForCurrentUser($pdfName, true)['bookmark'];
+        return self::findByNameForUser($pdfName, true)['bookmark'];
     }
 
-    public static function findByNameForCurrentUser(string $pdfName, bool $asArray = false): self|array
+    public static function findByNameForUser(string $pdfName, bool $asArray = false): self|array
     {
         $pdfFile = self::find();
         if ($asArray) {
@@ -122,7 +122,7 @@ class PdfFileRecord extends \yii\db\ActiveRecord
     public static function updateBookmark(string $pdfName, int $newBookmark): bool
     {
         try {
-            $pdfFile = self::findByNameForCurrentUser($pdfName);
+            $pdfFile = self::findByNameForUser($pdfName);
             $pdfFile->bookmark = $newBookmark;
             return $pdfFile->update();
         } catch (\Exception) {

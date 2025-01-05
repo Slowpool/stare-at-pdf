@@ -39,6 +39,7 @@ const mapSecondaryPageElementsAfterRequest = {
             uploadFileForm: document.getElementById('new-file-container'),
             addNewCategoryForm: document.getElementById('new-category-container'),
             allFilesList: document.getElementById('all-files-list'),
+            assignCategoryForm: document.getElementById('assign-category-container'),
         };
     },
     '/stare-at': () => {
@@ -75,7 +76,14 @@ const mapSpecialActionAfterRequest = {
     '/add-new-category': () => {
         secondaryPageElements.addNewCategoryForm.innerHTML = data.newForm;
         alert(data.categoryAdded ? 'successfully added' : 'failed to add');
-        // TODO add new category to each pdf card category selector??
+        if(data.addedCategory) {
+            var select = assignCategoryForm.getElementById('assigncategorymodel-categoryid')
+            var categoryOption = document.createElement('option');
+            // TODO xss??
+            categoryOption.value = data.addedCategory.id;
+            categoryOption.innerHTML = data.addedCategory.name;
+            select.appendChild(categoryOption);
+        }
     },
 };
 
@@ -261,6 +269,7 @@ function ReadData(jsonResponse) {
             data = {
                 categoryAdded: jsonResponse.updateResult,
                 newForm: jsonResponse.newForm,
+                addedCategory: jsonResponse.addedCategoryModel,
             }
             break;
         default:

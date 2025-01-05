@@ -6,7 +6,7 @@
 use diecoding\pdfjs\PdfJs;
 use yii\bootstrap5\Html;
 use yii\helpers\Url;
-use yii\helpers\UserUploadsPathMaker;
+use yii\helpers\UserUploadsPathHelper;
 
 ?>
 <div class="pdf-viewer-container">
@@ -19,7 +19,7 @@ use yii\helpers\UserUploadsPathMaker;
     </nav>
 
     <?php
-    $pdfUrl = $pdfSpecified ? Url::to([UserUploadsPathMaker::toFile($pdfName, true), '#' => "page=$bookmark"]) : '';
+    $pdfUrl = $pdfSpecified ? Url::to([UserUploadsPathHelper::toFile($pdfName, true), '#' => "page=$bookmark"]) : '';
     echo PdfJs::widget([
         'url' => $pdfUrl,
         // 'encodeUrl' => false,
