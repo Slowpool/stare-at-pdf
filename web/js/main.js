@@ -71,21 +71,28 @@ const mapSpecialActionAfterRequest = {
         secondaryPageElements.uploadFileForm.innerHTML = data.newForm;
         if (data.newPdfCard) {
             secondaryPageElements.allFilesList.insertAdjacentHTML('beforeend', data.newPdfCard);
+
+            // workaround. when newPdfCard is attached, than addedPdf is also attached.
+            AddOptionToSelect('#assigncategorymodel-pdffileid', data.addedPdf);
         }
     },
     '/add-new-category': () => {
         secondaryPageElements.addNewCategoryForm.innerHTML = data.newForm;
         alert(data.categoryAdded ? 'successfully added' : 'failed to add');
-        if(data.addedCategory) {
-            var select = assignCategoryForm.getElementById('assigncategorymodel-categoryid')
-            var categoryOption = document.createElement('option');
-            // TODO xss??
-            categoryOption.value = data.addedCategory.id;
-            categoryOption.innerHTML = data.addedCategory.name;
-            select.appendChild(categoryOption);
+        if (data.addedCategory) {
+            AddOptionToSelect('#assigncategorymodel-categoryid', data.addedCategory);
         }
     },
 };
+
+function AddOptionToSelect(selectorId, {id, name}) {
+    var select = secondaryPageElements.assignCategoryForm.querySelector(selectorId);
+    var pdfFileOption = document.createElement('option');
+    // TODO xss??
+    pdfFileOption.value = id;
+    pdfFileOption.innerHTML = name;
+    select.appendChild(pdfFileOption);
+}
 
 // TODO override in production
 var leftUrlPart = 'https://localhost:8080';
@@ -257,6 +264,7 @@ function ReadData(jsonResponse) {
                 url: jsonResponse.url, // duplicate
                 newForm: jsonResponse.newForm,
                 newPdfCard: jsonResponse.newPdfCard,
+                addedPdf: jsonResponse.addedPdfModel,
             };
             break;
         case 'bookmark update result':
