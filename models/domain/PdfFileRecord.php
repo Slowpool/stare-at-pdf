@@ -4,6 +4,7 @@ namespace app\models\domain;
 
 use Yii;
 use app\models\domain\UserRecord;
+use yii\db\ActiveQuery;
 
 /**
  * This is the model class for table "pdf_file".
@@ -92,9 +93,10 @@ class PdfFileRecord extends \yii\db\ActiveRecord
     /** @return string[] */
     public static function getFilesOfUserAsArray($fieldsToSelect = ['id', 'name', 'bookmark', 'user_id'])
     {
-        for($i = 0 ; $i < sizeof($fieldsToSelect); $i++) {
+        for ($i = 0; $i < sizeof($fieldsToSelect); $i++) {
             $fieldsToSelect[$i] = 'pf.' . $fieldsToSelect[$i];
-        };
+        }
+        ;
         return self::find()
             ->alias('pf')
             ->asArray()
@@ -109,14 +111,14 @@ class PdfFileRecord extends \yii\db\ActiveRecord
         return self::findByNameForUser($pdfName, true)['bookmark'];
     }
 
-    public static function findByNameForUser(string $pdfName, bool $asArray = false): self|array
+    public static function findByNameForUser(string $pdfName, bool $asArray = false, bool $execute = true): ActiveQuery|self|array
     {
         $pdfFile = self::find();
         if ($asArray) {
             $pdfFile = $pdfFile->asArray();
         }
-        return $pdfFile->where(['name' => $pdfName, 'user_id' => Yii::$app->user->identity->id])
-            ->one();
+        $query = $pdfFile->where(['name' => $pdfName, 'user_id' => Yii::$app->user->identity->id]);
+        return $execute ? $query->one() : $query;
     }
 
     public static function updateBookmark(string $pdfName, int $newBookmark): bool
@@ -130,7 +132,8 @@ class PdfFileRecord extends \yii\db\ActiveRecord
         }
     }
 
-    public static function getPdfFileIdsAndNames(): array {
+    public static function getPdfFileIdsAndNames(): array
+    {
         return self::getFilesOfUserAsArray(['id', 'name']);
     }
 }

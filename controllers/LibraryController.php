@@ -55,9 +55,14 @@ class LibraryController extends AjaxControllerWithIdentityAction
 
     public function createIndexPage($pdfCards, $newFileModel, $newCategoryModel, $assignCategoryModel): PageResponse
     {
-        $categoryIds = PdfFileCategoryRecord::getCategoryIdsAndNames();
-        $pdfFileIds = PdfFileRecord::getPdfFileIdsAndNames();
+        [$categoryIds, $pdfFileIds] = self::obtainPdfFileIdsAndCategoryIds();
         return new PageResponse('Library', $this->renderPartial('index', compact('pdfCards', 'newFileModel', 'newCategoryModel', 'assignCategoryModel', 'pdfFileIds', 'categoryIds')), $this->request->url);
+    }
+
+    /** @return array [0] => categoryIdsAndNames, [1] => pdffileIdsAndNames */
+    public static function obtainPdfFileIdsAndCategoryIds(): array {
+        return [PdfFileCategoryRecord::getCategoryIdsAndNames(),
+        PdfFileRecord::getPdfFileIdsAndNames()];
     }
 
     public function actionIndex(): PageResponse|string
@@ -67,7 +72,7 @@ class LibraryController extends AjaxControllerWithIdentityAction
             // should be in automapper-like class
             $pdfCards = [];
             foreach ($pdfFiles as $pdfFile) {
-                $pdfCards[] = new PdfCardModel($pdfFile['name'], $pdfFile['bookmark']);
+                $pdfCards[] = new PdfCardModel($pdfFile['name'], $pdfFile['bookmark'], PdfFileCategoryEntryRecord::getColorsOfPdfByName($pdfFile['name']));
             }
             $newFileModel = new NewFileModel();
             $newCategoryModel = new NewCategoryModel();
@@ -120,7 +125,7 @@ class LibraryController extends AjaxControllerWithIdentityAction
             );
         }
 
-        $pdfCard = new PdfCardModel($pdfFileRecord->name, $pdfFileRecord->bookmark);
+        $pdfCard = new PdfCardModel($pdfFileRecord->name, $pdfFileRecord->bookmark, PdfFileCategoryEntryRecord::getColorsOfPdfByName($pdfFileRecord->name));
         $newFileModel = new NewFileModel();
         $addedPdfModel = new AddedPdfModel($pdfFileRecord->name, $pdfFileRecord->id);
         return $this->createSuccessfulUploadFileForm($newFileModel, $pdfCard, $addedPdfModel);
@@ -186,12 +191,12 @@ class LibraryController extends AjaxControllerWithIdentityAction
 
         $assignCategoryModel = new AssignCategoryModel;
         if (!$assignCategoryModel->load(Yii::$app->request->post(), '')) {
-            return $this->createCategoryAssigningResponse(false, $assignCategoryModel, 'Request', 'Lack of data');
+            return $this->createCategoryAssigningResponse(false, $assignCategoryModel, '', 'Lack of data');
         }
 
         $pdfCategoryEntryRecord = PdfFileCategoryEntryRecord::explicitConstructor($assignCategoryModel->pdfFileId, $assignCategoryModel->categoryId);
         if (!$pdfCategoryEntryRecord->save()) {
-            return $this->createCategoryAssigningResponse(false, $assignCategoryModel);
+            return $this->createCategoryAssigningResponse(false, $assignCategoryModel, '', 'Failed to save');
         }
 
         return $this->createCategoryAssigningResponse(true, new AssignCategoryModel);
@@ -199,9 +204,10 @@ class LibraryController extends AjaxControllerWithIdentityAction
 
     public function createCategoryAssigningResponse(bool $assigningResult, AssignCategoryModel $assignCategoryModel, string $errorAttribute = null, string $error = null): AssignCategoryResponse
     {
-        if ($errorAttribute) {
+        if ($errorAttribute !== null) {
             $assignCategoryModel->addError($errorAttribute, $error);
         }
-        return new AssignCategoryResponse($assigningResult, $this->renderPartial(Yii::getAlias('@partial_assign_category_form'), compact('assignCategoryModel')));
+        [$categoryIds, $pdfFileIds] = self::obtainPdfFileIdsAndCategoryIds();
+        return new AssignCategoryResponse($assigningResult, $this->renderPartial(Yii::getAlias('@partial_assign_category_form'), compact('assignCategoryModel', 'categoryIds', 'pdfFileIds')));
     }
 }

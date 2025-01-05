@@ -9,7 +9,7 @@ class AssignCategoryResponse extends BookmarkUpdateResponse {
     public function __construct($assigningResult, $newForm) {
         // totally awkward
         parent::__construct($assigningResult, $newForm);
-        
+
         $this->responseType = 'category assigning result';
     }
 }

@@ -23,7 +23,7 @@ class PdfFileCategoryEntryRecord extends \yii\db\ActiveRecord
         $record->category_id = $categoryId;
         return $record;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -76,5 +76,15 @@ class PdfFileCategoryEntryRecord extends \yii\db\ActiveRecord
     public function getPdfFile()
     {
         return $this->hasOne(PdfFileRecord::class, ['id' => 'pdf_file_id']);
+    }
+
+    public static function getColorsOfPdfByName(string $pdfName): array
+    {
+        return PdfFileRecord::findByNameForUser($pdfName, true, false)
+            ->alias('pf')
+            ->leftJoin('pdf_file_category_entry pfce', ['pfce.pdf_file_id' => 'pf.id'])
+            ->leftJoin('pdf_file_category pfc', ['pfce.category_id' => 'pfc.id'])
+            ->select('pfc.color')
+            ->all();
     }
 }

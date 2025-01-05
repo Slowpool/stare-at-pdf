@@ -88,10 +88,7 @@ const mapSpecialActionAfterRequest = {
     },
     '/assign-category': () => {
         secondaryPageElements.assignCategoryForm.innerHTML = data.newForm;
-        alert(data.categoryAssigned ? 'successfully added' : 'failed to add');
-        if (data.addedCategory) {
-            AddOptionToSelect('#assigncategorymodel-categoryid', data.addedCategory);
-        }
+        alert(data.categoryAssigned ? 'successfully assigned' : 'failed to assign');
     },
 };
 
