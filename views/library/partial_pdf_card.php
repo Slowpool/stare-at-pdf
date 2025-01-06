@@ -10,8 +10,18 @@ use yii\helpers\Url;
 /** @param PdfCardModel $pdfCard */
 ?>
 
-<?= Html::beginTag('li', ['class' => 'pdf-file-card']); ?>
+<?php
+$style = !empty($pdfCard['backgroundColors'])
+    // when there's at least one color, the first one is obtained
+    ? ['style' => "background-color: #" . $pdfCard['backgroundColors'][0]]
+    // no colors = no styles (sounds like )
+    : [];
+?>
+
+<?= Html::beginTag('li', array_merge(['class' => 'pdf-file-card'], $style)); ?>
 <?php $url = Url::toRoute(['/stare-at/' . Html::encode(urlEncode($pdfCard->name)), 'page' => Html::encode($pdfCard->bookmark)]) ?>
 <?= Html::a(Html::encode($pdfCard->name), $url, ['class' => 'pdf-file-link ajax-action']); ?>
-<?= " " . Html::encode($pdfCard->bookmark) . " p."; ?>
+<span class="pdf-card-page">
+    <?= " " . Html::encode($pdfCard->bookmark) . " p."; ?>
+</span>
 <?= Html::endTag('li'); ?>

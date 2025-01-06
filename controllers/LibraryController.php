@@ -68,11 +68,11 @@ class LibraryController extends AjaxControllerWithIdentityAction
     public function actionIndex(): PageResponse|string
     {
         return $this->executeIfAjaxOtherwiseRenderSinglePage(function (): PageResponse {
-            $pdfFiles = PdfFileRecord::getFilesOfUserAsArray();
+            $pdfFiles = PdfFileRecord::getFilesOfUserAsArray(true);
             // should be in automapper-like class
             $pdfCards = [];
             foreach ($pdfFiles as $pdfFile) {
-                $pdfCards[] = new PdfCardModel($pdfFile['name'], $pdfFile['bookmark'], PdfFileCategoryEntryRecord::getColorsOfPdfByName($pdfFile['name']));
+                $pdfCards[] = new PdfCardModel($pdfFile['name'], $pdfFile['bookmark'], array_column($pdfFile['categories'], 'color'));
             }
             $newFileModel = new NewFileModel();
             $newCategoryModel = new NewCategoryModel();
@@ -125,7 +125,8 @@ class LibraryController extends AjaxControllerWithIdentityAction
             );
         }
 
-        $pdfCard = new PdfCardModel($pdfFileRecord->name, $pdfFileRecord->bookmark, PdfFileCategoryEntryRecord::getColorsOfPdfByName($pdfFileRecord->name));
+        // just created (no categories == no colors), so []
+        $pdfCard = new PdfCardModel($pdfFileRecord->name, $pdfFileRecord->bookmark, []);
         $newFileModel = new NewFileModel();
         $addedPdfModel = new AddedPdfModel($pdfFileRecord->name, $pdfFileRecord->id);
         return $this->createSuccessfulUploadFileForm($newFileModel, $pdfCard, $addedPdfModel);

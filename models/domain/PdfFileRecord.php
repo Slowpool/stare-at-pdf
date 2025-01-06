@@ -90,19 +90,30 @@ class PdfFileRecord extends \yii\db\ActiveRecord
         return $this->hasOne(UserRecord::class, ['id' => 'user_id']);
     }
 
-    /** @return string[] */
-    public static function getFilesOfUserAsArray($fieldsToSelect = ['id', 'name', 'bookmark', 'user_id'])
+    public function getCategories()
+    {
+        // TODO malconfigurated???
+        return $this->hasMany(PdfFileCategoryRecord::class, ['id' => 'category_id'])
+            ->viaTable('pdf_file_category_entry', ['pdf_file_id' => 'id']);
+    }
+
+    /** @return  */
+    public static function getFilesOfUserAsArray($includeCategories = false, $fieldsToSelect = ['id', 'name', 'bookmark', 'user_id']): array
     {
         for ($i = 0; $i < sizeof($fieldsToSelect); $i++) {
             $fieldsToSelect[$i] = 'pf.' . $fieldsToSelect[$i];
         }
-        ;
-        return self::find()
-            ->alias('pf')
-            ->asArray()
-            ->select($fieldsToSelect)
-            ->joinWith('user u') // TODO probably ordinary join?
+
+        $query = self::find()
+            ->leftJoin('user u', 'u.id = pf.user_id')
             ->where(['u.name' => Yii::$app->user->identity->name])
+            ->alias('pf')
+            ->asArray();
+
+        if ($includeCategories) {
+            $query = $query->with('categories');
+        }
+        return $query->select($fieldsToSelect)
             ->all();
     }
 
@@ -117,7 +128,7 @@ class PdfFileRecord extends \yii\db\ActiveRecord
         if ($asArray) {
             $pdfFile = $pdfFile->asArray();
         }
-        $query = $pdfFile->where(['name' => $pdfName, 'user_id' => Yii::$app->user->identity->id]);
+        $query = $pdfFile->where(['pdf_file.name' => $pdfName, 'pdf_file.user_id' => Yii::$app->user->identity->id]);
         return $execute ? $query->one() : $query;
     }
 
@@ -134,6 +145,6 @@ class PdfFileRecord extends \yii\db\ActiveRecord
 
     public static function getPdfFileIdsAndNames(): array
     {
-        return self::getFilesOfUserAsArray(['id', 'name']);
+        return self::getFilesOfUserAsArray(false, ['id', 'name']);
     }
 }

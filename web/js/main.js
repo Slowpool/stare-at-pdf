@@ -76,14 +76,14 @@ const mapSpecialActionAfterRequest = {
             secondaryPageElements.allFilesList.insertAdjacentHTML('beforeend', data.newPdfCard);
 
             // workaround. when newPdfCard is attached, than addedPdf is also attached.
-            AddOptionToSelect('#assigncategorymodel-pdffileid', data.addedPdf);
+            AddOptionToSelect('#pdffileid', data.addedPdf);
         }
     },
     '/add-new-category': () => {
         secondaryPageElements.addNewCategoryForm.innerHTML = data.newForm;
         alert(data.categoryAdded ? 'successfully added' : 'failed to add');
         if (data.addedCategory) {
-            AddOptionToSelect('#assigncategorymodel-categoryid', data.addedCategory);
+            AddOptionToSelect('#categoryid', data.addedCategory);
         }
     },
     '/assign-category': () => {

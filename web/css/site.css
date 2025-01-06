@@ -171,5 +171,11 @@ input {
     display: flex;
     flex-direction: row;
     justify-content: start;
-    background-color: #54f3f1;
+    /* background-color: #ff0000 */
+}
+
+.pdf-file-link,
+span.pdf-card-page {
+    background-color: #027cff;
+    background-color: white;
 }
