@@ -197,10 +197,13 @@ class LibraryController extends AjaxControllerWithIdentityAction
 
         $pdfCategoryEntryRecord = PdfFileCategoryEntryRecord::explicitConstructor($assignCategoryModel->pdfFileId, $assignCategoryModel->categoryId);
         if (!$pdfCategoryEntryRecord->save()) {
+            // TODO error isn't displayed
             return $this->createCategoryAssigningResponse(false, $assignCategoryModel, '', 'Failed to save');
         }
 
-        return $this->createCategoryAssigningResponse(true, new AssignCategoryModel);
+        // keep picked category (because it can be assigned further again (i was intuitively willing to assign all books with one category, then for another)), but reset pdf id
+        $assignCategoryModel->pdfFileId = null;
+        return $this->createCategoryAssigningResponse(true, $assignCategoryModel);
     }
 
     public function createCategoryAssigningResponse(bool $assigningResult, AssignCategoryModel $assignCategoryModel, string $errorAttribute = null, string $error = null): AssignCategoryResponse
