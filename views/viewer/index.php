@@ -19,8 +19,8 @@ use yii\helpers\UserUploadsPathHelper;
     </nav>
 
     <?php
-    $pdfUrl = $pdfSpecified ? Url::to([UserUploadsPathHelper::toFile($pdfName, true), '#' => "page=$bookmark"]) : '';
-    echo PdfJs::widget([
+    $pdfUrl = $pdfSpecified ? Url::to([UserUploadsPathHelper::toFile($pdfName, true), '#' => "page=$bookmark"]) : ''; ?>
+    <?= PdfJs::widget([
         'url' => $pdfUrl,
         // 'encodeUrl' => false,
         'options' => [

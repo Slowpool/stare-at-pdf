@@ -346,9 +346,10 @@ function LoadPdf() {
     jQuery(function ($) {
         var form = $("#pdfjs-form-w0");
 
-        /** \diecoding\pdfjs\PdfJs::widget() generates widget with encoded characters in url, even when it is passed decoded. So "#page=30" will be "%23page%3D30", that will be ignored by "pdfjs?file=..." ajax request and the page number from cookies will be opened anywway. i didn't find another solution rather than merely change the generated form action via js. */
+        /** \diecoding\pdfjs\PdfJs::widget() generates widget with encoded characters in url, even when it is passed decoded. So "#page=30" will be "%23page%3D30", that will be ignored by "pdfjs?file=..." ajax request and the page number from cookies (???) will be opened anywway. i didn't find another solution rather than merely change the generated form action via js. */
         function FixWrongPdfUrl() {
-            form[0].action = form[0].action.replace('%3D', '=').replace('%23', '#');
+            var newUrl = form.attr('action').replace('%3D', '=').replace('%23', '#');
+            form.attr('action', newUrl);
         }
         FixWrongPdfUrl();
 

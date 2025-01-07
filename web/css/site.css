@@ -176,6 +176,7 @@ input {
 
 .pdf-file-link,
 span.pdf-card-page {
-    background-color: #027cff;
+    /* background-color: #1b4261; */
     background-color: white;
+    padding: 2px;
 }

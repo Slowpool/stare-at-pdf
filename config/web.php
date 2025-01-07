@@ -7,21 +7,21 @@ $config = [
     'id' => 'basic',
     'name' => 'Home', // let it be
     'basePath' => dirname(__DIR__),
-    'bootstrap' => ['log'],
+    'bootstrap' => ['log', 'headers'],
     'aliases' => [
         '@MAX_CATEGORY_NAME_LENGTH' => 50,
         '@CATEGORY_COLOR_LENGTH' => 6,
 
         '@bower' => '@vendor/bower-asset',
-        '@npm'   => '@vendor/npm-asset',
-        
+        '@npm' => '@vendor/npm-asset',
+
         '@views' => '@app/views',
         '@main_layout' => '@views/layouts/main.php',
-        
+
         '@home_view' => '//viewer/index.php',
         '@login_view' => '//identity/login.php',
         '@library_view' => '//library/index.php',
-        
+
         '@partial_nav_logout_form' => '//layouts/partial_nav_logout_form.php',
         '@partial_nav_login_button' => '//layouts/partial_nav_login.php',
         '@partial_new_file_form' => '//library/partial_new_file_form.php',
@@ -29,7 +29,7 @@ $config = [
         '@partial_new_bookmark_form' => '//viewer/partial_new_bookmark_form.php',
         '@partial_new_category_form' => '//library/partial_new_category_form.php',
         '@partial_assign_category_form' => '//library/partial_assign_category_form.php',
-        
+
         '@uploads' => '@app/web/uploads',
         '@scripts' => '@app/web/js',
     ],
@@ -68,24 +68,9 @@ $config = [
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
-            'rules' => require_once 'urls.php',
+            'rules' => require 'urls.php',
         ],
-        // 'headers' => [
-        //     'class' => 'hyperia\security\Headers',
-        //     'cspDirectives' => [
-        //         'default-src' => "'self'",
-        //         'script-src' => "'self'",
-        //         'style-src' => "'self'",
-        //         'img-src' => "'self'",
-        //         'connect-src' => "'self'",
-        //         'font-src' => "'self'",
-        //         'object-src' => "'self'",
-        //         'media-src' => "'self'",
-        //         'form-action' => "'self'",
-        //         'frame-src' => "'self'",
-        //         'child-src' => "'self'"
-        //     ]
-        // ]
+        'headers' => require 'CSP.php',
     ],
     'modules' => [
         'pdfjs' => [
