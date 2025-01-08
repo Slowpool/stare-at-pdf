@@ -3,8 +3,24 @@
 namespace app\models\jsonResponses;
 
 class PageResponse extends JsonRedirectResponse {
+    /**
+     * Or title, or current page name.
+     * @var string
+     */
     public string $selectedNav;
+    /**
+     * Will be placed into <body> into <main>.
+     * @var string
+     */
     public string $content;
+
+    // TODO i would add it, but the architecture is so awkward that it'll take eternity
+    // public string $descriptionMeta;
+
+    // public string $keywordsMeta;
+
+    // public array $linksMeta;
+    
 
     // TODO why did i add it if it is never being validated?
     public function rules() {
