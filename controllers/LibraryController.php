@@ -60,7 +60,7 @@ class LibraryController extends AjaxControllerWithIdentityAction
     }
 
     /** @return array [0] => categoryIdsAndNames, [1] => pdffileIdsAndNames */
-    public static function obtainPdfFileIdsAndCategoryIds(): array {
+    protected static function obtainPdfFileIdsAndCategoryIds(): array {
         return [PdfFileCategoryRecord::getCategoryIdsAndNames(),
         PdfFileRecord::getPdfFileIdsAndNames()];
     }
@@ -100,11 +100,9 @@ class LibraryController extends AjaxControllerWithIdentityAction
 
         // TODO add slugification, ensuring uniqueness of slug
 
-        // '.' ruins the pretty url matching. i tried everything, nothing helped except this
-        $validPdfName = str_replace('.', '-', $newFileModel->newFile->basename);
         // q: difference between UploadedFile->baseName and name
         // a: baseName has no extension
-        $pdfFileRecord = PdfFileRecord::explicitConstructor($validPdfName);
+        $pdfFileRecord = PdfFileRecord::explicitConstructor($newFileModel->newFile->basename);
         if (!$pdfFileRecord->save()) {
             // TODO handle file deleting
             return $this->createFailedUploadFormWithError(
@@ -119,7 +117,7 @@ class LibraryController extends AjaxControllerWithIdentityAction
             $pdfDir = UserUploadsPathHelper::getUserUploadsPath();
             self::ensureDirRecursively($pdfDir);
 
-            $newFileModel->newFile->saveAs(UserUploadsPathHelper::toFile($validPdfName));
+            $newFileModel->newFile->saveAs(UserUploadsPathHelper::toFile($newFileModel->newFile->basename));
         } catch (\Exception) {
             return $this->createFailedUploadFormWithError(
                 $newFileModel,

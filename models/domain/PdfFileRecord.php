@@ -15,11 +15,11 @@ use yii\db\Expression;
  * @property string $name
  * @property int $bookmark
  * @property int $user_id
- * @property string $slug
+ * @property Expression|string $slug
  *
  * @property UserRecord $user
  */
-class PdfFileRecord extends \yii\db\ActiveRecord
+class PdfFileRecord extends ActiveRecord
 {
     // https://qna.habr.com/q/425831?ysclid=m4wxkml2dl503187584
     // public $id;
@@ -39,6 +39,7 @@ class PdfFileRecord extends \yii\db\ActiveRecord
         $record->user_id = Yii::$app->user->identity->id;
         // still not sure that default values should be set this way
         $record->bookmark = 1;
+        $record->slug = new Expression("SLUGIFICATE(:name)", [':name' => $fileName]);
         return $record;
     }
 
@@ -56,11 +57,11 @@ class PdfFileRecord extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            // TODO is slug safe?
+            // TODO should slug be safe?
             [['id', 'name', 'bookmark', 'user_id', 'slug'], 'safe'],
             [['name', 'user_id', 'slug'], 'required'],
             [['bookmark', 'user_id'], 'integer'],
-            [['name', 'slug'], 'string', 'max' => 150],
+            [['name'], 'string', 'max' => 150],
             [
                 ['user_id', 'name'],
                 'unique',
@@ -92,15 +93,15 @@ class PdfFileRecord extends \yii\db\ActiveRecord
         ];
     }
 
-    public function beforeSave($insert) {
-        if (parent::beforeSave($insert)) {
-            $this->slug = new Expression("SLUGIFICATE(:name)", [':name' => $this->name]);
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
+    // public function beforeSave($insert)
+    // {
+    //     if (parent::beforeSave($insert)) {
+    //         $this->slug = new Expression("SLUGIFICATE(:name)", [':name' => $this->name]);
+    //         return true;
+    //     } else {
+    //         return false;
+    //     }
+    // }
 
     /**
      * Gets query for [[User]].
@@ -114,12 +115,11 @@ class PdfFileRecord extends \yii\db\ActiveRecord
 
     public function getCategories()
     {
-        // TODO malconfigurated???
         return $this->hasMany(PdfFileCategoryRecord::class, ['id' => 'category_id'])
             ->viaTable('pdf_file_category_entry', ['pdf_file_id' => 'id']);
     }
 
-    /** @return  */
+    /** @return array Pdf files of current user, ordered by id. */
     public static function getFilesOfUserAsArray($includeCategories = false, $fieldsToSelect = ['id', 'slug', 'name', 'bookmark', 'user_id']): array
     {
         for ($i = 0; $i < sizeof($fieldsToSelect); $i++) {
@@ -130,6 +130,7 @@ class PdfFileRecord extends \yii\db\ActiveRecord
             ->leftJoin('user u', 'u.id = pf.user_id')
             ->where(['u.name' => Yii::$app->user->identity->name])
             ->alias('pf')
+            ->orderBy('pf.id ASC')
             ->asArray();
 
         if ($includeCategories) {
@@ -139,7 +140,8 @@ class PdfFileRecord extends \yii\db\ActiveRecord
             ->all();
     }
 
-    public static function findBySlugForCurrentUser($pdfSlug, bool $asArray = false, bool $execute = true): ActiveQuery|ActiveRecord|array|null {
+    public static function findBySlugForCurrentUser($pdfSlug, bool $asArray = false, bool $execute = true): ActiveQuery|ActiveRecord|array|null
+    {
         $pdfFile = self::find();
         if ($asArray) {
             $pdfFile = $pdfFile->asArray();

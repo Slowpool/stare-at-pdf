@@ -8,9 +8,8 @@ use yii\bootstrap5\Html;
 use yii\helpers\Url;
 
 /** @param PdfCardModel $pdfCard */
-?>
 
-<?php
+// TODO despite to being implemented via array, view displayes a single color. (i don't know yet what to do with several colors. divide card on several parts with different colors? weird?)
 $style = !empty($pdfCard['backgroundColors'])
     // when there's at least one color, the first one is obtained
     ? ['style' => "background-color: #" . $pdfCard['backgroundColors'][0]]

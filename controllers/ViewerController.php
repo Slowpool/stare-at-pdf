@@ -52,11 +52,11 @@ class ViewerController extends AjaxControllerWithIdentityAction
         return $page;
     }
 
-    public function actionIndex($pdfSlug, $bookmark = null): PageResponse|PageResponseWithIdentityAction|string
+    public function actionIndex($pdfSlug, $page = null): PageResponse|PageResponseWithIdentityAction|string
     {
-        return $this->executeIfAjaxOtherwiseRenderSinglePage(function () use ($pdfSlug, $bookmark): PageResponse {
+        return $this->executeIfAjaxOtherwiseRenderSinglePage(function () use ($pdfSlug, $page): PageResponse {
             $pdfFileRecord = PdfFileRecord::findBySlugForCurrentUser($pdfSlug);
-            $pdfModel = new PdfModel($pdfFileRecord->id, $pdfFileRecord->name, $bookmark, $pdfSlug);
+            $pdfModel = new PdfModel($pdfFileRecord->id, $pdfFileRecord->name, $page, $pdfSlug);
             $pageResponse = $this->goHomeAjax($pdfModel);
             return $pageResponse;
         });

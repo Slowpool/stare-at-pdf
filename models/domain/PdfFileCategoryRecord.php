@@ -78,6 +78,7 @@ class PdfFileCategoryRecord extends \yii\db\ActiveRecord
             ->asArray()
             ->select(['name', 'id'])
             ->where(['user_id' => Yii::$app->user->identity->id])
+            ->orderBy('id ASC')
             ->all();
     }
 }
