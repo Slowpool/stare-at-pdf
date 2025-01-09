@@ -4,6 +4,7 @@ namespace app\models\domain;
 
 use Yii;
 use app\models\domain\UserRecord;
+use yii\behaviors\SluggableBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
@@ -39,7 +40,7 @@ class PdfFileRecord extends ActiveRecord
         $record->user_id = Yii::$app->user->identity->id;
         // still not sure that default values should be set this way
         $record->bookmark = 1;
-        $record->slug = new Expression("SLUGIFICATE(:name)", [':name' => $fileName]);
+        // $record->slug = new Expression("SLUGIFICATE(:name)", [':name' => $fileName]);
         return $record;
     }
 
@@ -76,6 +77,15 @@ class PdfFileRecord extends ActiveRecord
                 'message' => 'You already have such a slug in your library'
             ],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => UserRecord::class, 'targetAttribute' => ['user_id' => 'id']],
+        ];
+    }
+
+    public function behaviors() {
+        return [
+            [
+                'class' => SluggableBehavior::class,
+                'attribute' => 'name'
+            ],
         ];
     }
 

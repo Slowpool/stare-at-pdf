@@ -25,6 +25,7 @@ use app\models\library\NewFileModel;
 use app\models\library\NewCategoryModel;
 use app\models\library\AssignCategoryModel;
 use app\models\library\AddedCategoryModel;
+use yii\behaviors\SluggableBehavior;
 
 class LibraryController extends AjaxControllerWithIdentityAction
 {
