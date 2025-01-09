@@ -98,6 +98,8 @@ class LibraryController extends AjaxControllerWithIdentityAction
             return $this->createFailedUploadFormWithError($newFileModel);
         }
 
+        // TODO add slugification, ensuring uniqueness of slug
+
         // '.' ruins the pretty url matching. i tried everything, nothing helped except this
         $validPdfName = str_replace('.', '-', $newFileModel->newFile->basename);
         // q: difference between UploadedFile->baseName and name

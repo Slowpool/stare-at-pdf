@@ -78,7 +78,7 @@ $config = [
         ],
     ],
     'params' => $params,
-    'meta' => require 'meta.php',
+    // 'meta' => require 'meta.php',
 ];
 
 if (YII_ENV_DEV) {
