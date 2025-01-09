@@ -9,8 +9,8 @@ return [
     ],
     'update-bookmark' => 'viewer/update-bookmark',
     [
-        // here pdfName doesn't have extension. file *semaphores.pdf* has to be specified as *stare-at/semaphores*
-        'pattern' => 'stare-at/<pdfName>',
+        // here pdfSlug doesn't have extension. file *semaphores guide.pdf* has to be specified as *stare-at/semaphores-guide*
+        'pattern' => 'stare-at/<pdfSlug>',
         'route' => 'viewer/index',
     ],
     // library

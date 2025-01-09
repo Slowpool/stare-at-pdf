@@ -8,6 +8,7 @@ use yii\bootstrap5\Html;
 use yii\helpers\Url;
 use yii\helpers\UserUploadsPathHelper;
 
+// TODO model is changed. adjust new model.
 ?>
 <div class="pdf-viewer-container">
     <nav id="custom-toolbar">

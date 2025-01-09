@@ -5,6 +5,8 @@ namespace app\models\domain;
 use Yii;
 use app\models\domain\UserRecord;
 use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "pdf_file".
@@ -13,6 +15,7 @@ use yii\db\ActiveQuery;
  * @property string $name
  * @property int $bookmark
  * @property int $user_id
+ * @property string $slug
  *
  * @property UserRecord $user
  */
@@ -53,15 +56,23 @@ class PdfFileRecord extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id', 'name', 'bookmark', 'user_id'], 'safe'],
-            [['name', 'user_id'], 'required'],
+            // TODO is slug safe?
+            [['id', 'name', 'bookmark', 'user_id', 'slug'], 'safe'],
+            [['name', 'user_id', 'slug'], 'required'],
             [['bookmark', 'user_id'], 'integer'],
-            [['name'], 'string', 'max' => 150],
+            [['name', 'slug'], 'string', 'max' => 150],
             [
-                ['name', 'user_id'],
+                ['user_id', 'name'],
                 'unique',
                 'targetAttribute' => ['name', 'user_id'],
                 'message' => 'You already have the book with this name in your library'
+            ],
+            [
+                ['user_id', 'slug'],
+                'unique',
+                'targetAttribute' => ['user_id', 'slug'],
+                // TODO bad message
+                'message' => 'You already have such a slug in your library'
             ],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => UserRecord::class, 'targetAttribute' => ['user_id' => 'id']],
         ];
@@ -78,6 +89,16 @@ class PdfFileRecord extends \yii\db\ActiveRecord
             'bookmark' => 'Bookmark',
             'user_id' => 'User ID',
         ];
+    }
+
+    public function beforeSave($insert) {
+        if (parent::beforeSave($insert)) {
+            $this->slug = new Expression("SLUGIFICATE(:name)", [':name' => $this->name]);
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
     /**
@@ -117,11 +138,22 @@ class PdfFileRecord extends \yii\db\ActiveRecord
             ->all();
     }
 
+    /**
+     * @deprecated
+     * @param string $pdfName
+     * @return self
+     */
     public static function getBookmarkByFileName($pdfName)
     {
+        trigger_error('use findBySlugForCurrentUser instead', E_USER_DEPRECATED);
         return self::findByNameForUser($pdfName, true)['bookmark'];
     }
 
+    /**
+     * @deprecated
+     * @param string $pdfName
+     * @return self
+     */
     public static function findByNameForUser(string $pdfName, bool $asArray = false, bool $execute = true): ActiveQuery|self|array
     {
         $pdfFile = self::find();
@@ -131,17 +163,30 @@ class PdfFileRecord extends \yii\db\ActiveRecord
         $query = $pdfFile->where(['pdf_file.name' => $pdfName, 'pdf_file.user_id' => Yii::$app->user->identity->id]);
         return $execute ? $query->one() : $query;
     }
+    
+    public static function findBySlugForCurrentUser($pdfSlug, bool $asArray = false, bool $execute = true): ActiveQuery|ActiveRecord|array|null {
+        $pdfFile = self::find();
+        if ($asArray) {
+            $pdfFile = $pdfFile->asArray();
+        }
+        $query = $pdfFile->where(['pdf_file.slug' => $pdfSlug, 'pdf_file.user_id' => Yii::$app->user->identity->id]);
+        return $execute ? $query->one() : $query;
+    }
 
-    public static function updateBookmark(string $pdfName, int $newBookmark): bool
+    public static function updateBookmark(string $pdfId, int $newBookmark): bool
     {
         try {
-            $pdfFile = self::findByNameForUser($pdfName);
+            $pdfFile = self::findOne($pdfId);
             $pdfFile->bookmark = $newBookmark;
             return $pdfFile->update();
         } catch (\Exception) {
             return false;
         }
     }
+
+    // public static function findById($id): PdfFileRecord|null {
+    //     return self::findOne($id);
+    // }
 
     public static function getPdfFileIdsAndNames(): array
     {

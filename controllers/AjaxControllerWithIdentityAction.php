@@ -6,6 +6,7 @@ use Yii;
 use yii\web\Controller;
 use app\models\jsonResponses\PageResponse;
 use app\models\jsonResponses\PageResponseWithIdentityAction;
+use app\models\viewer\PdfModel;
 use yii\web\Response;
 
 abstract class AjaxControllerWithIdentityAction extends Controller
@@ -38,15 +39,16 @@ abstract class AjaxControllerWithIdentityAction extends Controller
         $this->response->format = Response::FORMAT_JSON;
     }
 
-    public function createHomePage($pdfName, $pdfSpecified, $bookmark): PageResponse
+    public function createHomePage(PdfModel $pdfModel): PageResponse
     {
-        return new PageResponse(Yii::$app->name, $this->renderPartial(Yii::getAlias('@home_view'), compact('pdfName', 'bookmark', 'pdfSpecified')), Yii::$app->homeUrl);
+        return new PageResponse(Yii::$app->name, $this->renderPartial(Yii::getAlias('@home_view'), compact('pdfModel')), Yii::$app->homeUrl);
     }
 
     /** @return PageResponse the page with pdf viewer */
-    public function goHomeAjax($pdfName = '', $pdfSpecified = false, $page = 0): PageResponse
+    // TODO it mustn't be here
+    public function goHomeAjax(PdfModel $pdfModel): PageResponse
     {
-        return $this->createHomePage($pdfName, $pdfSpecified, $page);
+        return $this->createHomePage($pdfModel);
     }
 
     public function renderSinglePage(): string
