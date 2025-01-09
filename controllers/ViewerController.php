@@ -56,7 +56,7 @@ class ViewerController extends AjaxControllerWithIdentityAction
     {
         return $this->executeIfAjaxOtherwiseRenderSinglePage(function () use ($pdfSlug, $bookmark): PageResponse {
             $pdfFileRecord = PdfFileRecord::findBySlugForCurrentUser($pdfSlug);
-            $pdfModel = new PdfModel($pdfFileRecord->name, $bookmark, $pdfSlug);
+            $pdfModel = new PdfModel($pdfFileRecord->id, $pdfFileRecord->name, $bookmark, $pdfSlug);
             $pageResponse = $this->goHomeAjax($pdfModel);
             return $pageResponse;
         });

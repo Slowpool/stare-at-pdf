@@ -72,7 +72,7 @@ class LibraryController extends AjaxControllerWithIdentityAction
             // should be in automapper-like class
             $pdfCards = [];
             foreach ($pdfFiles as $pdfFile) {
-                $pdfCards[] = new PdfCardModel($pdfFile['name'], $pdfFile['bookmark'], array_column($pdfFile['categories'], 'color'));
+                $pdfCards[] = new PdfCardModel($pdfFile['name'], $pdfFile['bookmark'], $pdfFile['slug'], array_column($pdfFile['categories'], 'color'));
             }
             $newFileModel = new NewFileModel();
             $newCategoryModel = new NewCategoryModel();
@@ -127,8 +127,8 @@ class LibraryController extends AjaxControllerWithIdentityAction
             );
         }
 
-        // just created (no categories == no colors), so []
-        $pdfCard = new PdfCardModel($pdfFileRecord->name, $pdfFileRecord->bookmark, []);
+        // just created => no categories => no colors => [] passed as colors
+        $pdfCard = new PdfCardModel($pdfFileRecord->name, $pdfFileRecord->bookmark, $pdfFileRecord->slug, []);
         $newFileModel = new NewFileModel();
         $addedPdfModel = new AddedPdfModel($pdfFileRecord->name, $pdfFileRecord->id);
         return $this->createSuccessfulUploadFileForm($newFileModel, $pdfCard, $addedPdfModel);

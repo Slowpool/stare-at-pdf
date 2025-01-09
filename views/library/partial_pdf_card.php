@@ -19,7 +19,7 @@ $style = !empty($pdfCard['backgroundColors'])
 ?>
 
 <?= Html::beginTag('li', array_merge(['class' => 'pdf-file-card'], $style)); ?>
-<?php $url = Url::toRoute(['/stare-at/' . Html::encode(urlEncode($pdfCard->name)), 'page' => Html::encode($pdfCard->bookmark)]) ?>
+<?php $url = Url::toRoute(['/stare-at/' . Html::encode(urlEncode($pdfCard->slug)), 'page' => Html::encode($pdfCard->bookmark)]) ?>
 <?= Html::a(Html::encode($pdfCard->name), $url, ['class' => 'pdf-file-link ajax-action']); ?>
 <span class="pdf-card-page">
     <?= " " . Html::encode($pdfCard->bookmark) . " p."; ?>

@@ -88,6 +88,7 @@ class PdfFileRecord extends \yii\db\ActiveRecord
             'name' => 'Name',
             'bookmark' => 'Bookmark',
             'user_id' => 'User ID',
+            'slug' => 'Slug'
         ];
     }
 
@@ -119,7 +120,7 @@ class PdfFileRecord extends \yii\db\ActiveRecord
     }
 
     /** @return  */
-    public static function getFilesOfUserAsArray($includeCategories = false, $fieldsToSelect = ['id', 'name', 'bookmark', 'user_id']): array
+    public static function getFilesOfUserAsArray($includeCategories = false, $fieldsToSelect = ['id', 'slug', 'name', 'bookmark', 'user_id']): array
     {
         for ($i = 0; $i < sizeof($fieldsToSelect); $i++) {
             $fieldsToSelect[$i] = 'pf.' . $fieldsToSelect[$i];
@@ -138,32 +139,6 @@ class PdfFileRecord extends \yii\db\ActiveRecord
             ->all();
     }
 
-    /**
-     * @deprecated
-     * @param string $pdfName
-     * @return self
-     */
-    public static function getBookmarkByFileName($pdfName)
-    {
-        trigger_error('use findBySlugForCurrentUser instead', E_USER_DEPRECATED);
-        return self::findByNameForUser($pdfName, true)['bookmark'];
-    }
-
-    /**
-     * @deprecated
-     * @param string $pdfName
-     * @return self
-     */
-    public static function findByNameForUser(string $pdfName, bool $asArray = false, bool $execute = true): ActiveQuery|self|array
-    {
-        $pdfFile = self::find();
-        if ($asArray) {
-            $pdfFile = $pdfFile->asArray();
-        }
-        $query = $pdfFile->where(['pdf_file.name' => $pdfName, 'pdf_file.user_id' => Yii::$app->user->identity->id]);
-        return $execute ? $query->one() : $query;
-    }
-    
     public static function findBySlugForCurrentUser($pdfSlug, bool $asArray = false, bool $execute = true): ActiveQuery|ActiveRecord|array|null {
         $pdfFile = self::find();
         if ($asArray) {

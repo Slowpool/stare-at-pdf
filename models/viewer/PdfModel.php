@@ -4,16 +4,18 @@ namespace app\models\viewer;
 
 class PdfModel
 {
-    public string $pdfName;
+    public int $id;
+    public string $name;
     public int $bookmark;
     public string $slug;
     public function getPdfSpecified(): bool
     {
-        return $this->pdfName != null;
+        return $this->name != null;
     }
-    public function __construct($name, $bookmark, $slug)
+    public function __construct($id, $name, $bookmark, $slug)
     {
-        $this->pdfName = $name;
+        $this->id = $id;
+        $this->name = $name;
         $this->bookmark = $bookmark;
         $this->slug = $slug;
     }

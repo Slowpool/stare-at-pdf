@@ -1,26 +1,26 @@
 <?php
 
 /** @var yii\web\View $this */
-/** @var $bookmark must not be null */
+/** @param PdfModel $pdfModel  */
 
+use app\models\viewer\PdfModel;
 use diecoding\pdfjs\PdfJs;
 use yii\bootstrap5\Html;
 use yii\helpers\Url;
 use yii\helpers\UserUploadsPathHelper;
 
-// TODO model is changed. adjust new model.
 ?>
 <div class="pdf-viewer-container">
     <nav id="custom-toolbar">
         <ul class="navbar-nav nav">
             <li id="update-bookmark-container">
-                <?= $this->render(Yii::getAlias('@partial_new_bookmark_form'), compact('pdfName')) ?>
+                <?= $this->render(Yii::getAlias('@partial_new_bookmark_form'), ['pdfId' => $pdfModel->id]) ?>
             </li>
         </ul>
     </nav>
 
     <?php
-    $pdfUrl = $pdfSpecified ? Url::to([UserUploadsPathHelper::toFile($pdfName, true), '#' => "page=$bookmark"]) : ''; ?>
+    $pdfUrl = $pdfModel->getPdfSpecified() ? Url::to([UserUploadsPathHelper::toFile($pdfModel->name, true), '#' => "page=$pdfModel->bookmark"]) : ''; ?>
     <?= PdfJs::widget([
         'url' => $pdfUrl,
         // 'encodeUrl' => false,
