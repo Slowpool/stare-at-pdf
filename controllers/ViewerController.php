@@ -52,6 +52,7 @@ class ViewerController extends AjaxControllerWithIdentityAction
         return $page;
     }
 
+    // TODO doesn't work when this page is the first page the user asks for
     public function actionIndex($pdfSlug, $page = null): PageResponse|PageResponseWithIdentityAction|string
     {
         return $this->executeIfAjaxOtherwiseRenderSinglePage(function () use ($pdfSlug, $page): PageResponse {
