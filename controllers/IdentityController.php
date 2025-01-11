@@ -68,7 +68,7 @@ class IdentityController extends AjaxControllerWithIdentityAction
      * @param bool $pdfSpecified IGNORED inherited param.
      * @param string $page IGNORED inherited param.
      */
-    public function goHomeAjax(?PdfModel $pdfModel): PageResponse
+    public function goHomeAjax(?PdfModel $pdfModel = null): PageResponse
     {
         return Yii::$app->user->isGuest
             ? $this->createLoginPage([])

@@ -25,15 +25,14 @@ use app\models\library\NewFileModel;
 use app\models\library\NewCategoryModel;
 use app\models\library\AssignCategoryModel;
 use app\models\library\AddedCategoryModel;
-use yii\behaviors\SluggableBehavior;
 
 class LibraryController extends AjaxControllerWithIdentityAction
 {
-
     public function behaviors()
     {
         return [
             'access' => [
+                // TODO bug: returns error instead of redirect to login for unauthorized user.
                 'class' => AccessControl::class,
                 'only' => ['index', 'upload-pdf'],
                 'rules' => [
@@ -61,9 +60,12 @@ class LibraryController extends AjaxControllerWithIdentityAction
     }
 
     /** @return array [0] => categoryIdsAndNames, [1] => pdffileIdsAndNames */
-    protected static function obtainPdfFileIdsAndCategoryIds(): array {
-        return [PdfFileCategoryRecord::getCategoryIdsAndNames(),
-        PdfFileRecord::getPdfFileIdsAndNames()];
+    protected static function obtainPdfFileIdsAndCategoryIds(): array
+    {
+        return [
+            PdfFileCategoryRecord::getCategoryIdsAndNames(),
+            PdfFileRecord::getPdfFileIdsAndNames()
+        ];
     }
 
     public function actionIndex(): PageResponse|string

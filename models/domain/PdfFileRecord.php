@@ -80,7 +80,8 @@ class PdfFileRecord extends ActiveRecord
         ];
     }
 
-    public function behaviors() {
+    public function behaviors()
+    {
         return [
             [
                 'class' => SluggableBehavior::class,
@@ -177,10 +178,12 @@ class PdfFileRecord extends ActiveRecord
      * @param int $id
      * @return \app\models\domain\PdfFileRecord
      */
-    public static function findByIdForCurrentUser($id): PdfFileRecord {
-        return self::find()
-                    ->where(['id' => $id, 'user_id' => Yii::$app->user->identity->id])
-                    ->one();
+    public static function findByIdForCurrentUser($id): PdfFileRecord|null
+    {
+        return self::findOne([
+            'id' => $id,
+            'user_id' => Yii::$app->user->identity->id
+        ]);
     }
 
     public static function getPdfFileIdsAndNames(): array

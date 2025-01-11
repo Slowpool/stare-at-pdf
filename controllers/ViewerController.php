@@ -51,7 +51,7 @@ class ViewerController extends AjaxControllerWithIdentityAction
     public function createHomePage(?PdfModel $pdfModel = null): PageResponse
     {
         $page = parent::createHomePage($pdfModel);
-        if ($pdfModel->getPdfSpecified())
+        if ($pdfModel?->getPdfSpecified())
         // TODO why to use Url::to()?
             $page->url = "/stare-at/$pdfModel->slug";
         return $page;

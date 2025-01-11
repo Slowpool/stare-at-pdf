@@ -52,7 +52,7 @@ abstract class AjaxControllerWithIdentityAction extends Controller
     }
 
     /** @return PageResponse the page with pdf viewer */
-    // TODO it mustn't be here.
+    // TODO unclear + obfuscated method.
     // upd: the problem is that it goes to ViewerController page, but the authorization redirects user to login page anyway. maybe i'm wrong.
     public function goHomeAjax(?PdfModel $pdfModel): PageResponse
     {

@@ -14,8 +14,19 @@ use yii\helpers\UserUploadsPathHelper;
     <?php if ($pdfModel == null): ?>
         <h3>
             You don't have any <strong>PDF</strong> in your
-            <?= Html::a('library', Url::to('library'), ['class' => 'ajax-action']); ?>
+            <?= Html::a('library', Url::to('/library'), ['class' => 'ajax-action']); ?>
             .
+            <?php // TODO add pdf uloading form right here for convenience ?>
+            <select>
+                <option>Or you are advanced user</option>
+                <option>who doesn't use cookies.</option>
+                <option>You know, here could be your</option>
+                <option>last opened pdf, which makes your life simpler,</option>
+                <option>allowing you to not remember your last opening pdf. </option>
+                <option>But you picked a hard way.</option>
+                <option>Well, deal with it by your own.</option>
+                <option>Or just enable cookies the next time.</option>
+            </select>
         </h3>
     <?php else: ?>
         <nav id="custom-toolbar">
