@@ -8,7 +8,7 @@ use yii\web\Controller;
 use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\identity\LoginForm;
-use app\models\ContactForm;
+use app\models\viewer\PdfModel;
 use app\models\jsonResponses\PageResponse;
 use app\models\jsonResponses\PageResponseWithIdentityAction;
 
@@ -68,11 +68,11 @@ class IdentityController extends AjaxControllerWithIdentityAction
      * @param bool $pdfSpecified IGNORED inherited param.
      * @param string $page IGNORED inherited param.
      */
-    public function goHomeAjax($pdfName = '', $pdfSpecified = false, $page = 0): PageResponse
+    public function goHomeAjax(?PdfModel $pdfModel): PageResponse
     {
         return Yii::$app->user->isGuest
             ? $this->createLoginPage([])
-            : parent::goHomeAjax();
+            : parent::goHomeAjax($pdfModel);
     }
 
     /**
@@ -113,7 +113,6 @@ class IdentityController extends AjaxControllerWithIdentityAction
     }
 
     /**
-     * Logout action.
      * @return Response
      */
     public function actionLogout(): PageResponse|PageResponseWithIdentityAction|string

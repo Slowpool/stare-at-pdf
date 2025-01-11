@@ -2,17 +2,21 @@
 
 namespace app\controllers;
 
+use app\models\ErrorModel;
 use Yii;
-use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\Response;
+use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use app\models\jsonResponses\PageResponse;
 use app\models\jsonResponses\PageResponseWithIdentityAction;
+use app\models\jsonResponses\BookmarkUpdateResponse;
+use app\models\jsonResponses\ErrorPageResponse;
 use app\models\domain\PdfFileRecord;
 use app\models\viewer\UpdateBookmarkModel;
-use app\models\jsonResponses\BookmarkUpdateResponse;
 use app\models\viewer\PdfModel;
+use yii\web\Cookie;
+use yii\web\NotFoundHttpException;
 
 class ViewerController extends AjaxControllerWithIdentityAction
 {
@@ -44,20 +48,49 @@ class ViewerController extends AjaxControllerWithIdentityAction
         ];
     }
 
-    public function createHomePage(PdfModel $pdfModel): PageResponse
+    public function createHomePage(?PdfModel $pdfModel = null): PageResponse
     {
         $page = parent::createHomePage($pdfModel);
         if ($pdfModel->getPdfSpecified())
+        // TODO why to use Url::to()?
             $page->url = "/stare-at/$pdfModel->slug";
         return $page;
     }
 
     // TODO doesn't work when this page is the first page the user asks for
-    public function actionIndex($pdfSlug, $page = null): PageResponse|PageResponseWithIdentityAction|string
+    public function actionIndex($pdfSlug = null, $page = null): PageResponse|PageResponseWithIdentityAction|string
     {
         return $this->executeIfAjaxOtherwiseRenderSinglePage(function () use ($pdfSlug, $page): PageResponse {
-            $pdfFileRecord = PdfFileRecord::findBySlugForCurrentUser($pdfSlug);
-            $pdfModel = new PdfModel($pdfFileRecord->id, $pdfFileRecord->name, $page, $pdfSlug);
+            if ($pdfSlug) {
+                try {
+                    // TODO what exceptions can this method throw here? if none, then delete try {}
+                    $pdfFileRecord = PdfFileRecord::findBySlugForCurrentUser($pdfSlug);
+                    if ($pdfFileRecord) {
+                        Yii::$app->response->cookies->add(new Cookie([
+                            'name' => 'last-opened-pdf-id',
+                            'value' => $pdfFileRecord->id,
+                        ]));
+                    }
+                    else {
+                        throw new \Exception();
+                    }
+                }
+                catch (\Exception) {
+                    throw new NotFoundHttpException('Such a PDF file was not found');
+                }
+            }
+            else {
+                try {
+                    $lastOpenedPdfId = Yii::$app->request->cookies->get('last-opened-pdf-id')->value;
+                    $pdfFileRecord = PdfFileRecord::findByIdForCurrentUser($lastOpenedPdfId);
+                }
+                catch (\Exception) {
+                    // if the last opened pdf wasn't found, the request is valid (this is a case when user has no uploaded pdf at all. e.g. just registered)
+                    $pdfFileRecord = null;
+                }
+            }
+            $pdfModel = $pdfFileRecord ? new PdfModel($pdfFileRecord->id, $pdfFileRecord->name, $page ?? $pdfFileRecord->bookmark, $pdfFileRecord->slug) : null;
+
             $pageResponse = $this->goHomeAjax($pdfModel);
             return $pageResponse;
         });

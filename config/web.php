@@ -5,7 +5,7 @@ $db = require __DIR__ . '/db.php';
 
 $config = [
     'id' => 'basic',
-    'name' => 'Home', // let it be
+    'name' => 'Stare at pdf',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log', 'headers'],
     'aliases' => [
@@ -19,6 +19,7 @@ $config = [
         '@main_layout' => '@views/layouts/main.php',
 
         '@home_view' => '//viewer/index.php',
+        '@error_view' => '//viewer/error.php',
         '@login_view' => '//identity/login.php',
         '@library_view' => '//library/index.php',
 

@@ -163,7 +163,7 @@ class PdfFileRecord extends ActiveRecord
     public static function updateBookmark(string $pdfId, int $newBookmark): bool
     {
         try {
-            $pdfFile = self::findOne($pdfId);
+            $pdfFile = self::findByIdForCurrentUser($pdfId);
             $pdfFile->bookmark = $newBookmark;
             return $pdfFile->update();
         } catch (\Exception) {
@@ -171,9 +171,17 @@ class PdfFileRecord extends ActiveRecord
         }
     }
 
-    // public static function findById($id): PdfFileRecord|null {
-    //     return self::findOne($id);
-    // }
+    /**
+     * Ensures finding of pdf only for a current user, preventing unauthorized changing of somebody else's pdf records.
+     * Use this method instead of self::findOne() or alike to find pdf only for current user.
+     * @param int $id
+     * @return \app\models\domain\PdfFileRecord
+     */
+    public static function findByIdForCurrentUser($id): PdfFileRecord {
+        return self::find()
+                    ->where(['id' => $id, 'user_id' => Yii::$app->user->identity->id])
+                    ->one();
+    }
 
     public static function getPdfFileIdsAndNames(): array
     {

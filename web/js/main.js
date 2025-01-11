@@ -108,7 +108,7 @@ var loaded = true;
 var secondaryPageElements = null;
 
 var data = {
-    selectedNav: "", // home or library
+    title: "",
     content: "",
     url: "",
     identityNavItem: "", // login or logout
@@ -250,14 +250,14 @@ function ReadData(jsonResponse) {
         case 'entire page':
             data = {
                 url: jsonResponse.url, // duplicate
-                selectedNav: jsonResponse.selectedNav,
+                title: jsonResponse.title,
                 content: jsonResponse.content,
             };
             break;
         case 'entire page with new identity action':
             data = {
                 url: jsonResponse.url, // duplicate
-                selectedNav: jsonResponse.selectedNav,
+                title: jsonResponse.title,
                 content: jsonResponse.content,
                 identityNavItem: jsonResponse.navbarItem,
             };
@@ -310,7 +310,7 @@ function CutRouteValues(url) {
 function TrashDataHandling(requestedUrl) {
     UpdateIdentityNavbarItemIfItReceived();
 
-    mandatoryPageElements.title.innerHTML = data.selectedNav;
+    mandatoryPageElements.title.innerHTML = data.title;
     mandatoryPageElements.content.innerHTML = data.content;
     // document.title = data.title // TODO what does it do?
 
@@ -320,9 +320,9 @@ function TrashDataHandling(requestedUrl) {
     }
 
     // TODO in spite of url updating, <- and -> doesn't work in browser
-    window.history.pushState(data.content, data.selectedNav, requestedUrl);
+    window.history.pushState(data.content, data.title, requestedUrl);
     if (data.url !== requestedUrl) {
-        window.history.pushState(data.content, data.selectedNav, data.url);
+        window.history.pushState(data.content, data.title, data.url);
     }
 }
 
