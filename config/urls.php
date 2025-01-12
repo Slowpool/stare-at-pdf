@@ -15,6 +15,7 @@ return [
     ],
     // library
     'library' => 'library/index',
+    'library/' => 'library/index',
     'upload-pdf' => 'library/create-pdf-file',
     'add-new-category' => 'library/create-new-category',
     'assign-category' => 'library/create-pdf-file-category-entry',

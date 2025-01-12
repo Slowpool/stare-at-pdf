@@ -25,12 +25,10 @@ class ViewerController extends AjaxControllerWithIdentityAction
         return [
             'access' => [
                 'class' => AccessControl::class,
-                // TODO remove error
-                'only' => ['index', 'error', 'updateBookmark'],
+                'only' => ['index', 'updateBookmark'],
                 'rules' => [
                     [
-                        // TODO remove error
-                        'actions' => ['index', 'error', 'updateBookmark'],
+                        'actions' => ['index', 'updateBookmark'],
                         'allow' => true,
                         'roles' => ['@']
                     ]
@@ -40,24 +38,48 @@ class ViewerController extends AjaxControllerWithIdentityAction
                 'class' => VerbFilter::class,
                 'actions' => [
                     'index' => ['get'],
+                    // TODO which case to use here? mustn't it be update-bookmark?
                     'updateBookmark' => ['post'],
-                    // TODO remove error
-                    'error' => ['get']
                 ]
             ]
         ];
     }
 
-    public function createHomePage(?PdfModel $pdfModel = null): PageResponse
+    /**
+     * @param mixed $pdfModel
+     * @return \app\models\jsonResponses\PageResponse
+     * @obsolete
+     */
+    public function createHomePageOld(?PdfModel $pdfModel = null): PageResponse
     {
-        $page = parent::createHomePage($pdfModel);
+        trigger_error('Obsolete', E_USER_ERROR);
+        $page = parent::createHomePageOld($pdfModel);
         if ($pdfModel?->getPdfSpecified())
-        // TODO why to use Url::to()?
+            // TODO why to use Url::to()?
             $page->url = "/stare-at/$pdfModel->slug";
         return $page;
     }
 
-    // TODO doesn't work when this page is the first page the user asks for
+    /**
+     * @param mixed $pdfModel
+     * @return PageResponse
+     * @obsolete
+     */
+    public function goHomeAjaxOld(?PdfModel $pdfModel = null): PageResponse|PageResponseWithIdentityAction
+    {
+        trigger_error('Obsolete', E_USER_ERROR);
+        return $this->createHomePage($pdfModel);
+    }
+
+    /**
+     * @param ?PdfModel $pdfModel
+     * @return \app\models\jsonResponses\PageResponse
+     */
+    public function createHomePage($pdfModel = null): PageResponse|PageResponseWithIdentityAction
+    {
+        return new PageResponse(Yii::$app->name, $this->renderPartial(Yii::getAlias('@pdf_viewer_view'), compact('pdfModel')), Yii::$app->homeUrl);
+    }
+
     public function actionIndex($pdfSlug = null, $page = null): PageResponse|PageResponseWithIdentityAction|string
     {
         return $this->executeIfAjaxOtherwiseRenderSinglePage(function () use ($pdfSlug, $page): PageResponse {
@@ -70,36 +92,29 @@ class ViewerController extends AjaxControllerWithIdentityAction
                             'name' => 'last-opened-pdf-id',
                             'value' => $pdfFileRecord->id,
                         ]));
-                    }
-                    else {
+                    } else {
                         throw new \Exception();
                     }
-                }
-                catch (\Exception) {
+                } catch (\Exception) {
                     throw new NotFoundHttpException('Such a PDF file was not found');
                 }
-            }
-            else {
+            } else {
                 try {
                     $lastOpenedPdfId = Yii::$app->request->cookies->get('last-opened-pdf-id')->value;
                     $pdfFileRecord = PdfFileRecord::findByIdForCurrentUser($lastOpenedPdfId);
-                }
-                catch (\Exception) {
+                } catch (\Exception) {
                     // if the last opened pdf wasn't found, the request is valid (this is a case when user has no uploaded pdf at all. e.g. just registered)
                     $pdfFileRecord = null;
                 }
             }
-            $pdfModel = $pdfFileRecord ? new PdfModel($pdfFileRecord->id, $pdfFileRecord->name, $page ?? $pdfFileRecord->bookmark, $pdfFileRecord->slug) : null;
+            // TODO automapper
+            $pdfModel = $pdfFileRecord
+                ? new PdfModel($pdfFileRecord->id, $pdfFileRecord->name, $page ?? $pdfFileRecord->bookmark, $pdfFileRecord->slug)
+                : null;
 
-            $pageResponse = $this->goHomeAjax($pdfModel);
+            $pageResponse = $this->createHomePage($pdfModel);
             return $pageResponse;
         });
-    }
-
-    // TODO remove error
-    public function actionError(): string
-    {
-        return $this->render('error');
     }
 
     public function actionUpdateBookmark(): BookmarkUpdateResponse

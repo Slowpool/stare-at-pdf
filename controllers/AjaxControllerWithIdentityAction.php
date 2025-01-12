@@ -14,6 +14,8 @@ use yii\web\HttpException;
 
 abstract class AjaxControllerWithIdentityAction extends Controller
 {
+    abstract protected function createHomePage($viewModel = null): PageResponse|PageResponseWithIdentityAction;
+
     // at first i've came up with this approach and thought it's good, but now it is starting look awkward due to each action begins with this method. 
     public function executeIfAjaxOtherwiseRenderSinglePage($callback): PageResponse|PageResponseWithIdentityAction|string
     {
@@ -32,7 +34,7 @@ abstract class AjaxControllerWithIdentityAction extends Controller
                 return $this->createErrorPage($exception->getName(), $exception->getMessage());
             }
         } else {
-            return $this->renderSinglePage();
+            return $this->createSinglePage();
         }
     }
 
@@ -46,27 +48,35 @@ abstract class AjaxControllerWithIdentityAction extends Controller
         $this->response->format = Response::FORMAT_JSON;
     }
 
-    public function createHomePage(?PdfModel $pdfModel = null): PageResponse
+    /**
+     * @param mixed $pdfModel
+     * @return \app\models\jsonResponses\PageResponse
+     * @obsolete
+     */
+    public function createHomePageOld(?PdfModel $pdfModel = null): PageResponse
     {
-        return new PageResponse(Yii::$app->name, $this->renderPartial(Yii::getAlias('@home_view'), compact('pdfModel')), Yii::$app->homeUrl);
+        trigger_error('Obsolete. This method logically belongs to ViewerController.', E_USER_ERROR);
+        return new PageResponse(Yii::$app->name, $this->renderPartial(Yii::getAlias('@pdf_viewer_view'), compact('pdfModel')), Yii::$app->homeUrl);
     }
 
-    /** @return PageResponse the page with pdf viewer */
-    // TODO unclear + obfuscated method.
-    // upd: the problem is that it goes to ViewerController page, but the authorization redirects user to login page anyway. maybe i'm wrong.
-    public function goHomeAjax(?PdfModel $pdfModel): PageResponse
+    /**
+     * @param ?PdfModel $pdfModel
+     * @return \app\models\jsonResponses\PageResponse
+     * @obsolete
+     */
+    public function goHomeAjaxOld(?PdfModel $pdfModel): PageResponse
     {
-        return $this->createHomePage($pdfModel);
+        trigger_error('Obsolete. This method mustn\'t be implemented in this class.', E_USER_ERROR);
+        return $this->createHomePageOld($pdfModel);
     }
 
-    public function renderSinglePage(): string
+    public function createSinglePage(): string
     {
         return $this->renderFile(Yii::getAlias('@main_layout'));
     }
 
-    protected function createErrorPage($errorName, $message = null): PageResponse
+    public function createErrorPage($errorName, $message = null): PageResponse
     {
-        $errorModel = new ErrorModel($errorName, $message);
-        return new PageResponse('Error', $this->renderPartial(Yii::getAlias('@error_view'), compact('errorModel')), Yii::$app->request->url);
+        return new PageResponse('Error', $this->renderPartial(Yii::getAlias('@error_view'), ['errorModel' => new ErrorModel($errorName, $message)]), Yii::$app->request->url);
     }
 }

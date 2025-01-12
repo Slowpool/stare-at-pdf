@@ -18,7 +18,7 @@ $config = [
         '@views' => '@app/views',
         '@main_layout' => '@views/layouts/main.php',
 
-        '@home_view' => '//viewer/index.php',
+        '@pdf_viewer_view' => '//viewer/index.php',
         '@error_view' => '//viewer/error.php',
         '@login_view' => '//identity/login.php',
         '@library_view' => '//library/index.php',

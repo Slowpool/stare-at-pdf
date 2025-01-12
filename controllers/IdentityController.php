@@ -36,6 +36,7 @@ class IdentityController extends AjaxControllerWithIdentityAction
                 'actions' => [
                     'logout' => ['post'],
                     'send-login-form' => ['post'],
+                    'login-form' => ['get'],
                 ],
             ],
         ];
@@ -44,52 +45,62 @@ class IdentityController extends AjaxControllerWithIdentityAction
     /**
      * {@inheritdoc}
      */
-    public function actions()
-    {
-        return [
-            'error' => [
-                'class' => 'yii\web\ErrorAction',
-            ],
-            'captcha' => [
-                'class' => 'yii\captcha\CaptchaAction',
-                'fixedVerifyCode' => YII_ENV_TEST ? 'testme' : null,
-            ],
-        ];
-    }
+    // public function actions()
+    // {
+    //     return [
+    //         'error' => [
+    //             'class' => 'yii\web\ErrorAction',
+    //         ],
+    //         'captcha' => [
+    //             'class' => 'yii\captcha\CaptchaAction',
+    //             'fixedVerifyCode' => YII_ENV_TEST ? 'testme' : null,
+    //         ],
+    //     ];
+    // }
 
-    public function createLoginPage($viewParams): PageResponse
+    /**
+     * @obsolete
+     * @param mixed $viewParams
+     * @return \app\models\jsonResponses\PageResponse
+     */
+    public function createLoginPageOld($viewParams): PageResponse
     {
+        trigger_error('Obsolete', E_USER_ERROR);
         return new PageResponse('Login', $this->renderPartial(Yii::getAlias('@login_view'), $viewParams), Yii::$app->user->loginUrl);
     }
 
-    /** Overriden. Sends either login page (for unsigned user) or home page (pdf viewer)
-     * @param string $pdf_url IGNORED inherited param. i can't imagine any case when you have a need to pick pdf url being on the login stage.
-     * The using of this method looks redundant everywhere. I forgot why i wanted to use it. Otherwise it defines one logic which applied everywhere.
-     * @param bool $pdfSpecified IGNORED inherited param.
-     * @param string $page IGNORED inherited param.
+    /**
+     * @param PdfModel $pdfModel IGNORED inherited param. i can't imagine any case when you have a need to pick pdf url being on the login stage.
+     * @obsolete
      */
-    public function goHomeAjax(?PdfModel $pdfModel = null): PageResponse
+    public function goHomeAjaxOld(?PdfModel $pdfModel = null): PageResponse
     {
+        trigger_error('Obsolete', E_USER_ERROR);
         return Yii::$app->user->isGuest
-            ? $this->createLoginPage([])
-            : parent::goHomeAjax($pdfModel);
+            ? $this->createLoginPageOld([])
+            : parent::goHomeAjaxOld($pdfModel);
     }
 
     /**
-     * Login action.
-     *
-     * @return Response|string
+     * @param ?PdfModel $pdfModel ignored
+     * @return \app\models\jsonResponses\PageResponse
+     */
+    public function createHomePage($loginForm = null): PageResponse
+    {
+        return new PageResponse('Login', $this->renderPartial(Yii::getAlias('@login_view'), compact('loginForm')), Yii::$app->user->loginUrl);
+    }
+
+    /**
+     * @return PageResponse|PageResponseWithIdentityAction|string
      */
     public function actionLoginForm(): PageResponse|PageResponseWithIdentityAction|string
     {
         return $this->executeIfAjaxOtherwiseRenderSinglePage(function (): PageResponse {
-            return $this->goHomeAjax();
+            return $this->createHomePage();
         });
     }
 
     /**
-     * Login action.
-     *
      * @return Response|string
      */
     public function actionSendLoginForm(): PageResponse|PageResponseWithIdentityAction|string
@@ -97,18 +108,19 @@ class IdentityController extends AjaxControllerWithIdentityAction
         return $this->executeIfAjaxOtherwiseRenderSinglePage(function (): PageResponse {
             // a signed-in user tries to login
             if (!Yii::$app->user->isGuest) {
-                return $this->goHomeAjax();
+                // redirect. Looks weird
+                return Yii::$app->runAction('viewer/index');
             }
 
-            $model = new LoginForm();
+            $loginForm = new LoginForm();
             // a guest successfully logged-in
-            if ($model->load(Yii::$app->request->post(), 'LoginForm') && $model->login()) {
-                return $this->goHomeAjax();
+            if ($loginForm->load(Yii::$app->request->post(), 'LoginForm') && $loginForm->login()) {
+                return Yii::$app->runAction('viewer/index');
             }
 
-            $model->password = '';
+            $loginForm->password = '';
             // a guest failed to log in
-            return $this->createLoginPage(compact('model'));
+            return $this->createHomePage($loginForm);
         });
     }
 
@@ -119,7 +131,7 @@ class IdentityController extends AjaxControllerWithIdentityAction
     {
         return $this->executeIfAjaxOtherwiseRenderSinglePage(function (): PageResponse {
             Yii::$app->user->logout();
-            return $this->goHomeAjax();
+            return $this->createHomePage();
         });
     }
 }

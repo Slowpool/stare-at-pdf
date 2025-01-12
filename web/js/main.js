@@ -156,14 +156,21 @@ function AjaxClickHandler(e) {
 
 function AjaxActionHandler(e, isForm) {
     e.preventDefault();
-    SendAjaxRequest(e.target.getAttribute(isForm ? 'action' : 'href'), isForm ? new FormData(e.target) : null);
+    if(isForm) {
+        var form = e.target;
+        SendAjaxRequest(form.getAttribute('action'), new FormData(e.target), form.getAttribute('method'));
+    }
+    else {
+        SendAjaxRequest(e.target.getAttribute('href'));
+    }
     return false;
 }
 
 // i decided to mix AjaxClick and AjaxSubmit because they were the same
-function SendAjaxRequest(url, formData = null) {
+function SendAjaxRequest(url, formData = null, formMethod = null) {
     var xhr = new XMLHttpRequest();
-    xhr.open(DescriptMethod(url), url, true);
+    // the <a> method is always get. (as far as i know)
+    xhr.open(formMethod ? formMethod : 'GET', url, true);
     xhr.setRequestHeader('X_REQUESTED_WITH', 'XMLHttpRequest');
 
     // ensures login/logout button if user just came the page 
@@ -175,7 +182,7 @@ function SendAjaxRequest(url, formData = null) {
         }
         loaded = true;
         if (xhr.status == 200) {
-            // where is query stringggggggg
+            // lack of query string. using app i didn't feel any discomfort with it.
             HandleResponse(JSON.parse(xhr.responseText), url);
         }
         else {
@@ -193,12 +200,12 @@ function SendAjaxRequest(url, formData = null) {
     xhr.send(formData);
 }
 
-// TODO actually it is stored in form 
-function DescriptMethod(url) {
+/** @obsolete */
+function DescriptAnchorMethod(url) {
     url = url.replace(leftUrlPart, '');
 
     switch (CutRouteValues(url)) {
-        case '': // TODO is it possible?
+        case '':
         case '/':
         case '/login':
         case '/library':

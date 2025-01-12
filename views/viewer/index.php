@@ -13,9 +13,9 @@ use yii\helpers\UserUploadsPathHelper;
 <div class="pdf-viewer-container">
     <?php if ($pdfModel == null): ?>
         <h3>
-            You don't have any <strong>PDF</strong> in your
+            You just entered your account or you don't have any <strong>PDF</strong> in your
             <?= Html::a('library', Url::to('/library'), ['class' => 'ajax-action']); ?>
-            .
+            . That's why it's empty here. 
             <?php // TODO add pdf uloading form right here for convenience ?>
             <select>
                 <option>Or you are advanced user</option>
