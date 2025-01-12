@@ -156,7 +156,7 @@ function AjaxClickHandler(e) {
 
 function AjaxActionHandler(e, isForm) {
     e.preventDefault();
-    if(isForm) {
+    if (isForm) {
         var form = e.target;
         SendAjaxRequest(form.getAttribute('action'), new FormData(e.target), form.getAttribute('method'));
     }
@@ -181,13 +181,17 @@ function SendAjaxRequest(url, formData = null, formMethod = null) {
             return;
         }
         loaded = true;
-        if (xhr.status == 200) {
-            // lack of query string. using app i didn't feel any discomfort with it.
-            HandleResponse(JSON.parse(xhr.responseText), url);
-        }
-        else {
-            alert('error');
-            console.log(xhr.status + ': ' + xhr.statusText);
+        switch (xhr.status) {
+            case 200:
+                // lack of query string. using app i didn't feel any discomfort with it.
+                HandleResponse(JSON.parse(xhr.responseText), url);
+                break;
+            // TODO handle redirect
+            default:
+                alert('error');
+                console.log(xhr.status + ': ' + xhr.statusText);
+                break;
+
         }
     };
 

@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\library\LibraryModel;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -34,38 +35,99 @@ class LibraryController extends AjaxControllerWithIdentityAction
             'access' => [
                 // TODO bug: returns error instead of redirect to login for unauthorized user.
                 'class' => AccessControl::class,
-                'only' => ['index', 'upload-pdf'],
+                'only' => ['index', 'create-pdf-file', 'create-new-category', 'create-pdf-file-category-entry'],
                 'rules' => [
                     [
-                        'actions' => ['index', 'upload-pdf'],
+                        'actions' => ['index', 'create-pdf-file', 'create-new-category', 'create-pdf-file-category-entry'],
                         'allow' => true,
-                        'roles' => ['@']
-                    ]
-                ]
+                        'roles' => ['@'],
+                    ],
+                ],
             ],
             'verbs' => [
                 'class' => VerbFilter::class,
                 'actions' => [
                     'index' => ['get'],
-                    'upload-pdf' => ['post'],
-                ]
-            ]
+                    'create-pdf-file' => ['post'],
+                    'create-new-category' => ['post'],
+                    'create-pdf-file-category-entry' => ['post'],
+                ],
+            ],
         ];
     }
 
-    public function createIndexPage($pdfCards, $newFileModel, $newCategoryModel, $assignCategoryModel): PageResponse
+
+
+    private static function ensureDirRecursively($dir): void
     {
-        [$categoryIds, $pdfFileIds] = self::obtainPdfFileIdsAndCategoryIds();
-        return new PageResponse('Library', $this->renderPartial('index', compact('pdfCards', 'newFileModel', 'newCategoryModel', 'assignCategoryModel', 'pdfFileIds', 'categoryIds')), $this->request->url);
+        if (!is_dir($dir))
+            FileHelper::createDirectory($dir);
     }
 
-    /** @return array [0] => categoryIdsAndNames, [1] => pdffileIdsAndNames */
+    private function createFailedUploadFormWithError($newFileModel, $error = null): FailedToUploadFileResponse
+    {
+        if ($error) {
+            $newFileModel->addError('newFile', $error);
+        }
+        return $this->createFailedUploadForm($newFileModel);
+    }
+
+    private function createFailedUploadForm($newFileModel): FailedToUploadFileResponse
+    {
+        return new FailedToUploadFileResponse($this->renderPartial(Yii::getAlias('@partial_new_file_form'), compact('newFileModel')));
+    }
+
+    private function createSuccessfulUploadFileForm(NewFileModel $newFileModel, PdfCardModel $newPdfCard, AddedPdfModel $addedPdfModel): FileSuccessfullyUploadedResponse
+    {
+        return new FileSuccessfullyUploadedResponse($this->createFailedUploadForm($newFileModel), $this->renderPartial(Yii::getAlias('@partial_pdf_card'), ['pdfCard' => $newPdfCard]), $addedPdfModel);
+    }
+
+    /**
+     * When $addedCategoryModel is provided, returned response is successful adding of new category. Otherwise - as failed one.
+     * @param mixed $addedCategoryModel
+     * @return \app\models\jsonResponses\AddNewCategoryResponse
+     */
+    private function createAddNewCategoryResponse(AddedCategoryModel $addedCategoryModel = null): AddNewCategoryResponse
+    {
+        return new AddNewCategoryResponse($addedCategoryModel != null, $this->renderPartial(Yii::getAlias('@partial_new_category_form'), ['newCategoryModel' => new NewCategoryModel()]), $addedCategoryModel);
+    }
+
+    private function createCategoryAssigningResponse(bool $assigningResult, AssignCategoryModel $assignCategoryModel, string $errorAttribute = null, string $error = null): AssignCategoryResponse
+    {
+        if ($errorAttribute !== null) {
+            $assignCategoryModel->addError($errorAttribute, $error);
+        }
+        [$categoryIds, $pdfFileIds] = self::obtainPdfFileIdsAndCategoryIds();
+        return new AssignCategoryResponse($assigningResult, $this->renderPartial(Yii::getAlias('@partial_assign_category_form'), compact('assignCategoryModel', 'categoryIds', 'pdfFileIds')));
+    }
+
+    /** @return array [0] => categoryIdsAndNames, [1] => pdfFileIdsAndNames */
     protected static function obtainPdfFileIdsAndCategoryIds(): array
     {
         return [
             PdfFileCategoryRecord::getCategoryIdsAndNames(),
             PdfFileRecord::getPdfFileIdsAndNames()
         ];
+    }
+
+    /**
+     * @param array $pdfCards
+     * @param \app\models\library\NewFileModel $newFileModel
+     * @param \app\models\library\NewCategoryModel $newCategoryModel
+     * @param \app\models\library\AssignCategoryModel $assignCategoryModel
+     * @throws \yii\web\ServerErrorHttpException
+     * @return \app\models\jsonResponses\PageResponse
+     */
+    protected function createHomePage($pdfCards = null, NewFileModel $newFileModel = null, NewCategoryModel $newCategoryModel = null, AssignCategoryModel $assignCategoryModel = null): PageResponse
+    {
+        if (is_null($pdfCards) || is_null($newFileModel) || is_null($newCategoryModel) || is_null($assignCategoryModel)) {
+            throw new ServerErrorHttpException('Something went wrong');
+        }
+        $libraryModel = new LibraryModel($pdfCards, $newFileModel, $newCategoryModel, $assignCategoryModel);
+        [$categoryIds, $pdfFileIds] = self::obtainPdfFileIdsAndCategoryIds();
+        return new PageResponse('Library', $this->renderPartial(Yii::getAlias('@library_view'), compact('libraryModel', 'pdfFileIds', 'categoryIds')), 
+        // TODO why not Yii::$app->request->url?
+        $this->request->url);
     }
 
     public function actionIndex(): PageResponse|string
@@ -80,7 +142,7 @@ class LibraryController extends AjaxControllerWithIdentityAction
             $newFileModel = new NewFileModel();
             $newCategoryModel = new NewCategoryModel();
             $assignCategoryModel = new AssignCategoryModel();
-            return $this->createIndexPage($pdfCards, $newFileModel, $newCategoryModel, $assignCategoryModel);
+            return $this->createHomePage($pdfCards, $newFileModel, $newCategoryModel, $assignCategoryModel);
         });
     }
 
@@ -135,30 +197,6 @@ class LibraryController extends AjaxControllerWithIdentityAction
         return $this->createSuccessfulUploadFileForm($newFileModel, $pdfCard, $addedPdfModel);
     }
 
-    public static function ensureDirRecursively($dir): void
-    {
-        if (!is_dir($dir))
-            FileHelper::createDirectory($dir);
-    }
-
-    public function createFailedUploadFormWithError($newFileModel, $error = null): FailedToUploadFileResponse
-    {
-        if ($error) {
-            $newFileModel->addError('newFile', $error);
-        }
-        return $this->createFailedUploadForm($newFileModel);
-    }
-
-    public function createFailedUploadForm($newFileModel): FailedToUploadFileResponse
-    {
-        return new FailedToUploadFileResponse($this->renderPartial(Yii::getAlias('@partial_new_file_form'), compact('newFileModel')));
-    }
-
-    public function createSuccessfulUploadFileForm(NewFileModel $newFileModel, PdfCardModel $newPdfCard, AddedPdfModel $addedPdfModel): FileSuccessfullyUploadedResponse
-    {
-        return new FileSuccessfullyUploadedResponse($this->createFailedUploadForm($newFileModel), $this->renderPartial(Yii::getAlias('@partial_pdf_card'), ['pdfCard' => $newPdfCard]), $addedPdfModel);
-    }
-
     public function actionCreateNewCategory(): AddNewCategoryResponse
     {
         $this->ResponseFormatJson();
@@ -179,16 +217,6 @@ class LibraryController extends AjaxControllerWithIdentityAction
         return $this->createAddNewCategoryResponse($addedCategoryModel);
     }
 
-    /**
-     * When $addedCategoryModel is provided, returned response is successful adding of new category. Otherwise - as failed one.
-     * @param mixed $addedCategoryModel
-     * @return \app\models\jsonResponses\AddNewCategoryResponse
-     */
-    public function createAddNewCategoryResponse(AddedCategoryModel $addedCategoryModel = null): AddNewCategoryResponse
-    {
-        return new AddNewCategoryResponse($addedCategoryModel != null, $this->renderPartial(Yii::getAlias('@partial_new_category_form'), ['newCategoryModel' => new NewCategoryModel()]), $addedCategoryModel);
-    }
-
     public function actionCreatePdfFileCategoryEntry(): AssignCategoryResponse
     {
         $this->ResponseFormatJson();
@@ -207,14 +235,5 @@ class LibraryController extends AjaxControllerWithIdentityAction
         // keep picked category (because it can be assigned further again (i was intuitively willing to assign all books with one category, then for another)), but reset pdf id
         $assignCategoryModel->pdfFileId = null;
         return $this->createCategoryAssigningResponse(true, $assignCategoryModel);
-    }
-
-    public function createCategoryAssigningResponse(bool $assigningResult, AssignCategoryModel $assignCategoryModel, string $errorAttribute = null, string $error = null): AssignCategoryResponse
-    {
-        if ($errorAttribute !== null) {
-            $assignCategoryModel->addError($errorAttribute, $error);
-        }
-        [$categoryIds, $pdfFileIds] = self::obtainPdfFileIdsAndCategoryIds();
-        return new AssignCategoryResponse($assigningResult, $this->renderPartial(Yii::getAlias('@partial_assign_category_form'), compact('assignCategoryModel', 'categoryIds', 'pdfFileIds')));
     }
 }

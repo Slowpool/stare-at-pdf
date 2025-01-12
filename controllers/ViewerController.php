@@ -25,57 +25,35 @@ class ViewerController extends AjaxControllerWithIdentityAction
         return [
             'access' => [
                 'class' => AccessControl::class,
-                'only' => ['index', 'updateBookmark'],
+                'only' => ['index', 'update-bookmark'],
                 'rules' => [
                     [
-                        'actions' => ['index', 'updateBookmark'],
+                        'actions' => ['index', 'update-bookmark'],
                         'allow' => true,
-                        'roles' => ['@']
-                    ]
-                ]
+                        'roles' => ['@'],
+                    ],
+                ],
             ],
             'verbs' => [
                 'class' => VerbFilter::class,
                 'actions' => [
                     'index' => ['get'],
-                    // TODO which case to use here? mustn't it be update-bookmark?
-                    'updateBookmark' => ['post'],
-                ]
-            ]
+                    'update-bookmark' => ['post'],
+                ],
+            ],
         ];
     }
 
-    /**
-     * @param mixed $pdfModel
-     * @return \app\models\jsonResponses\PageResponse
-     * @obsolete
-     */
-    public function createHomePageOld(?PdfModel $pdfModel = null): PageResponse
+    private function createBookmarkUpdateResponse(bool $success, string $pdfId): BookmarkUpdateResponse
     {
-        trigger_error('Obsolete', E_USER_ERROR);
-        $page = parent::createHomePageOld($pdfModel);
-        if ($pdfModel?->getPdfSpecified())
-            // TODO why to use Url::to()?
-            $page->url = "/stare-at/$pdfModel->slug";
-        return $page;
-    }
-
-    /**
-     * @param mixed $pdfModel
-     * @return PageResponse
-     * @obsolete
-     */
-    public function goHomeAjaxOld(?PdfModel $pdfModel = null): PageResponse|PageResponseWithIdentityAction
-    {
-        trigger_error('Obsolete', E_USER_ERROR);
-        return $this->createHomePage($pdfModel);
+        return new BookmarkUpdateResponse($success, $this->renderPartial(Yii::getAlias('@partial_new_bookmark_form'), compact('pdfId')));
     }
 
     /**
      * @param ?PdfModel $pdfModel
      * @return \app\models\jsonResponses\PageResponse
      */
-    public function createHomePage($pdfModel = null): PageResponse|PageResponseWithIdentityAction
+    protected function createHomePage($pdfModel = null): PageResponse
     {
         return new PageResponse(Yii::$app->name, $this->renderPartial(Yii::getAlias('@pdf_viewer_view'), compact('pdfModel')), Yii::$app->homeUrl);
     }
@@ -126,10 +104,5 @@ class ViewerController extends AjaxControllerWithIdentityAction
         }
 
         return $this->createBookmarkUpdateResponse(PdfFileRecord::updateBookmark($model->pdfId, $model->newBookmark), $model->pdfId);
-    }
-
-    public function createBookmarkUpdateResponse(bool $success, string $pdfId): BookmarkUpdateResponse
-    {
-        return new BookmarkUpdateResponse($success, $this->renderPartial(Yii::getAlias('@partial_new_bookmark_form'), compact('pdfId')));
     }
 }
