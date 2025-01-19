@@ -191,7 +191,6 @@ function SendAjaxRequest(url, formData = null, formMethod = null) {
                 alert('error');
                 console.log(xhr.status + ': ' + xhr.statusText);
                 break;
-
         }
     };
 

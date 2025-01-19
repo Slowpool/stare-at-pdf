@@ -55,7 +55,7 @@ class ViewerController extends AjaxControllerWithIdentityAction
      */
     protected function createHomePage($pdfModel = null): PageResponse
     {
-        return new PageResponse(Yii::$app->name, $this->renderPartial(Yii::getAlias('@pdf_viewer_view'), compact('pdfModel')), Yii::$app->homeUrl);
+        return new PageResponse(Yii::$app->name, $this->renderPartial(Yii::getAlias('@pdf_viewer_view'), compact('pdfModel')), $pdfModel ? "/stare-at/" . $pdfModel->slug : Yii::$app->homeUrl);
     }
 
     public function actionIndex($pdfSlug = null, $page = null): PageResponse|PageResponseWithIdentityAction|string
