@@ -2,7 +2,6 @@
 
 namespace app\controllers;
 
-use app\models\library\LibraryModel;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -26,6 +25,7 @@ use app\models\library\NewFileModel;
 use app\models\library\NewCategoryModel;
 use app\models\library\AssignCategoryModel;
 use app\models\library\AddedCategoryModel;
+use app\models\library\LibraryModel;
 
 class LibraryController extends AjaxControllerWithIdentityAction
 {

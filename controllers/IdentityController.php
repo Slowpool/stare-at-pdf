@@ -3,10 +3,12 @@
 namespace app\controllers;
 
 use Yii;
-use yii\filters\AccessControl;
+
 use yii\web\Controller;
 use yii\web\Response;
+use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
+
 use app\models\identity\LoginForm;
 use app\models\viewer\PdfModel;
 use app\models\jsonResponses\PageResponse;
@@ -80,7 +82,7 @@ class IdentityController extends AjaxControllerWithIdentityAction
     /**
      * @return Response|string
      */
-    public function actionSendLoginForm(): PageResponse|PageResponseWithIdentityAction|string
+    public function actionSendLoginForm(): PageResponse|PageResponseWithIdentityAction|string|RedirectResponse
     {
         return $this->executeIfAjaxOtherwiseRenderSinglePage(function (): PageResponse|RedirectResponse {
             // a signed-in user tries to login

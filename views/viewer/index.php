@@ -15,17 +15,17 @@ use yii\helpers\UserUploadsPathHelper;
         <h3>
             You just entered your account or you don't have any <strong>PDF</strong> in your
             <?= Html::a('library', Url::to('/library'), ['class' => 'ajax-action']); ?>
-            . That's why it's empty here. 
+            . That's why it's empty here.
             <?php // TODO add pdf uloading form right here for convenience ?>
             <select>
                 <option>Or you are advanced user</option>
                 <option>who doesn't use cookies.</option>
                 <option>You know, here could be your</option>
                 <option>last opened pdf, which makes your life simpler,</option>
-                <option>allowing you to not remember your last opening pdf. </option>
+                <option>allowing you to not keep in mind your last opened pdf. </option>
                 <option>But you picked a hard way.</option>
-                <option>Well, deal with it by your own.</option>
-                <option>Or just enable cookies the next time.</option>
+                <option>Well, deal with it by your own, Mr. Perfect Memory.</option>
+                <option>(Or just enable cookies the next time.)</option>
             </select>
         </h3>
     <?php else: ?>

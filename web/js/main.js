@@ -183,10 +183,13 @@ function SendAjaxRequest(url, formData = null, formMethod = null) {
         loaded = true;
         switch (xhr.status) {
             case 200:
-                // lack of query string. using app i didn't feel any discomfort with it.
+                // lack of query string. using app i didn't feel any discomfort about it.
                 HandleResponse(JSON.parse(xhr.responseText), url);
                 break;
-            // TODO handle redirect
+            case 300:
+                ReadData(JSON.parse(xhr.responseText))
+                SendAjaxRequest(data.destinationUrl);
+                break;
             default:
                 alert('error');
                 console.log(xhr.status + ': ' + xhr.statusText);
@@ -236,19 +239,18 @@ function AskForIdentityActionIfAbsent(request, force = false) {
     }
 }
 
-function HandleResponse(jsonResponse, url) {
+function HandleResponse(jsonResponse, requestedUrl) {
     ReadData(jsonResponse);
 
     // now i don't like that the requested url differs from the url in the response.
-
-    var action = mapSpecialActionAfterRequest[CutRouteValues(url)];
+    var action = mapSpecialActionAfterRequest[CutRouteValues(requestedUrl)];
     if (action) {
         // special action like /upload-pdf or /update-bookmark
         action();
     }
     else {
         // returns entire new page, like /library
-        TrashDataHandling(url);
+        TrashDataHandling(requestedUrl);
     };
 
     UpdateLinks();
@@ -289,20 +291,25 @@ function ReadData(jsonResponse) {
             data = {
                 bookmarkUpdated: jsonResponse.updateResult,
                 newForm: jsonResponse.newForm,
-            }
+            };
             break;
         case 'new category add result':
             data = {
                 categoryAdded: jsonResponse.updateResult,
                 newForm: jsonResponse.newForm,
                 addedCategory: jsonResponse.addedCategoryModel,
-            }
+            };
             break;
         case 'category assigning result':
             data = {
                 categoryAssigned: jsonResponse.updateResult,
                 newForm: jsonResponse.newForm,
-            }
+            };
+            break;
+        case 'redirect':
+            data = {
+                destinationUrl: jsonResponse.destinationUrl
+            };
             break;
         default:
             throw new Error('unknown response type');
