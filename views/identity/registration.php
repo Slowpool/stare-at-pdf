@@ -2,22 +2,23 @@
 
 /** @var yii\web\View $this */
 /** @var yii\bootstrap5\ActiveForm $form */
+/** @var app\models\jsonResponses\PageResponse $page */
 
-/** @var app\models\identity\LoginForm $loginForm */
+/** @var app\models\identity\RegistrationForm $registrationForm */
 
 use yii\bootstrap5\ActiveForm;
 use yii\bootstrap5\Html;
-use app\models\identity\LoginForm;
+use app\models\identity\RegistrationForm;
 
 ?>
 
-<div id="login-container">
-    <h1>Login</h1>
-    <p>Please fill out the following fields to login:</p>
+<div id="registration-container">
+    <h1>Registration</h1>
+    <p>Please fill out the following fields to register:</p>
     <div class="row">
         <?php $form = ActiveForm::begin([
-            'id' => 'login-form',
-            'action' => '/send-credentials-to-login',
+            'id' => 'registration-form',
+            'action' => '/send-credentials-to-register',
             'options' => ['class' => 'ajax-action'],
             'fieldConfig' => [
                 'template' => "{label}\n{input}\n{error}",
@@ -26,17 +27,14 @@ use app\models\identity\LoginForm;
                 'errorOptions' => ['class' => 'col-lg-7 invalid-feedback'],
             ],
         ]); ?>
-        <?= $form->field($loginForm, 'username')->textInput(['autofocus' => true, 'value' => 'admin']) ?>
-        <?= $form->field($loginForm, 'password')->passwordInput(['value' => 'admin']) ?>
-        <?= $form->field($loginForm, 'rememberMe')->checkbox([
+        <?= $form->field($registrationForm, 'username')->textInput(['autofocus' => true]) ?>
+        <?= $form->field($registrationForm, 'password')->passwordInput() ?>
+        <?= $form->field($registrationForm, 'rememberMe')->checkbox([
             'template' => "<div class=\"custom-control custom-checkbox\">{input} {label}</div>\n<div class=\"col-lg-8\">{error}</div>",
         ]) ?>
         <div>
-            <?= Html::submitButton('Login', ['class' => 'btn btn-primar', 'name' => 'login-button']) ?>
+            <?= Html::submitButton('Become the starer (Sign up)', ['class' => 'btn btn-primar', 'name' => 'retistration -button']) ?>
         </div>
         <?php ActiveForm::end(); ?>
-        <div style="color:#999;">
-            You may login with <strong>john/john</strong> or <strong>admin/admin</strong>
-        </div>
     </div>
 </div>

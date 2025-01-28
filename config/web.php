@@ -11,28 +11,29 @@ $config = [
     'aliases' => [
         '@MAX_CATEGORY_NAME_LENGTH' => 50,
         '@CATEGORY_COLOR_LENGTH' => 6,
-
+        // directories
         '@bower' => '@vendor/bower-asset',
         '@npm' => '@vendor/npm-asset',
-
         '@views' => '@app/views',
         '@main_layout' => '@views/layouts/main.php',
-
-        '@pdf_viewer_view' => '//viewer/index.php',
-        '@error_view' => '//viewer/error.php',
-        '@login_view' => '//identity/login.php',
-        '@library_view' => '//library/index.php',
-
-        '@partial_nav_logout_form' => '//layouts/partial_nav_logout_form.php',
-        '@partial_nav_login_button' => '//layouts/partial_nav_login.php',
-        '@partial_new_file_form' => '//library/partial_new_file_form.php',
-        '@partial_pdf_card' => '//library/partial_pdf_card.php',
-        '@partial_new_bookmark_form' => '//viewer/partial_new_bookmark_form.php',
-        '@partial_new_category_form' => '//library/partial_new_category_form.php',
-        '@partial_assign_category_form' => '//library/partial_assign_category_form.php',
-
         '@uploads' => '@app/web/uploads',
         '@scripts' => '@app/web/js',
+        // viewer
+        '@pdf_viewer_view' => '//viewer/index.php',
+        '@error_view' => '//viewer/error.php',
+        '@partial_new_bookmark_form' => '//viewer/partial_new_bookmark_form.php',
+        // identity
+        '@login_view' => '//identity/login.php',
+        '@registration_view' => '//identity/login.php',
+        '@partial_nav_logout_form' => '//identity/partial_nav_logout_form.php',
+        '@partial_nav_login_button' => '//identity/partial_nav_unsigned_action.php',
+        // library
+        '@library_view' => '//library/index.php',
+        '@partial_new_file_form' => '//library/partial_new_file_form.php',
+        '@partial_pdf_card' => '//library/partial_pdf_card.php',
+        '@partial_new_category_form' => '//library/partial_new_category_form.php',
+        '@partial_assign_category_form' => '//library/partial_assign_category_form.php',
+        
     ],
     'components' => [
         'request' => [

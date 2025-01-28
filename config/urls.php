@@ -23,4 +23,6 @@ return [
     'logout' => 'identity/logout',
     'login' => 'identity/login-form',
     'send-credentials-to-login' => 'identity/send-login-form',
+    'registration' => 'identity/registration-form',
+    'send-credentials-to-register' => 'identity/send-registration-form',
 ];

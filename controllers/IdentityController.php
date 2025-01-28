@@ -10,6 +10,7 @@ use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 
 use app\models\identity\LoginForm;
+use app\models\identity\RegistrationForm;
 use app\models\viewer\PdfModel;
 use app\models\jsonResponses\PageResponse;
 use app\models\jsonResponses\RedirectResponse;
@@ -66,7 +67,13 @@ class IdentityController extends AjaxControllerWithIdentityAction
      */
     protected function createHomePage($loginForm = null): PageResponse
     {
+        $registrationForm = $loginForm ?: new LoginForm; 
         return new PageResponse('Login', $this->renderPartial(Yii::getAlias('@login_view'), compact('loginForm')), Yii::$app->user->loginUrl);
+    }
+     
+    protected function createRegistrationPage(RegistrationForm $registrationForm = null): PageResponse {
+        $registrationForm = $registrationForm ?: new RegistrationForm; 
+        return new PageResponse('Registration', $this->renderPartial('@registration_view', compact('registrationForm')), '/registration');
     }
 
     /**
@@ -75,7 +82,9 @@ class IdentityController extends AjaxControllerWithIdentityAction
     public function actionLoginForm(): PageResponse|PageResponseWithIdentityAction|string
     {
         return $this->executeIfAjaxOtherwiseRenderSinglePage(function (): PageResponse {
-            return $this->createHomePage();
+                return Yii::$app->user->isGuest
+                ? $this->createHomePage()
+                : $this->ajaxRedirect('/');
         });
     }
 
@@ -110,6 +119,34 @@ class IdentityController extends AjaxControllerWithIdentityAction
         return $this->executeIfAjaxOtherwiseRenderSinglePage(function (): PageResponse {
             Yii::$app->user->logout();
             return $this->createHomePage();
+        });
+    }
+
+    public function actionRegistrationForm(): PageResponse|PageResponseWithIdentityAction|RedirectResponse|string {
+        return $this->executeIfAjaxOtherwiseRenderSinglePage(function (): PageResponse {
+            return Yii::$app->user->isGuest
+                ? $this->createRegistrationPage()
+                : $this->ajaxRedirect('/');
+        });
+    }
+
+    // TODO problem: this method is copy-paste of actionSendLoginForm
+    public function actionSendRegistrationForm(): PageResponse|PageResponseWithIdentityAction|RedirectResponse|string {
+        return $this->executeIfAjaxOtherwiseRenderSinglePage(function (): PageResponse|RedirectResponse {
+            // a signed-in user tries to register
+            if (!Yii::$app->user->isGuest) {
+                return $this->ajaxRedirect('/');
+            }
+
+            $registrationForm = new LoginForm();
+            // a guest successfully registered
+            if ($registrationForm->load(Yii::$app->request->post(), 'RegistrationForm') && $registrationForm->register() && $registrationForm->login()) {
+                return $this->ajaxRedirect('/');
+            }
+
+            $registrationForm->password = '';
+            // a guest failed to log in
+            return $this->createRegistrationPage($registrationForm);
         });
     }
 }
