@@ -2,9 +2,9 @@
 
 return [
     'class' => 'yii\db\Connection',
-    'dsn' => 'mysql:host=localhost;dbname=stare_at_pdf',
+    'dsn' => 'mysql:host=' . $_ENV['DB_HOST'] . ';port=3306;dbname=stare_at_pdf',
     'username' => 'root',
-    'password' => 'password',
+    'password' => $_ENV['DB_PASSWORD'],
     'charset' => 'utf8',
 
     // Schema cache options (for production environment)

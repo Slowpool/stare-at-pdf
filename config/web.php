@@ -47,7 +47,7 @@ $config = [
             'enableAutoLogin' => true,
         ],
         'errorHandler' => [
-            // TODO not an action
+            // TODO not action
             'errorAction' => 'viewer/error',
         ],
         'mailer' => [
@@ -79,7 +79,7 @@ $config = [
         ],
     ],
     'params' => $params,
-    // 'meta' => require 'meta.php',
+    // 'meta' => require 'meta.php', // UPD: deprecated thing
 ];
 
 if (YII_ENV_DEV) {
