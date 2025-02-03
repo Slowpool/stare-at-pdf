@@ -67,7 +67,7 @@ class IdentityController extends AjaxControllerWithIdentityAction
      */
     protected function createHomePage($loginForm = null): PageResponse
     {
-        $registrationForm = $loginForm ?: new LoginForm; 
+        $loginForm ??= new LoginForm; 
         return new PageResponse('Login', $this->renderPartial(Yii::getAlias('@login_view'), compact('loginForm')), Yii::$app->user->loginUrl);
     }
      
@@ -130,7 +130,7 @@ class IdentityController extends AjaxControllerWithIdentityAction
         });
     }
 
-    // TODO problem: this method is copy-paste of actionSendLoginForm
+    // TODO problem: this method is copy-paste (except `$registrationForm->register()` moment) of actionSendLoginForm
     public function actionSendRegistrationForm(): PageResponse|PageResponseWithIdentityAction|RedirectResponse|string {
         return $this->executeIfAjaxOtherwiseRenderSinglePage(function (): PageResponse|RedirectResponse {
             // a signed-in user tries to register
@@ -138,9 +138,9 @@ class IdentityController extends AjaxControllerWithIdentityAction
                 return $this->ajaxRedirect('/');
             }
 
-            $registrationForm = new LoginForm();
+            $registrationForm = new RegistrationForm;
             // a guest successfully registered
-            if ($registrationForm->load(Yii::$app->request->post(), 'RegistrationForm') && $registrationForm->register() && $registrationForm->login()) {
+            if ($registrationForm->load(Yii::$app->request->post(), 'RegistrationForm') && $registrationForm->registerAndLogin()) {
                 return $this->ajaxRedirect('/');
             }
 

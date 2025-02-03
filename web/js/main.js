@@ -102,7 +102,7 @@ function AddOptionToSelect(selectorId, { id, name }) {
 }
 
 // TODO override in production
-var leftUrlPart = 'https://localhost:8080';
+const LEFT_PART_OF_URL = 'https://localhost:1937';
 var links = null;
 var loaded = true;
 var secondaryPageElements = null;
@@ -208,7 +208,7 @@ function SendAjaxRequest(url, formData = null, formMethod = null) {
 
 /** @obsolete */
 function DescriptAnchorMethod(url) {
-    url = url.replace(leftUrlPart, '');
+    url = url.replace(LEFT_PART_OF_URL, '');
 
     switch (CutRouteValues(url)) {
         case '':

@@ -56,8 +56,6 @@ class LibraryController extends AjaxControllerWithIdentityAction
         ];
     }
 
-
-
     private static function ensureDirRecursively($dir): void
     {
         if (!is_dir($dir))

@@ -15,7 +15,7 @@ use yii\web\IdentityInterface;
  * @property string $access_token
  * @property string $auth_key
  *
- * @property PdfFile[] $pdfFiles
+ * @property PdfFileRecord[] $pdfFiles
  */
 class UserRecord extends ActiveRecord implements IdentityInterface
 {
@@ -69,7 +69,7 @@ class UserRecord extends ActiveRecord implements IdentityInterface
     {
         return self::findOne($id);
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -77,7 +77,7 @@ class UserRecord extends ActiveRecord implements IdentityInterface
     {
         return self::findOne(['access_token' => $token]);
     }
-    
+
     /**
      * Finds user by username
      *
@@ -134,11 +134,36 @@ class UserRecord extends ActiveRecord implements IdentityInterface
         return $this->hasMany(PdfFileRecord::class, ['user_id' => 'id']);
     }
 
-    public function getUsername() {
+    public function getUsername()
+    {
         return $this->name;
     }
 
-    public static function hashPassword($password) {
+    public static function hashPassword($password)
+    {
         return hash('haval256,4', $password);
+    }
+
+    /**
+     * 
+     * @param mixed $username
+     * @param mixed $password
+     * @return bool True - successfully registered. False - user with such a username already exists
+     * @throws \Exception Failed to register
+     */
+    public static function register($username, $password): bool
+    {
+        if (self::findByName($username) === null) {
+            $passwordHash = UserRecord::hashPassword($password);
+            $userRecord = new UserRecord([
+                'name' => $username,
+                'password_hash' => $passwordHash,
+                'access_token' => Yii::$app->security->generateRandomString(16),
+                'auth_key' => Yii::$app->security->generateRandomString(),
+            ]);
+            return $userRecord->save();
+        } else {
+            return false;
+        }
     }
 }
