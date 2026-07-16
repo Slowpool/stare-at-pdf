@@ -127,8 +127,7 @@ main {
 
 li.pdf-file-card,
 .form-control,
-.form-select
- {
+.form-select {
     border: 2px solid #1e5184;
     padding-inline: 10px;
     padding-block: 5px;
@@ -137,7 +136,8 @@ li.pdf-file-card,
 
 li.pdf-file-card {
     width: 30%;
-    /* width: fit-content; */ /* alternative */
+    /* width: fit-content; */
+    /* alternative */
 }
 
 
@@ -183,4 +183,9 @@ span.pdf-card-page {
 
 .nav-link {
     display: inline;
+}
+
+.scroll-container-vertical {
+    height: 700px;
+    overflow-y: auto;
 }

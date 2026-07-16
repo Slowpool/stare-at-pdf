@@ -24,9 +24,11 @@ use app\models\library\LibraryModel;
             </li>
         </ul>
     </nav>
-    <ul id="all-files-list">
-        <?php foreach ($libraryModel->pdfCards as $pdfCard): ?>
-            <?= $this->render(Yii::getAlias('@partial_pdf_card'), compact('pdfCard')) ?>
-        <?php endforeach; ?>
-    </ul>
+    <div class="scroll-container-vertical">
+        <ul id="all-files-list">
+            <?php foreach ($libraryModel->pdfCards as $pdfCard): ?>
+                <?= $this->render(Yii::getAlias('@partial_pdf_card'), compact('pdfCard')) ?>
+            <?php endforeach; ?>
+        </ul>
+    </div>
 </div>
