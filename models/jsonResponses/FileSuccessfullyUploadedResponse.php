@@ -3,7 +3,6 @@
 namespace app\models\jsonResponses;
 
 use app\models\library\AddedPdfModel;
-use app\models\library\PdfCardModel;
 
 // TODO merge these classes in one. they indeed annoy
 class FileSuccessfullyUploadedResponse extends FailedToUploadFileResponse

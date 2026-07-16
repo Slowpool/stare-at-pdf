@@ -19,6 +19,8 @@ use app\models\jsonResponses\AssignCategoryResponse;
 use app\models\domain\PdfFileRecord;
 use app\models\domain\PdfFileCategoryRecord;
 use app\models\domain\PdfFileCategoryEntryRecord;
+use app\models\jsonResponses\AbandonPdfFileResponse;
+use app\models\library\AbandonPdfFileModel;
 use app\models\library\PdfCardModel;
 use app\models\library\AddedPdfModel;
 use app\models\library\NewFileModel;
@@ -123,9 +125,12 @@ class LibraryController extends AjaxControllerWithIdentityAction
         }
         $libraryModel = new LibraryModel($pdfCards, $newFileModel, $newCategoryModel, $assignCategoryModel);
         [$categoryIds, $pdfFileIds] = self::obtainPdfFileIdsAndCategoryIds();
-        return new PageResponse('Library', $this->renderPartial(Yii::getAlias('@library_view'), compact('libraryModel', 'pdfFileIds', 'categoryIds')), 
-        // TODO why not Yii::$app->request->url?
-        $this->request->url);
+        return new PageResponse(
+            'Library',
+            $this->renderPartial(Yii::getAlias('@library_view'), compact('libraryModel', 'pdfFileIds', 'categoryIds')),
+            // TODO why not Yii::$app->request->url?
+            $this->request->url
+        );
     }
 
     public function actionIndex(): PageResponse|string
@@ -135,7 +140,7 @@ class LibraryController extends AjaxControllerWithIdentityAction
             // should be in automapper-like class
             $pdfCards = [];
             foreach ($pdfFiles as $pdfFile) {
-                $pdfCards[] = new PdfCardModel($pdfFile['name'], $pdfFile['bookmark'], $pdfFile['slug'], array_column($pdfFile['categories'], 'color'));
+                $pdfCards[] = new PdfCardModel($pdfFile['id'], $pdfFile['name'], $pdfFile['bookmark'], $pdfFile['slug'], array_column($pdfFile['categories'], 'color'), $pdfFile['is_abandoned']);
             }
             $newFileModel = new NewFileModel();
             $newCategoryModel = new NewCategoryModel();
@@ -189,7 +194,7 @@ class LibraryController extends AjaxControllerWithIdentityAction
         }
 
         // just created => no categories => no colors => [] passed as colors
-        $pdfCard = new PdfCardModel($pdfFileRecord->name, $pdfFileRecord->bookmark, $pdfFileRecord->slug, []);
+        $pdfCard = new PdfCardModel($pdfFileRecord->id, $pdfFileRecord->name, $pdfFileRecord->bookmark, $pdfFileRecord->slug, [], $pdfFileRecord->is_abandoned);
         $newFileModel = new NewFileModel();
         $addedPdfModel = new AddedPdfModel($pdfFileRecord->name, $pdfFileRecord->id);
         return $this->createSuccessfulUploadFileForm($newFileModel, $pdfCard, $addedPdfModel);
@@ -233,5 +238,35 @@ class LibraryController extends AjaxControllerWithIdentityAction
         // keep picked category (because it can be assigned further again (i was intuitively willing to assign all books with one category, then for another)), but reset pdf id
         $assignCategoryModel->pdfFileId = null;
         return $this->createCategoryAssigningResponse(true, $assignCategoryModel);
+    }
+
+    public function actionAbandonPdfFile()
+    {
+        $this->ResponseFormatJson();
+
+        $abandonPdfFileModel = new AbandonPdfFileModel;
+        if (!$abandonPdfFileModel->load(Yii::$app->request->post(), '')) {
+            // TODO test
+            return $this->createPdfFileAbandoningResponse(false, $abandonPdfFileModel, '', 'Lack of data');
+        }
+
+        $pdfFile = PdfFileRecord::findOne(['id' => $abandonPdfFileModel->pdfFileId]);
+        if ($pdfFile === null) {
+            // TODO test
+            return $this->createPdfFileAbandoningResponse(false, $abandonPdfFileModel, '', 'Pdf file not found');
+        }
+
+        $pdfFile->is_abandoned = true;
+        if ($pdfFile->save()) {
+            // TODO test
+            return $this->createPdfFileAbandoningResponse(true, $abandonPdfFileModel, '', 'Failed to save');
+        } else {
+            return $this->createPdfFileAbandoningResponse(false, $abandonPdfFileModel, '', 'Failed to save');
+        }
+
+    }
+
+    protected function createPdfFileAbandoningResponse(bool $success) {
+        return new AbandonPdfFileResponse($success);
     }
 }

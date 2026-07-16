@@ -90,6 +90,9 @@ const mapSpecialActionAfterRequest = {
         secondaryPageElements.assignCategoryForm.innerHTML = data.newForm;
         alert(data.categoryAssigned ? 'successfully assigned' : 'failed to assign');
     },
+    '/abandon-pdf-file': () => {
+        // TODO
+    },
 };
 
 function AddOptionToSelect(selectorId, { id, name }) {

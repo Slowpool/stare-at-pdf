@@ -19,6 +19,7 @@ return [
     'upload-pdf' => 'library/create-pdf-file',
     'add-new-category' => 'library/create-new-category',
     'assign-category' => 'library/create-pdf-file-category-entry',
+    'abandon-pdf-file' => 'library/abandon-pdf-file',
     // identity
     'logout' => 'identity/logout',
     'login' => 'identity/login-form',

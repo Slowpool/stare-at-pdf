@@ -17,6 +17,7 @@ use yii\db\Expression;
  * @property int $bookmark
  * @property int $user_id
  * @property Expression|string $slug
+ * @property boolean $is_abandoned
  *
  * @property UserRecord $user
  */
@@ -41,6 +42,7 @@ class PdfFileRecord extends ActiveRecord
         // still not sure that default values should be set this way
         $record->bookmark = 1;
         // $record->slug = new Expression("SLUGIFICATE(:name)", [':name' => $fileName]);
+        $record->is_abandoned = false;
         return $record;
     }
 
@@ -60,9 +62,10 @@ class PdfFileRecord extends ActiveRecord
         return [
             // TODO should slug be safe?
             [['id', 'name', 'bookmark', 'user_id', 'slug'], 'safe'],
-            [['name', 'user_id', 'slug'], 'required'],
+            [['name', 'user_id', 'slug', 'is_abandoned'], 'required'],
             [['bookmark', 'user_id'], 'integer'],
             [['name'], 'string', 'max' => 150],
+            [['is_abandoned'], 'boolean'],
             [
                 ['user_id', 'name'],
                 'unique',
@@ -131,7 +134,7 @@ class PdfFileRecord extends ActiveRecord
     }
 
     /** @return array Pdf files of current user, ordered by id. */
-    public static function getFilesOfUserAsArray($includeCategories = false, $fieldsToSelect = ['id', 'slug', 'name', 'bookmark', 'user_id']): array
+    public static function getFilesOfUserAsArray($includeCategories = false, $fieldsToSelect = ['id', 'slug', 'name', 'bookmark', 'user_id', 'is_abandoned']): array
     {
         for ($i = 0; $i < sizeof($fieldsToSelect); $i++) {
             $fieldsToSelect[$i] = 'pf.' . $fieldsToSelect[$i];
