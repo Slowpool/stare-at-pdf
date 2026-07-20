@@ -93,6 +93,9 @@ const mapSpecialActionAfterRequest = {
     '/abandon-pdf-file': () => {
         // TODO
     },
+    '/complete-pdf-file': () => {
+        // TODO
+    },
 };
 
 function AddOptionToSelect(selectorId, { id, name }) {

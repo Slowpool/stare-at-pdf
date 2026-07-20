@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\jsonResponses\CompletePdfFileResponse;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -27,6 +28,7 @@ use app\models\library\NewFileModel;
 use app\models\library\NewCategoryModel;
 use app\models\library\AssignCategoryModel;
 use app\models\library\AddedCategoryModel;
+use app\models\library\CompletePdfFileModel;
 use app\models\library\LibraryModel;
 
 class LibraryController extends AjaxControllerWithIdentityAction
@@ -140,7 +142,7 @@ class LibraryController extends AjaxControllerWithIdentityAction
             // should be in automapper-like class
             $pdfCards = [];
             foreach ($pdfFiles as $pdfFile) {
-                $pdfCards[] = new PdfCardModel($pdfFile['id'], $pdfFile['name'], $pdfFile['bookmark'], $pdfFile['slug'], array_column($pdfFile['categories'], 'color'), $pdfFile['is_abandoned']);
+                $pdfCards[] = new PdfCardModel($pdfFile['id'], $pdfFile['name'], $pdfFile['bookmark'], $pdfFile['slug'], array_column($pdfFile['categories'], 'color'), $pdfFile['is_abandoned'], $pdfFile['is_completed']);
             }
             $newFileModel = new NewFileModel();
             $newCategoryModel = new NewCategoryModel();
@@ -194,7 +196,7 @@ class LibraryController extends AjaxControllerWithIdentityAction
         }
 
         // just created => no categories => no colors => [] passed as colors
-        $pdfCard = new PdfCardModel($pdfFileRecord->id, $pdfFileRecord->name, $pdfFileRecord->bookmark, $pdfFileRecord->slug, [], $pdfFileRecord->is_abandoned);
+        $pdfCard = new PdfCardModel($pdfFileRecord->id, $pdfFileRecord->name, $pdfFileRecord->bookmark, $pdfFileRecord->slug, [], $pdfFileRecord->is_abandoned, $pdfFileRecord->is_completed);
         $newFileModel = new NewFileModel();
         $addedPdfModel = new AddedPdfModel($pdfFileRecord->name, $pdfFileRecord->id);
         return $this->createSuccessfulUploadFileForm($newFileModel, $pdfCard, $addedPdfModel);
@@ -266,7 +268,39 @@ class LibraryController extends AjaxControllerWithIdentityAction
 
     }
 
-    protected function createPdfFileAbandoningResponse(bool $success) {
+    protected function createPdfFileAbandoningResponse(bool $success)
+    {
         return new AbandonPdfFileResponse($success);
+    }
+
+    public function actionCompletePdfFile()
+    {
+        $this->ResponseFormatJson();
+
+        $completePdfFileModel = new CompletePdfFileModel;
+        if (!$completePdfFileModel->load(Yii::$app->request->post(), '')) {
+            // TODO test
+            return $this->createPdfFileCompletingResponse(false, $completePdfFileModel, '', 'Lack of data');
+        }
+
+        $pdfFile = PdfFileRecord::findOne(['id' => $completePdfFileModel->pdfFileId]);
+        if ($pdfFile === null) {
+            // TODO test
+            return $this->createPdfFileCompletingResponse(false, $completePdfFileModel, '', 'Pdf file not found');
+        }
+
+        $pdfFile->is_completed = true;
+        if ($pdfFile->save()) {
+            // TODO test
+            return $this->createPdfFileCompletingResponse(true, $completePdfFileModel, '', 'Failed to save');
+        } else {
+            return $this->createPdfFileCompletingResponse(false, $completePdfFileModel, '', 'Failed to save');
+        }
+
+    }
+
+    protected function createPdfFileCompletingResponse(bool $success)
+    {
+        return new CompletePdfFileResponse($success);
     }
 }

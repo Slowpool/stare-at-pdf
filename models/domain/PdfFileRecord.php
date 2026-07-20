@@ -18,6 +18,7 @@ use yii\db\Expression;
  * @property int $user_id
  * @property Expression|string $slug
  * @property boolean $is_abandoned
+ * @property boolean $is_completed
  *
  * @property UserRecord $user
  */
@@ -43,6 +44,7 @@ class PdfFileRecord extends ActiveRecord
         $record->bookmark = 1;
         // $record->slug = new Expression("SLUGIFICATE(:name)", [':name' => $fileName]);
         $record->is_abandoned = false;
+        $record->is_completed = false;
         return $record;
     }
 
@@ -62,10 +64,10 @@ class PdfFileRecord extends ActiveRecord
         return [
             // TODO should slug be safe?
             [['id', 'name', 'bookmark', 'user_id', 'slug'], 'safe'],
-            [['name', 'user_id', 'slug', 'is_abandoned'], 'required'],
+            [['name', 'user_id', 'slug', 'is_abandoned', 'is_completed'], 'required'],
             [['bookmark', 'user_id'], 'integer'],
             [['name'], 'string', 'max' => 150],
-            [['is_abandoned'], 'boolean'],
+            [['is_abandoned', 'is_completed'], 'boolean'],
             [
                 ['user_id', 'name'],
                 'unique',
@@ -134,7 +136,7 @@ class PdfFileRecord extends ActiveRecord
     }
 
     /** @return array Pdf files of current user, ordered by id. */
-    public static function getFilesOfUserAsArray($includeCategories = false, $fieldsToSelect = ['id', 'slug', 'name', 'bookmark', 'user_id', 'is_abandoned']): array
+    public static function getFilesOfUserAsArray($includeCategories = false, $fieldsToSelect = ['id', 'slug', 'name', 'bookmark', 'user_id', 'is_abandoned', 'is_completed']): array
     {
         for ($i = 0; $i < sizeof($fieldsToSelect); $i++) {
             $fieldsToSelect[$i] = 'pf.' . $fieldsToSelect[$i];

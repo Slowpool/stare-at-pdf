@@ -1,0 +1,16 @@
+Array
+(
+    [here we are] => Array
+        (
+            [_csrf] => H7L3HB6s74vDJl3TLX8NuDtXzKrVOAqJ5yCuJ2O0aSFbxaMoVu_fzvoWBbdiSXzbchmlh4xCc-GDR-ZRBcchcw==
+            [pdfFileId] => 46
+        )
+
+    [date] => DateTime Object
+        (
+            [date] => 2026-07-16 09:11:31.411984
+            [timezone_type] => 3
+            [timezone] => UTC
+        )
+
+)

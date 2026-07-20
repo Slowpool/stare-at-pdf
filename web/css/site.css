@@ -200,6 +200,24 @@ li.abandoned::before {
     inset: 0;
     pointer-events: none;
     background-image:
-        linear-gradient(to bottom left, transparent 45%, #2d6a2d 45%, #2d6a2d 55%, transparent 55%),
-        linear-gradient(to top left, transparent 45%, #2d6a2d 45%, #2d6a2d 55%, transparent 55%);
+        linear-gradient(to bottom left, transparent 45%, #ff0000 45%, #ff0000 55%, transparent 5%),
+        linear-gradient(to top left, transparent 45%, #ff0000 45%, #ff0000 55%, transparent 55%),
+        linear-gradient(to bottom left, transparent 43%, #820000 43%, #820000 57%, transparent 57%),
+        linear-gradient(to top left, transparent 43%, #820000 43%, #820000 57%, transparent 57%);
+}
+
+li.completed {
+    position: relative;
+}
+
+li.completed::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+        linear-gradient(to bottom left, transparent 46%, #00ff00 46%, #00ff00 54%, transparent 54%),
+        linear-gradient(to top left, transparent 46%, #00ff00 46%, #00ff00 54%, transparent 54%),
+        linear-gradient(to bottom left, transparent 43%, #0b4207 43%, #0b4207 57%, transparent 57%),
+        linear-gradient(to top left, transparent 43%, #0b4207 43%, #0b4207 57%, transparent 57%);
 }

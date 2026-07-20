@@ -1,5 +1,7 @@
 services:
   php-app:
+    container_name:
+      'stare-at-pdf-app'
     image: yiisoftware/yii2-php:8.3-apache
     environment:
       DB_HOST: ${DB_HOST}
@@ -8,13 +10,22 @@ services:
     volumes:
       - ~/.composer-docker/cache:/root/.composer/cache:delegated
       - ./:/app:delegated
+      - ./php-ini:/usr/local/etc/php:delegated
     ports:
       - '${APP_PORT}:80'
-  # uncomment it if you don't have db
+    networks:
+      - mysql
+
+networks:
+  mysql:
+    external: true
+
   # mysql-db:
   #   image: mysql:8.0
+  #   # volume: 'test_db'
   #   environment:
   #     MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
   #     MYSQL_DATABASE: 'stare_at_pdf'
   #   # ports:
   #     # - '3306:3306'
+

@@ -579,22 +579,22 @@ report_memleaks = On
 ; Note: Never use this feature for production boxes.
 ; https://php.net/docref-root
 ; Examples
-docref_root = https://www.php.net/manual/en/
+;docref_root = "/phpmanual/"
 
 ; https://php.net/docref-ext
-docref_ext = .php
+;docref_ext = .html
 
 ; String to output before an error message. PHP's default behavior is to leave
 ; this setting blank.
 ; https://php.net/error-prepend-string
 ; Example:
-error_prepend_string = "<div style='color:#e74c3c;margin:20px 0px 20px 0px;padding:0px 10px 20px 10px;border:solid 1px #e74c3c;border-radius:4px;'>"
+;error_prepend_string = "<span style='color: #ff0000'>"
 
 ; String to output after an error message. PHP's default behavior is to leave
 ; this setting blank.
 ; https://php.net/error-append-string
 ; Example:
-error_append_string = "</div>"
+;error_append_string = "</span>"
 
 ; Log errors to specified file. PHP's default behavior is to leave this value
 ; empty.
@@ -708,7 +708,7 @@ auto_globals_jit = On
 ; Its value may be 0 to disable the limit. It is ignored if POST data reading
 ; is disabled through enable_post_data_reading.
 ; https://php.net/post-max-size
-post_max_size = 1000M
+post_max_size = 8M
 
 ; Automatically add files before PHP document.
 ; https://php.net/auto-prepend-file
@@ -775,7 +775,7 @@ user_dir =
 ; https://php.net/extension-dir
 ;extension_dir = "./"
 ; On windows:
-extension_dir = "C:\EasyPHP-Devserver-17\eds-binaries\php\php833vs16x64x241124123054\ext"
+;extension_dir = "ext"
 
 ; Directory where the temporary files should be placed.
 ; Defaults to the system default (see sys_get_temp_dir)
@@ -860,10 +860,10 @@ file_uploads = On
 
 ; Maximum allowed size for uploaded files.
 ; https://php.net/upload-max-filesize
-upload_max_filesize = 1000M ; 1GB
+upload_max_filesize = 2M
 
 ; Maximum number of files that can be uploaded via a single request
-max_file_uploads = 5
+max_file_uploads = 20
 
 ;;;;;;;;;;;;;;;;;;
 ; Fopen wrappers ;
@@ -927,26 +927,31 @@ default_socket_timeout = 60
 ;   extension folders as well as the separate PECL DLL download.
 ;   Be sure to appropriately set the extension_dir directive.
 ;
-extension=bz2
-extension=curl
+;extension=bz2
+
+; The ldap extension must be before curl if OpenSSL 1.0.2 and OpenLDAP is used
+; otherwise it results in segfault when unloading after using SASL.
+; See https://github.com/php/php-src/issues/8620 for more info.
+;extension=ldap
+
+;extension=curl
 ;extension=ffi
 ;extension=ftp
-extension=fileinfo
-extension=gd
-extension=gettext
+;extension=fileinfo
+;extension=gd
+;extension=gettext
 ;extension=gmp
 ;extension=intl
 ;extension=imap
-;extension=ldap
-extension=mbstring
-extension=exif      ; Must be after mbstring as it depends on it
-extension=mysqli
+;extension=mbstring
+;extension=exif      ; Must be after mbstring as it depends on it
+;extension=mysqli
 ;extension=oci8_12c  ; Use with Oracle Database 12c Instant Client
 ;extension=oci8_19  ; Use with Oracle Database 19 Instant Client
 ;extension=odbc
-extension=openssl
+;extension=openssl
 ;extension=pdo_firebird
-extension=pdo_mysql
+;extension=pdo_mysql
 ;extension=pdo_oci
 ;extension=pdo_odbc
 ;extension=pdo_pgsql
@@ -959,13 +964,14 @@ extension=pdo_mysql
 ;extension=snmp
 
 ;extension=soap
-extension=sockets
+;extension=sockets
 ;extension=sodium
 ;extension=sqlite3
 ;extension=tidy
 ;extension=xsl
+;extension=zip
 
-
+;zend_extension=opcache
 
 ;;;;;;;;;;;;;;;;;;;
 ; Module Settings ;
@@ -978,7 +984,7 @@ cli_server.color = On
 [Date]
 ; Defines the default timezone used by the date functions
 ; https://php.net/date.timezone
-date.timezone = Europe/Moscow
+;date.timezone =
 
 ; https://php.net/date.default-latitude
 ;date.default_latitude = 31.7667

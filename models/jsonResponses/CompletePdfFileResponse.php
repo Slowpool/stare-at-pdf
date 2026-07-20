@@ -2,12 +2,12 @@
 
 namespace app\models\jsonResponses;
 
-class AbandonPdfFileResponse extends JsonResponse
+class CompletePdfFileResponse extends JsonResponse
 {
     public bool $success;
     public function __construct($success)
     {
-        $this->responseType = 'abandon pdf file result';
+        $this->responseType = 'complete pdf file result';
 
         $this->success = $success;
     }

@@ -12,9 +12,13 @@ use yii\bootstrap5\ActiveForm;
 
 /** @param PdfCardModel $pdfCard */
 
+$pdfCardId = $pdfCard['id'];
+
 $class = 'pdf-file-card';
 if ($pdfCard['isAbandoned']) {
     $class .= ' abandoned';
+} else if ($pdfCard['isCompleted']) {
+    $class .= ' completed';
 }
 
 // TODO despite to being implemented via array, view displayes a single color. (i don't know yet what to do with several colors. divide card on several parts with different colors? weird?)
@@ -31,10 +35,19 @@ $style = !empty($pdfCard['backgroundColors'])
     <?= " " . Html::encode($pdfCard->bookmark) . " p."; ?>
 </span>
 
-<?php $form = ActiveForm::begin(['action' => '/abandon-pdf-file', 'options' => ['id' => 'abandon-pdf-file-form', 'class' => 'ajax-action']]) ?>
-<input id="pdfFileId" name="pdfFileId" type="hidden" value="<?= $pdfCard->id ?>">
+
+<?php $form = ActiveForm::begin(['action' => '/abandon-pdf-file', 'options' => ['id' => "abandon-pdf-file-form$pdfCardId", 'class' => 'ajax-action']]) ?>
+<input id="pdfFileId" name="pdfFileId" type="hidden" value="<?= $pdfCardId ?>">
 
 <?= Html::submitButton('Abandon') ?>
 <?php ActiveForm::end() ?>
+
+
+<?php $form = ActiveForm::begin(['action' => '/complete-pdf-file', 'options' => ['id' => "complete-pdf-file-form$pdfCardId", 'class' => 'ajax-action']]) ?>
+<input id="pdfFileId" name="pdfFileId" type="hidden" value="<?= $pdfCardId ?>">
+
+<?= Html::submitButton('Complete') ?>
+<?php ActiveForm::end() ?>
+
 
 <?= Html::endTag('li'); ?>
